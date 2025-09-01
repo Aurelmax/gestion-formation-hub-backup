@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programme de formation - Créer et gérer un site WordPress & Stratégie de contenu Inbound Marketing</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            color: #374151;
+            padding: 1.5rem;
+            max-width: 210mm;
+            margin: 0 auto;
+            background-color: #ffffff;
+            font-size: 0.9rem;
+        }
+        
+        .header {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        
+        .header-content {
+            flex-grow: 1;
+        }
+        
+        .logo {
+            max-height: 70px;
+            max-width: 150px;
+            margin-bottom: 0;
+            object-fit: contain;
+        }
+        
+        h1 {
+            font-size: 1.6rem;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            font-size: 1.3rem;
+            color: #2563eb;
+            margin-bottom: 0.75rem;
+            margin-top: 1.25rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        
+        h3 {
+            font-size: 1.1rem;
+            color: #1e40af;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        h4 {
+            font-size: 1rem;
+            color: #1d4ed8;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 0.75rem;
+            max-width: 100%;
+            line-height: 1.4;
+        }
+        
+        ul, ol {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.25rem;
+            line-height: 1.4;
+        }
+        
+        .info-block {
+            background-color: #f8fafc;
+            border-radius: 4px;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        .info-row {
+            margin-bottom: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: baseline;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #1e40af;
+            min-width: 120px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #6b7280;
+        }
+        
+        .badge-blue {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-green {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge-yellow {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+        
+        .badge-red {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .section {
+            margin-bottom: 1rem;
+            break-inside: auto;
+            padding-bottom: 0.25rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .jour {
+            margin-bottom: 1rem;
+            background-color: #f9fafb;
+            padding: 0.75rem;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .jour-title {
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 0.75rem;
+            font-size: 1.125rem;
+        }
+
+        .session {
+            margin-bottom: 0.75rem;
+            padding-left: 0.75rem;
+            border-left: 1px solid #e5e7eb;
+            margin-top: 0.5rem;
+        }
+
+        .session-title {
+            font-weight: 600;
+            color: #2563eb;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .module {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.25rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                font-size: 9pt;
+            }
+            
+            @page {
+                margin: 1cm;
+                size: A4 portrait;
+            }
+            
+            h1 { font-size: 14pt; }
+            h2 { font-size: 12pt; }
+            h3 { font-size: 11pt; }
+            h4 { font-size: 10pt; }
+            
+            .jour {
+                break-inside: auto;
+            }
+            
+            .info-block {
+                break-inside: avoid;
+            }
+            
+            a {
+                text-decoration: none;
+                color: #1e40af;
+            }
+            
+            p, li {
+                line-height: 1.3;
+            }
+            
+            .section:nth-child(even) {
+                background-color: transparent;
+                padding: 0;
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+        
+        footer {
+            margin-top: 1.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        
+        .footer-info {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        
+        /* Optimisation des sections avec un style plus compact */
+        .section:nth-child(even) {
+            background-color: #fafafa;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-left: -0.5rem;
+            margin-right: -0.5rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Programme de formation</h1>
+            <h2>Créer et gérer un site WordPress & Stratégie de contenu Inbound Marketing</h2>
+        </div>
+        <img src="../logo-gestionmax-antibes.png" alt="GestionMax Logo" class="logo" />
+    </div>
+
+    <div class="info-block">
+        <div class="info-row">
+            <div class="info-label">Code :</div>
+            <div>A010-WP-IM</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Version :</div>
+            <div>1</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Date :</div>
+            <div>25/11/24</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Prérequis :</div>
+            <div>Maîtriser son environnement et les fonctions de base pour utiliser un ordinateur.</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Public concerné :</div>
+            <div>Artisans, commerçants ou professions libérales.</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Durée :</div>
+            <div>21 heures ou 3 jours</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Horaires :</div>
+            <div>9h à 13h et de 14h à 17h</div>
+        </div>
+    </div>
+
+    <section class="section">
+        <h2>Objectifs pédagogiques</h2>
+        <p>A la fin de la formation, l'apprenant(e) devra être capable de :</p>
+        
+        <div class="jour">
+            <div class="jour-title">Jour 1</div>
+            <p>Créer et gérer un site WordPress de manière autonome, avec une maîtrise des bases techniques et des fonctionnalités essentielles.</p>
+        </div>
+        
+        <div class="jour">
+            <div class="jour-title">Jour 2</div>
+            <p>Comprendre les principes de l'Inbound Marketing et élaborer une stratégie de contenu performante.</p>
+        </div>
+
+        <div class="jour">
+            <div class="jour-title">Jour 3</div>
+            <p>Mettre en place des outils et méthodes pour attirer, convertir et fidéliser une audience en ligne.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Programme détaillé</h2>
+        
+        <div class="jour">
+            <h3>Jour 1 : Découverte et prise en main de WordPress (7 heures)</h3>
+            
+            <div class="session">
+                <h4>Matin (9h - 13h)</h4>
+                
+                <div class="module">
+                    <div class="session-title">1. Introduction à WordPress</div>
+                    <ul>
+                        <li>Qu'est-ce que WordPress ? Ses avantages pour la création de sites web.</li>
+                        <li>Présentation des fonctionnalités principales : pages, articles, médias.</li>
+                        <li>Installation et configuration initiale : choix d'un hébergeur, installation de WordPress.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">2. Premiers pas sur WordPress</div>
+                    <ul>
+                        <li>Configuration de base : permaliens, fuseau horaire, langue.</li>
+                        <li>Création des premières pages : Accueil, À propos, Contact.</li>
+                        <li>Gestion des menus de navigation et des widgets.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h - 17h)</h4>
+                
+                <div class="module">
+                    <div class="session-title">3. Personnalisation de l'apparence du site</div>
+                    <ul>
+                        <li>Choisir et installer un thème adapté à son activité.</li>
+                        <li>Introduction au Customizer : typographies, couleurs, mise en page.</li>
+                        <li>Introduction à l'éditeur Gutenberg : ajouter et organiser des blocs.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">4. Ajout de fonctionnalités essentielles</div>
+                    <ul>
+                        <li>Installer des plugins indispensables : SEO, sécurité, formulaires de contact.</li>
+                        <li>Premiers réglages pour la sécurité et les sauvegardes.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="jour">
+            <h3>Jour 2 : Bases de l'Inbound Marketing et stratégie de contenu (7 heures)</h3>
+            
+            <div class="session">
+                <h4>Matin (9h - 13h)</h4>
+                
+                <div class="module">
+                    <div class="session-title">1. Introduction à l'Inbound Marketing</div>
+                    <ul>
+                        <li>Qu'est-ce que l'Inbound Marketing ? Principes et avantages.</li>
+                        <li>Comprendre le parcours client : de l'attraction à la fidélisation.</li>
+                        <li>Définir ses objectifs de contenu : trafic, conversion, engagement.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">2. Création de personas</div>
+                    <ul>
+                        <li>Identifier son audience cible : qui sont vos clients potentiels ?</li>
+                        <li>Définir les besoins, attentes et comportements des personas.</li>
+                        <li>Élaborer des contenus adaptés à chaque étape du parcours client.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h - 17h)</h4>
+                
+                <div class="module">
+                    <div class="session-title">3. Planification et création de contenu</div>
+                    <ul>
+                        <li>Choisir les types de contenu : articles de blog, vidéos, infographies, études de cas.</li>
+                        <li>Introduction à la recherche de mots-clés pour le SEO.</li>
+                        <li>Création d'un calendrier éditorial : fréquence, sujets, canaux.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">4. Optimisation des contenus pour le SEO</div>
+                    <ul>
+                        <li>Rédiger des titres accrocheurs et optimiser les balises (title, meta description).</li>
+                        <li>Structurer les contenus avec des balises HTML (H1, H2, H3).</li>
+                        <li>Insérer des appels à l'action (CTA) pour inciter à l'engagement.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="jour">
+            <h3>Jour 3 : Mise en pratique avec la présentation des outils pour débutant (7 heures)</h3>
+            
+            <div class="session">
+                <h4>Matin (9h - 13h)</h4>
+                
+                <div class="module">
+                    <div class="session-title">1. Mise en œuvre de la stratégie de contenu sur WordPress</div>
+                    <ul>
+                        <li>Publier un article optimisé pour le SEO avec Gutenberg.</li>
+                        <li>Ajouter des images, des vidéos et des liens internes/externes.</li>
+                        <li>Introduction aux outils de suivi d'impact du contenu (Google Analytics VS Matomo).</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">2. Stratégie de diffusion des contenus</div>
+                    <ul>
+                        <li>Planifier et partager des contenus sur les réseaux sociaux.</li>
+                        <li>Découverte de plateformes comme Buffer ou Hootsuite pour gérer les publications.</li>
+                        <li>Introduction aux automatisations de campagnes avec Brevo.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h - 17h)</h4>
+                
+                <div class="module">
+                    <div class="session-title">3. Fidélisation et suivi des performances</div>
+                    <ul>
+                        <li>Introduction aux techniques pour convertir les visiteurs en leads qualifiés (e-books, newsletters).</li>
+                        <li>Introduction aux indicateurs de performance (taux de clics, engagement, conversions).</li>
+                        <li>Ajuster la stratégie en fonction des données collectées.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">4. Quiz de fin de formation et mise en pratique</div>
+                    <ul>
+                        <li>Quiz pour valider les connaissances acquises.</li>
+                        <li>Ateliers pratiques pour consolider les compétences : création d'un article, planification d'une campagne.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Informations complémentaires</h2>
+        
+        <h3>Modalités et délais d'accès</h3>
+        <p>A réception de votre accord de prise en charge pour les professionnels.</p>
+        
+        <h3>Tarif de la formation</h3>
+        <p>Le tarif de la formation s'élève à 1470€ Nets de taxes Art-293 du CGI.</p>
+        
+        <h3>Modalités de règlement</h3>
+        <p>Chèque ou virement à réception de facture.</p>
+        
+        <h3>Contact de l'organisme, référent pédagogique, référent qualité</h3>
+        <p>L'apprenant(e) recevra un soutien continu de la part du formateur tout au long de sa formation. Pendant toute la durée du programme, chaque stagiaire pourra le contacter par courriel à l'adresse aurelien@gestionmax.fr ou par téléphone/SMS au 06.46.02.24.68.</p>
+        
+        <h3>Modalités techniques et pédagogiques</h3>
+        <p>Formation en présentiel individuel (méthode expositive et démonstrative) avec alternance d'exposés théoriques et de cas pratiques. Cette méthode permet de varier les modes d'apprentissage pour favoriser l'acquisition des connaissances et des compétences. Les exposés théoriques permettent de présenter les concepts et les principes fondamentaux sur Brevo, tandis que les cas pratiques permettent de mettre en application ces notions dans des situations concrètes. Cette alternance permet de favoriser l'engagement de l'apprenant(e) dans leur propre processus d'apprentissage en leur donnant des occasions d'appliquer directement ce qu'ils ont appris. Cette méthode est particulièrement adaptée pour les formations professionnelles qui ont pour objectif de développer des compétences pratiques chez les apprenants notamment les adultes.</p>
+        
+        <h3>Formateur</h3>
+        <p>Aurélien Lavayssière, consultant formateur spécialisé en digitalisation de la relation client et expert du CMS WordPress, accompagne les professionnels dans leur transition digitale. Fort d'une solide expérience en formation des adultes, il propose des formations axées sur des outils pratiques pour améliorer la gestion de la présence en ligne et l'efficacité des stratégies de contenu.</p>
+        
+        <h3>L'organisme de formation mettra à disposition de l'apprenant(e)</h3>
+        <p>Sa salle de formation équipée de son matériel informatique haut de gamme connectée à internet, afin de pouvoir aisément garantir le bon déroulement de la formation du point de vue pédagogique et technique. Un support de cours (Projet et ressources téléchargeables sur Notion, un hébergement Web, quizz, fiches pratiques).</p>
+        
+        <h3>Modalités d'évaluation</h3>
+        <p>Afin de permettre d'évaluer les compétences acquises par l'apprenant(e), il lui sera demandé, à l'issue de chaque bloc de compétences, de se soumettre à un quizz d'une dizaine de questions par l'intermédiaire de notre plateforme d'évaluation en ligne EVALBOX. Grille d'analyse des compétences, travaux pratiques.</p>
+        
+        <h3>Sanction de la formation</h3>
+        <p>Un certificat de réalisation de formation. Une feuille d'émargement individuelle sera conjointement signée par le formateur et chaque stagiaire, pour chaque demi-journée de formation, permettant d'attester de l'exécution de l'action de formation.</p>
+        
+        <h3>Niveau/certification obtenue</h3>
+        <p>Aucune</p>
+        
+        <h3>Délai d'acceptation</h3>
+        <p>Mise en place de votre parcours de formation dès réception de votre acompte ou votre accord de prise en charge.</p>
+        
+        <h3>Accessibilité handicapée</h3>
+        <p>Votre organisme est engagé dans une démarche d'accueil et d'accompagnement en formation des personnes en situation de handicap. Dans ce cadre, je vous propose :</p>
+        <ul>
+            <li>Un entretien téléphonique pour vous accompagner individuellement,</li>
+            <li>D'évaluer vos besoins spécifiques au regard d'une situation de handicap,</li>
+            <li>De mettre en œuvre les adaptations pédagogiques, organisationnelles et matériels nécessaires.</li>
+        </ul>
+        <p>Référent handicap de l'organisme : Aurélien LAVAYSSIERE - aurelien@gestionmax.fr – 06.46.02.24.68</p>
+        
+        <h3>Cessation anticipée de la formation ou abandon en cours de formation</h3>
+        <ul>
+            <li>En cas de renonciation de l'apprenant(e) avant le début de la formation, aucune facturation.</li>
+            <li>En cas de renonciation en cours de formation, la facturation se fera au pro rata de l'assiduité de l'apprenant(e).</li>
+        </ul>
+    </section>
+           
+    <footer>
+        <div class="footer-info">
+            <strong>Aurélien LAVAYSSIERE - GESTIONMAX</strong>
+        </div>
+        <div class="footer-info">
+            Les vergers de Valconstance - 300 chemin de la suquette - 06600 Antibes
+        </div>
+        <div class="footer-info">
+            Siret : 483 797 213 00061
+        </div>
+    </footer>
+</body>
+</html>

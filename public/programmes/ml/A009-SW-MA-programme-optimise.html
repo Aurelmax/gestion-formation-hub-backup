@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programme de formation - Gestion de la sécurité (WordPress) + Techniques d'analyse statistique Web avec Matomo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.35;
+            color: #374151;
+            padding: 1.25rem;
+            max-width: 210mm;
+            margin: 0 auto;
+            background-color: #ffffff;
+            font-size: 0.85rem;
+        }
+        
+        .header {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        
+        .header-content {
+            flex-grow: 1;
+        }
+        
+        .logo {
+            max-height: 60px;
+            max-width: 130px;
+            margin-bottom: 0;
+            object-fit: contain;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: #1e3a8a;
+            margin-bottom: 0.3rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        
+        h2 {
+            font-size: 1.2rem;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+            margin-top: 1rem;
+            font-weight: 600;
+            line-height: 1.1;
+        }
+        
+        h3 {
+            font-size: 1rem;
+            color: #1e40af;
+            margin-top: 0.75rem;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+        }
+        
+        h4 {
+            font-size: 0.95rem;
+            color: #1d4ed8;
+            margin-top: 0.5rem;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 0.5rem;
+            max-width: 100%;
+            line-height: 1.35;
+        }
+        
+        ul, ol {
+            margin-bottom: 0.5rem;
+            padding-left: 1.25rem;
+        }
+        
+        li {
+            margin-bottom: 0.2rem;
+            line-height: 1.35;
+        }
+        
+        .info-block {
+            background-color: #f8fafc;
+            border-radius: 4px;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 0.75rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 0.4rem;
+            align-items: baseline;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #1e40af;
+            min-width: 95px;
+            margin-right: 0.25rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            margin-right: 0.4rem;
+            margin-bottom: 0.4rem;
+            color: #6b7280;
+        }
+        
+        .badge-blue {
+            background-color: #eff6ff;
+            color: #1e40af;
+        }
+        
+        .badge-green {
+            background-color: #f0fdf4;
+            color: #166534;
+        }
+        
+        .footer {
+            margin-top: 2rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .section {
+            margin-bottom: 0.75rem;
+            break-inside: auto;
+            padding-bottom: 0.2rem;
+        }
+
+        .section-title {
+            background-color: #e0e7ff;
+            padding: 0.4rem 0.75rem;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 0.75rem;
+        }
+
+        .jour {
+            margin-bottom: 0.75rem;
+            background-color: #f9fafb;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .jour-title {
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .session {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+        }
+
+        .module {
+            margin-bottom: 0.5rem;
+        }
+
+        .session-title {
+            font-weight: 500;
+            color: #1e40af;
+            margin-bottom: 0.3rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        th, td {
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        @media print {
+            body {
+                padding: 0.75rem;
+                font-size: 9pt;
+            }
+            
+            @page {
+                margin: 0.8cm;
+                size: A4 portrait;
+            }
+            
+            h1 {
+                font-size: 14pt;
+            }
+            
+            h2 {
+                font-size: 12pt;
+            }
+            
+            h3 {
+                font-size: 11pt;
+            }
+            
+            h4 {
+                font-size: 10pt;
+            }
+            
+            .footer {
+                position: running(footer);
+                margin-top: 1rem;
+            }
+            
+            @page {
+                @bottom-center {
+                    content: element(footer);
+                }
+            }
+            
+            .pagebreak {
+                page-break-before: always;
+            }
+        }
+        
+        footer {
+            margin-top: 1.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        
+        .footer-info {
+            margin-bottom: 0.3rem;
+            line-height: 1.35;
+        }
+        
+        .two-columns {
+            column-count: 2;
+            column-gap: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .compact-list li {
+            margin-bottom: 0.15rem;
+        }
+        
+        .compact-section {
+            margin-bottom: 0.5rem;
+        }
+        
+        .highlight-box {
+            background-color: #eff6ff;
+            border-left: 3px solid #3b82f6;
+            padding: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Programme de formation</h1>
+            <h2>Gestion de la sécurité (WordPress) + Techniques d'analyse statistique Web avec Matomo</h2>
+        </div>
+        <img src="../logo-gestionmax-antibes.png" alt="GestionMax Logo" class="logo" />
+    </div>
+
+    <div class="info-block">
+        <div>
+            <div class="info-row">
+                <div class="info-label">Version :</div>
+                <div>1</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Date :</div>
+                <div>12/08/2025</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Code :</div>
+                <div>A009-SW-MA</div>
+            </div>
+        </div>
+        <div>
+            <div class="info-row">
+                <div class="info-label">Durée :</div>
+                <div>14h (2 jours)</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Horaires :</div>
+                <div>9h-13h / 14h-17h</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Tarif :</div>
+                <div>1200€ HT</div>
+            </div>
+        </div>
+        <div>
+            <div class="info-row">
+                <div class="info-label">Public :</div>
+                <div>TPE, artisans, commerçants</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Prérequis :</div>
+                <div>WordPress installé, bases web</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Modalité :</div>
+                <div>Présentiel / Distanciel</div>
+            </div>
+        </div>
+    </div>
+
+    <section class="section">
+        <h2>Objectifs pédagogiques</h2>
+        <p>A la fin de la formation, l'apprenant(e) devra être capable de :</p>
+        
+        <div class="two-columns compact-list">
+            <ul>
+                <li>Identifier les vulnérabilités potentielles d'un site WordPress</li>
+                <li>Mettre en place des procédures de sécurisation WordPress</li>
+                <li>Installer et configurer Matomo pour le suivi statistique des visiteurs</li>
+                <li>Analyser les données de fréquentation et comportements des utilisateurs</li>
+                <li>Établir un plan de sauvegarde et de restauration efficace</li>
+                <li>Configurer une stratégie d'analyse des performances web</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Programme détaillé</h2>
+        
+        <div class="jour">
+            <h3>Jour 1 : Gestion de la sécurité WordPress (7 heures)</h3>
+            
+            <div class="session">
+                <h4>Matin (9h - 13h)</h4>
+                <div class="module">
+                    <div class="session-title">1. Introduction à la sécurité WordPress</div>
+                    <ul class="compact-list">
+                        <li>Les menaces courantes qui ciblent WordPress (brute force, injections SQL, XSS)</li>
+                        <li>Impact des failles de sécurité sur votre site et votre activité</li>
+                        <li>Comprendre les vulnérabilités courantes des sites WordPress</li>
+                        <li>Auditer la sécurité actuelle de votre site et identifier les points faibles</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">2. Sécurisation de l'environnement WordPress</div>
+                    <ul class="compact-list">
+                        <li>Sécurisation des accès (FTP, base de données, administration)</li>
+                        <li>Bonnes pratiques pour les mots de passe et la gestion des utilisateurs</li>
+                        <li>Configuration du fichier .htaccess pour renforcer la sécurité</li>
+                        <li>Blocage des URL malicieuses</li>
+                        <li>Présentation d'un plugin tout-en-un pour sécuriser le site</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h - 17h)</h4>
+                <div class="module">
+                    <div class="session-title">3. Protection contre les attaques</div>
+                    <ul class="compact-list">
+                        <li>Configuration de pare-feu WordPress (WAF)</li>
+                        <li>Protection contre les attaques par force brute</li>
+                        <li>Sécurisation du formulaire de connexion</li>
+                        <li>Mise en place de l'authentification à deux facteurs</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">4. Sauvegardes et récupération</div>
+                    <ul class="compact-list">
+                        <li>Stratégies de sauvegarde (complètes vs différentielles)</li>
+                        <li>Automatisation des sauvegardes</li>
+                        <li>Stockage sécurisé des sauvegardes</li>
+                        <li>Procédures de restauration et tests</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="jour">
+            <h3>Jour 2 : Techniques d'analyse statistique Web avec Matomo (7 heures)</h3>
+            
+            <div class="session">
+                <h4>Matin (9h - 13h)</h4>
+                <div class="module">
+                    <div class="session-title">1. Introduction à Matomo</div>
+                    <ul class="compact-list">
+                        <li>Présentation de Matomo et comparaison avec Google Analytics</li>
+                        <li>Avantages de Matomo : protection des données, conformité RGPD</li>
+                        <li>Installation et configuration de Matomo sur WordPress</li>
+                        <li>Configuration du suivi des visiteurs</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">2. Configuration avancée de Matomo</div>
+                    <ul class="compact-list">
+                        <li>Paramétrage des objectifs et des conversions</li>
+                        <li>Configuration du suivi e-commerce</li>
+                        <li>Mise en place du tracking des événements</li>
+                        <li>Suivi des téléchargements et des liens sortants</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h - 17h)</h4>
+                <div class="module">
+                    <div class="session-title">3. Analyse des données avec Matomo</div>
+                    <ul class="compact-list">
+                        <li>Analyse du comportement des visiteurs sur le site</li>
+                        <li>Interprétation des statistiques de fréquentation</li>
+                        <li>Analyse des parcours de navigation et optimisation</li>
+                        <li>Identification des sources de trafic et de leur qualité</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">4. Rapports et optimisation</div>
+                    <ul class="compact-list">
+                        <li>Création de tableaux de bord personnalisés</li>
+                        <li>Configuration des rapports automatisés</li>
+                        <li>Analyse des performances de vitesse du site</li>
+                        <li>Utilisation des insights pour optimiser le site et la stratégie web</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Modalités pédagogiques</h2>
+        
+        <div class="two-columns">
+            <div>
+                <h3>Méthodes pédagogiques</h3>
+                <ul class="compact-list">
+                    <li>Apports théoriques et exercices pratiques</li>
+                    <li>Études de cas réels de failles de sécurité</li>
+                    <li>Travaux pratiques sur l'environnement WordPress</li>
+                    <li>Mise en situation d'audit et de configuration</li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3>Moyens techniques</h3>
+                <ul class="compact-list">
+                    <li>Environnement WordPress de test</li>
+                    <li>Accès à Matomo pour la pratique</li>
+                    <li>Support de formation et documentation</li>
+                    <li>Outils d'audit de sécurité</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <section class="section">
+        <h2>Informations complémentaires</h2>
+        
+        <div class="two-columns">
+            <div>
+                <h3>Évaluation</h3>
+                <p>Quizz en ligne via notre plateforme EVALBOX à l'issue de chaque bloc de compétences. Grille d'analyse des compétences et travaux pratiques.</p>
+                
+                <h3>Certification</h3>
+                <p>Certificat de réalisation de formation et feuille d'émargement individuelle.</p>
+                
+                <h3>Accessibilité handicap</h3>
+                <p>Formation accessible aux personnes en situation de handicap. Référent handicap : Aurélien LAVAYSSIERE - <a href="mailto:aurelien@gestionmax.fr">aurelien@gestionmax.fr</a> – 06.46.02.24.68</p>
+            </div>
+            
+            <div>
+                <h3>Formateur</h3>
+                <p>Aurélien LAVAYSSIERE, consultant formateur en informatique de gestion, spécialisé dans le CMS WordPress et l'analyse web.</p>
+                
+                <h3>Délai d'accès</h3>
+                <p>Mise en place de votre parcours de formation dès réception de votre acompte ou accord de prise en charge.</p>
+                
+                <h3>Cessation anticipée</h3>
+                <p>En cas de renonciation avant la formation : aucune facturation. En cours de formation : facturation au prorata de l'assiduité.</p>
+            </div>
+        </div>
+    </section>
+           
+    <footer>
+        <div class="footer-info">
+            <strong>Aurélien LAVAYSSIERE - GESTIONMAX</strong>
+        </div>
+        <div class="footer-info">
+            Les vergers de Valconstance - 300 chemin de la suquette - 06600 Antibes
+        </div>
+        <div class="footer-info">
+            Siret : 483 797 213 00061
+        </div>
+    </footer>
+</body>
+</html>

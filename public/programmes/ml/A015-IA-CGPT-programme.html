@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programme de formation - Génération de contenu avec ChatGPT + Automatisation Marketing</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            color: #374151;
+            padding: 1.5rem;
+            max-width: 210mm;
+            margin: 0 auto;
+            background-color: #ffffff;
+            font-size: 0.9rem;
+        }
+        
+        .header {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        
+        .header-content {
+            flex-grow: 1;
+        }
+        
+        .logo {
+            max-height: 70px;
+            max-width: 150px;
+            margin-bottom: 0;
+            object-fit: contain;
+        }
+        
+        h1 {
+            font-size: 1.6rem;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            font-size: 1.3rem;
+            color: #2563eb;
+            margin-bottom: 0.75rem;
+            margin-top: 1.25rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        
+        h3 {
+            font-size: 1.1rem;
+            color: #1e40af;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        h4 {
+            font-size: 1rem;
+            color: #1d4ed8;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 0.75rem;
+            max-width: 100%;
+            line-height: 1.4;
+        }
+        
+        ul, ol {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.25rem;
+            line-height: 1.4;
+        }
+        
+        .info-block {
+            background-color: #f8fafc;
+            border-radius: 4px;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        .info-row {
+            margin-bottom: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: baseline;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #1e40af;
+            min-width: 120px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #6b7280;
+        }
+        
+        .badge-blue {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-green {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge-yellow {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+        
+        .badge-red {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .section {
+            margin-bottom: 1rem;
+            break-inside: auto;
+            padding-bottom: 0.25rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .jour {
+            margin-bottom: 1rem;
+            background-color: #f9fafb;
+            padding: 0.75rem;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .jour-title {
+            font-weight: 600;
+            color: #1e40af;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .session {
+            margin-bottom: 1rem;
+        }
+
+        .module {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            border-left: 2px solid #e5e7eb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                font-size: 9pt;
+            }
+            
+            @page {
+                margin: 1cm;
+                size: A4 portrait;
+            }
+            
+            .header {
+                margin-bottom: 0.75rem;
+                padding-bottom: 0.5rem;
+            }
+            
+            h1 {
+                font-size: 14pt;
+            }
+            
+            h2 {
+                font-size: 12pt;
+            }
+            
+            h3 {
+                font-size: 11pt;
+            }
+            
+            .info-block {
+                padding: 0.5rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .jour {
+                padding: 0.5rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+        }
+        
+        footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        
+        .footer-info {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        
+        /* Optimisation des sections avec un style plus compact */
+        .section:nth-child(even) {
+            background-color: #fafafa;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-left: -0.5rem;
+            margin-right: -0.5rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Programme de formation</h1>
+            <h2>Génération de contenu avec ChatGPT + Automatisation Marketing</h2>
+        </div>
+        <img src="/logo.png" alt="Logo GESTIONMAX" class="logo">
+    </div>
+
+    <div class="info-block">
+        <div class="info-row">
+            <div class="info-label">Référence :</div>
+            <div>A015-IA-CGPT</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Prérequis :</div>
+            <div>Maîtriser son environnement et les fonctions de base pour utiliser un ordinateur.</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Public concerné :</div>
+            <div>Artisans, commerçants ou professions libérales.</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Durée :</div>
+            <div>14 heures ou 2 jours</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Horaires :</div>
+            <div>9h à 13h et de 14h à 17h</div>
+        </div>
+    </div>
+
+    <section class="section">
+        <h2>Objectifs pédagogiques</h2>
+        <p>Ce programme complet permet au participant d'acquérir des compétences opérationnelles et stratégiques pour la génération de contenu et l'automatisation marketing. À la fin de la formation, l'apprenant(e) devra être capable de :</p>
+        <ol>
+            <li>Comprendre les fondamentaux de ChatGPT pour générer du contenu efficace et pertinent.</li>
+            <li>Créer des contenus optimisés pour le web, les réseaux sociaux et les campagnes marketing.</li>
+            <li>Mettre en place des stratégies d'automatisation pour maximiser l'impact des campagnes de marketing digital.</li>
+            <li>Utiliser des outils comme ChatGPT, Brevo, Make et d'autres solutions d'automatisations.</li>
+        </ol>
+    </section>
+
+    <section class="section">
+        <h2>Programme détaillé</h2>
+        
+        <div class="jour">
+            <h3>Jour 1 : Maîtriser ChatGPT pour la création de contenu (7 heures)</h3>
+            
+            <div class="session">
+                <h4>Matin (9h - 13h) : Découverte et prise en main de ChatGPT</h4>
+                
+                <div class="module">
+                    <h4>Introduction à ChatGPT</h4>
+                    <ul>
+                        <li>Comprendre ce qu'est ChatGPT et comment il fonctionne.</li>
+                        <li>Exemples d'applications pratiques pour la génération de contenu.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h4>Création de contenu textuel</h4>
+                    <ul>
+                        <li>Rédaction d'articles de blog optimisés pour le SEO.</li>
+                        <li>Création de scripts vidéo ou podcasts.</li>
+                        <li>Production de contenu engageant pour les réseaux sociaux.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h4>Personnalisation des prompts</h4>
+                    <ul>
+                        <li>Structurer et affiner les prompts pour obtenir des résultats qualitatifs.</li>
+                        <li>Méthodes pour guider efficacement ChatGPT.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h - 17h) : Ateliers pratiques</h4>
+                
+                <div class="module">
+                    <h4>Mise en pratique</h4>
+                    <ul>
+                        <li>Création d'un calendrier éditorial avec ChatGPT.</li>
+                        <li>Rédaction d'un article de blog ou de posts pour les réseaux sociaux en fonction des objectifs marketing.</li>
+                        <li>Développement de contenu pour une newsletter.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h4>Optimisation des contenus</h4>
+                    <ul>
+                        <li>Réécriture et amélioration des textes générés.</li>
+                        <li>Ajout d'appels à l'action pour maximiser les conversions.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="jour">
+            <h3>Jour 2 : Automatisation Marketing avec des outils dédiés (7 heures)</h3>
+            
+            <div class="session">
+                <h4>Matin (9h - 13h) : Découverte et configuration des outils</h4>
+                
+                <div class="module">
+                    <h4>Introduction à l'automatisation marketing</h4>
+                    <ul>
+                        <li>Définition et avantages.</li>
+                        <li>Les outils phares : Brevo, Zapier, Make (Integromat).</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h4>Configurer une automatisation avec Brevo (ex-Sendinblue)</h4>
+                    <ul>
+                        <li>Création et gestion d'une campagne d'email marketing automatisée.</li>
+                        <li>Segmentation des listes et scénarios d'automatisation (exemple : e-mails de bienvenue, relances de panier abandonné).</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h4>Automatiser des tâches avec Make</h4>
+                    <ul>
+                        <li>Intégration de ChatGPT avec des outils tiers.</li>
+                        <li>Exemples d'automatisations pour gagner du temps :
+                            <ul>
+                                <li>Planification de posts automatiques avec ChatGPT et un outil comme Buffer.</li>
+                                <li>Envoi d'e-mails automatisés basés sur des actions spécifiques.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h - 17h) : Mise en application et stratégies avancées</h4>
+                
+                <div class="module">
+                    <h4>Atelier pratique : Scénario d'automatisation complet</h4>
+                    <ul>
+                        <li>Création d'un workflow automatisé complet combinant :
+                            <ul>
+                                <li>Génération de contenu avec ChatGPT.</li>
+                                <li>Diffusion automatique via Brevo (e-mails) ou réseaux sociaux (via Buffer/Zapier).</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h4>Stratégies avancées</h4>
+                    <ul>
+                        <li>Utilisation des analytics pour évaluer les performances des automatisations.</li>
+                        <li>Optimisation des flux pour améliorer la productivité et les conversions.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h4>Présentation des travaux et conclusion</h4>
+                    <ul>
+                        <li>Débriefing des productions réalisées.</li>
+                        <li>Questions/réponses et validation des acquis.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="section">
+        <h2>Modalités et informations complémentaires</h2>
+        
+        <h3>Modalités, délais moyens d'accès</h3>
+        <p>A réception de votre accord de prise en charge pour les professionnels.</p>
+        
+        <h3>Tarif de la formation</h3>
+        <p>Le tarif de la formation s'élève à 1960€ Nets de taxes Art-293 du CGI.</p>
+        <p>Modalités de règlement : chèque ou virement à réception de facture.</p>
+        
+        <h3>Contact de l'organisme, référent pédagogique, référent qualité</h3>
+        <p>L'apprenant(e) recevra un soutien continu de la part du formateur tout au long de sa formation. Pendant toute la durée du programme, chaque stagiaire pourra le contacter par courriel à l'adresse aurelien@gestionmax.fr ou par téléphone/SMS au 06.46.02.24.68</p>
+        
+        <h3>Modalités techniques et pédagogiques</h3>
+        <p>La formation est dispensée en présentiel individuel, avec une méthode expositive et démonstrative, alternant exposés théoriques et cas pratiques. Cette approche favorise une compréhension approfondie des concepts et une mise en application immédiate des compétences acquises.</p>
+        
+        <h4>Exposés théoriques</h4>
+        <p>Les exposés permettent d'introduire et d'expliquer les concepts fondamentaux liés à l'utilisation de ChatGPT et des outils d'automatisation marketing. Parmi les sujets abordés :</p>
+        <ul>
+            <li>Découverte et utilisation de ChatGPT :
+                <ul>
+                    <li>Fonctionnement des modèles d'IA générative.</li>
+                    <li>Bonnes pratiques pour la rédaction de prompts efficaces.</li>
+                    <li>Applications pour la création de contenu texte (articles, posts réseaux sociaux, newsletters, scripts vidéo).</li>
+                </ul>
+            </li>
+            <li>Introduction à l'automatisation marketing :
+                <ul>
+                    <li>Fonctionnement des outils d'automatisation (Make, Zapier).</li>
+                    <li>Automatisation des workflows pour optimiser le temps (intégration avec emails, CRM, réseaux sociaux).</li>
+                    <li>Les cas d'usage : création de campagnes automatisées, envoi d'e-mails personnalisés, reporting automatisé.</li>
+                </ul>
+            </li>
+        </ul>
+        
+        <h4>Cas pratiques</h4>
+        <p>Les cas pratiques permettent aux apprenants de mettre en œuvre directement les notions théoriques dans des situations concrètes :</p>
+        <ul>
+            <li>Génération de contenu avec ChatGPT :
+                <ul>
+                    <li>Rédaction de posts LinkedIn et articles de blog optimisés pour le SEO.</li>
+                    <li>Création de contenus engageants pour les réseaux sociaux (Facebook, Instagram, Twitter).</li>
+                    <li>Structuration et rédaction de newsletters automatisées avec des prompts efficaces.</li>
+                </ul>
+            </li>
+            <li>Automatisation des tâches marketing avec Make (ou autre outil) :
+                <ul>
+                    <li>Mise en place d'une campagne automatisée d'e-mailing : création d'un scénario avec des déclencheurs (trigger) et des actions.</li>
+                    <li>Automatisation des publications sur les réseaux sociaux à partir de contenus générés avec ChatGPT.</li>
+                    <li>Connexion entre outils marketing (CRM, Google Sheets, MailChimp, Notion, etc.) pour automatiser le suivi des leads et des ventes.</li>
+                </ul>
+            </li>
+            <li>Optimisation d'un workflow marketing :
+                <ul>
+                    <li>Création d'un scénario complet pour la gestion d'une campagne promotionnelle automatisée.</li>
+                    <li>Envoi d'un rapport de performance automatisé via Google Sheets ou Slack.</li>
+                </ul>
+            </li>
+            <li>Personnalisation des contenus générés :
+                <ul>
+                    <li>A/B Testing des contenus pour les campagnes automatisées.</li>
+                    <li>Utilisation des données clients pour ajuster les réponses et optimiser les workflows.</li>
+                </ul>
+            </li>
+        </ul>
+        
+        <h3>Formateur</h3>
+        <p>Aurélien Lavayssière, consultant formateur spécialisé en digitalisation de la relation client et expert en outils no-code et automatisation marketing. Fort de son expertise, il accompagne les apprenants dans l'utilisation de solutions comme ChatGPT, Brevo, Canva et Make pour améliorer leur productivité et atteindre leurs objectifs digitaux.</p>
+        
+        <h3>L'organisme de formation mettra à disposition de l'apprenant(e)</h3>
+        <p>Sa salle de formation équipée de son matériel informatique haut de gamme connectée à internet, afin de pouvoir aisément garantir le bon déroulement de la formation du point de vue pédagogique et technique. Un support de cours (Projet et ressources téléchargeables disponibles sur votre espace apprenant sur Notion, un hébergement Web, quizz, fiches pratiques).</p>
+        
+        <h3>Modalités d'évaluation</h3>
+        <p>Pour évaluer les compétences acquises par l'apprenant(e), plusieurs outils et méthodes seront mis en place afin de garantir une validation progressive et complète des acquis théoriques et pratiques.</p>
+        
+        <h4>1. Quiz en ligne via EVALBOX</h4>
+        <p>À l'issue de chaque bloc de compétences, un quiz en ligne composé d'environ 20 questions sera proposé pour valider les acquis théoriques. Ces évaluations permettront de vérifier la compréhension des concepts clés tels que :</p>
+        <ul>
+            <li>La création et l'optimisation de contenus avec ChatGPT.</li>
+            <li>La mise en place de scénarios automatisés avec Make.</li>
+            <li>L'identification et l'amélioration des points de blocage dans un workflow marketing.</li>
+        </ul>
+        
+        <h4>2. Travaux pratiques</h4>
+        <p>Tout au long de la formation, des cas pratiques seront réalisés afin d'évaluer la capacité de l'apprenant(e) à appliquer les notions théoriques dans des contextes concrets. Ces exercices incluront notamment :</p>
+        <ul>
+            <li>La création de contenus optimisés pour le web et les réseaux sociaux avec ChatGPT.</li>
+            <li>La mise en place d'un workflow automatisé complet avec Make pour automatiser des tâches marketing (emailing, publication de contenus, reporting).</li>
+            <li>L'analyse critique d'un scénario d'automatisation pour en améliorer l'efficacité.</li>
+        </ul>
+        
+        <h4>3. Grille d'analyse des compétences</h4>
+        <p>Une grille sera utilisée pour évaluer les compétences pratiques de l'apprenant(e), en se basant sur des critères spécifiques comme :</p>
+        <ul>
+            <li>La qualité et l'originalité des contenus générés.</li>
+            <li>La cohérence et l'efficacité des workflows automatisés mis en place.</li>
+            <li>La capacité à résoudre des problèmes dans un environnement marketing automatisé.</li>
+            <li>L'optimisation des processus pour gagner en productivité.</li>
+        </ul>
+        
+        <h4>4. Validation finale par projet</h4>
+        <p>En fin de formation, un projet final individuel sera réalisé pour synthétiser les compétences acquises. L'apprenant(e) devra :</p>
+        <ul>
+            <li>Créer une stratégie complète de génération de contenu avec ChatGPT pour une entreprise fictive ou réelle.</li>
+            <li>Automatiser un workflow (campagne d'emailing, suivi de leads ou publication de contenus) avec Make.</li>
+            <li>Présenter et analyser les résultats obtenus, en identifiant les axes d'amélioration.</li>
+        </ul>
+        
+        <h3>Sanction de la formation</h3>
+        <p>Un certificat de réalisation de formation.</p>
+        <p>Une feuille d'émargement individuelle sera conjointement signée par le formateur et chaque stagiaire, pour chaque demi-journée de formation, permettant d'attester de l'exécution de l'action de formation.</p>
+        
+        <h3>Niveau/certification obtenue</h3>
+        <p>Aucune certification officielle n'est délivrée à l'issue de cette formation.</p>
+        
+        <h3>Délai d'acceptation</h3>
+        <p>Mise en place de votre parcours de formation dès réception de votre acompte ou votre accord de prise en charge.</p>
+        
+        <h3>Accessibilité handicapée</h3>
+        <p>Votre organisme est engagé dans une démarche d'accueil et d'accompagnement en formation des personnes en situation de handicap. Dans ce cadre, je vous propose :</p>
+        <ul>
+            <li>Un entretien téléphonique pour vous accompagner individuellement,</li>
+            <li>D'évaluer vos besoins spécifiques au regard d'une situation de handicap,</li>
+            <li>De mettre en œuvre les adaptations pédagogiques, organisationnelles et matériels nécessaires.</li>
+        </ul>
+        <p>Référent handicap de l'organisme : Aurélien LAVAYSSIERE - aurelien@gestionmax.fr – 06.46.02.24.68</p>
+        
+        <h3>Cessation anticipée de la formation ou abandon en cours de formation</h3>
+        <ul>
+            <li>En cas de renonciation de l'apprenant(e) avant le début de la formation, aucune facturation.</li>
+            <li>En cas de renonciation en cours de formation, la facturation se fera au pro rata de l'assiduité de l'apprenant(e).</li>
+        </ul>
+    </section>
+           
+    <footer>
+        <div class="footer-info">
+            <strong>Aurélien LAVAYSSIERE - GESTIONMAX</strong>
+        </div>
+        <div class="footer-info">
+            Les vergers de Valconstance - 300 chemin de la suquette - 06600 Antibes
+        </div>
+        <div class="footer-info">
+            Siret : 483 797 213 00061
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,33 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies and build
+node_modules
+dist
+dist-ssr
+*.local
+
+# Next.js specific
+.next/
+.next/cache/
+.next/cache/webpack/
+
+# Fichiers volumineux identifiés
+lucide-react
+react
+
+# Edito
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+/generated/prisma

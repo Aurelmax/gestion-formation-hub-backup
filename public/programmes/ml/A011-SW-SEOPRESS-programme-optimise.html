@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programme de formation - SEO les fondamentaux (SEOPress)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.2;
+            color: #374151;
+            padding: 0.8rem;
+            max-width: 210mm;
+            margin: 0 auto;
+            background-color: #ffffff;
+            font-size: 0.75rem;
+        }
+        
+        .header {
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        
+        .header-content {
+            flex-grow: 1;
+        }
+        
+        .logo {
+            max-height: 50px;
+            max-width: 110px;
+            margin-bottom: 0;
+            object-fit: contain;
+        }
+        
+        h1 {
+            font-size: 1.2rem;
+            color: #1e3a8a;
+            margin-bottom: 0.2rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        
+        h2 {
+            font-size: 1rem;
+            color: #2563eb;
+            margin-bottom: 0.3rem;
+            margin-top: 0.7rem;
+            font-weight: 600;
+            line-height: 1.1;
+        }
+        
+        h3 {
+            font-size: 0.9rem;
+            color: #1e40af;
+            margin-top: 0.5rem;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+        }
+        
+        h4 {
+            font-size: 0.8rem;
+            color: #1d4ed8;
+            margin-top: 0.3rem;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        p {
+            margin-bottom: 0.3rem;
+            max-width: 100%;
+            line-height: 1.2;
+        }
+        
+        ul, ol {
+            margin-bottom: 0.3rem;
+            padding-left: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.1rem;
+            line-height: 1.2;
+        }
+        
+        /* Bloc d'information ultra-compact */
+        .info-block {
+            border-radius: 3px;
+            padding: 0.3rem;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 0.5rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.3rem;
+            font-size: 0.7rem;
+            background-color: #f8fafc;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 0.2rem;
+            align-items: baseline;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #1e40af;
+            min-width: 60px;
+            margin-right: 0.2rem;
+        }
+        
+        .section {
+            margin-bottom: 0.5rem;
+            break-inside: auto;
+            padding-bottom: 0.1rem;
+        }
+
+        .section-title {
+            background-color: #e0e7ff;
+            padding: 0.2rem 0.4rem;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+        }
+
+        .jour {
+            margin-bottom: 0.4rem;
+            padding: 0.3rem;
+            border-left: 2px solid #3b82f6;
+            background-color: #f9fafb;
+        }
+
+        .session {
+            margin-bottom: 0.3rem;
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 0.3rem;
+        }
+        
+        .session-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .module {
+            flex: 1;
+            min-width: 45%;
+        }
+        
+        /* Grille ultra-compact pour les jours */
+        .programme-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .jour-grid {
+            padding: 0.3rem;
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+        }
+        
+        .jour-titre {
+            font-weight: 600;
+            color: #1e3a8a;
+            border-bottom: 1px solid #d1d5db;
+            margin-bottom: 0.3rem;
+            padding-bottom: 0.2rem;
+            font-size: 0.8rem;
+        }
+
+        /* Mise en colonnes multiples pour maximiser l'espace */
+        .three-columns {
+            column-count: 3;
+            column-gap: 0.7rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .two-columns {
+            column-count: 2;
+            column-gap: 0.7rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .compact-list li {
+            margin-bottom: 0.1rem;
+            padding-left: 0;
+        }
+        
+        /* Section horizontale */
+        .horizontal-section {
+            display: flex;
+            gap: 0.7rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .horizontal-section > div {
+            flex: 1;
+        }
+        
+        /* Boîtes avec informations condensées */
+        .info-box {
+            border: 1px solid #e5e7eb;
+            padding: 0.3rem;
+            margin-bottom: 0.4rem;
+            background-color: #f9fafb;
+        }
+        
+        .info-box h3 {
+            font-size: 0.8rem;
+            margin-top: 0;
+            margin-bottom: 0.2rem;
+            color: #1e40af;
+        }
+        
+        /* Pied de page plus compact */
+        footer {
+            margin-top: 0.8rem;
+            padding-top: 0.3rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.7rem;
+            color: #6b7280;
+            text-align: center;
+        }
+        
+        .footer-info {
+            margin-bottom: 0.1rem;
+            line-height: 1.2;
+        }
+        
+        /* Optimisations pour l'impression */
+        @media print {
+            body {
+                padding: 0.5rem;
+                font-size: 8pt;
+            }
+            
+            @page {
+                margin: 0.5cm;
+                size: A4 portrait;
+            }
+            
+            h1 {
+                font-size: 12pt;
+            }
+            
+            h2 {
+                font-size: 10pt;
+            }
+            
+            h3 {
+                font-size: 9pt;
+            }
+            
+            h4 {
+                font-size: 8pt;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Programme de formation</h1>
+            <h2>SEO les fondamentaux (SEOPress)</h2>
+        </div>
+        <img src="../logo-gestionmax-antibes.png" alt="GestionMax Logo" class="logo" />
+    </div>
+
+    <!-- Bloc d'information ultra-compact -->
+    <div class="info-block">
+        <div>
+            <div class="info-row">
+                <div class="info-label">Version:</div>
+                <div>1</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Date:</div>
+                <div>12/08/2025</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Code:</div>
+                <div>A011-SW-SEOPRESS</div>
+            </div>
+        </div>
+        <div>
+            <div class="info-row">
+                <div class="info-label">Durée:</div>
+                <div>14h (2j)</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Horaires:</div>
+                <div>9h-13h/14h-17h</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Tarif:</div>
+                <div>1200€ HT</div>
+            </div>
+        </div>
+        <div>
+            <div class="info-row">
+                <div class="info-label">Public:</div>
+                <div>TPE, artisans, commerçants</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Prérequis:</div>
+                <div>Usage PC/Internet, WordPress</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Modalité:</div>
+                <div>Présentiel/Distanciel</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Objectifs ultra-compacts -->
+    <section class="section">
+        <div class="section-title">Objectifs pédagogiques</div>
+        <div class="three-columns compact-list">
+            <ul>
+                <li>Comprendre les principes fondamentaux du SEO et l'algorithme de Google</li>
+                <li>Installer et configurer le plugin SEOPress efficacement</li>
+                <li>Optimiser les contenus du site pour les moteurs de recherche</li>
+                <li>Analyser et améliorer le positionnement des pages web</li>
+                <li>Mettre en place une stratégie de netlinking pertinente</li>
+                <li>Utiliser les outils d'analyse SEO pour suivre les performances</li>
+                <li>Corriger les problèmes techniques impactant le référencement</li>
+                <li>Adapter sa stratégie SEO aux mises à jour des algorithmes</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Programme ultra-compact -->
+    <section class="section">
+        <div class="section-title">Programme détaillé</div>
+        
+        <div class="programme-grid">
+            <div class="jour-grid">
+                <div class="jour-titre">Jour 1: Fondamentaux SEO & SEOPress</div>
+                <ul class="compact-list">
+                    <li><strong>Matin:</strong> Introduction au référencement naturel + Installation et configuration de SEOPress</li>
+                    <li><strong>A-midi:</strong> Création de contenu optimisé + Optimisations techniques avec SEOPress</li>
+                </ul>
+            </div>
+            
+            <div class="jour-grid">
+                <div class="jour-titre">Jour 2: SEO Avancé & Analytics</div>
+                <ul class="compact-list">
+                    <li><strong>Matin:</strong> Stratégies de mots-clés & netlinking + Analyse du positionnement</li>
+                    <li><strong>A-midi:</strong> Configuration des outils d'analyse + Optimisation et suivi des performances</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Détail plus précis mais toujours ultra-compact -->
+        <div class="jour">
+            <h3>Jour 1: Fondamentaux SEO & SEOPress</h3>
+            
+            <div class="session">
+                <h4>Matin (9h-13h)</h4>
+                <div class="session-content">
+                    <div class="module">
+                        <b>Introduction au SEO:</b> Fonctionnement des moteurs de recherche, facteurs de classement on-site/off-site, tendances SEO, analyse concurrentielle.
+                    </div>
+                    <div class="module">
+                        <b>Installation & Configuration:</b> Présentation de SEOPress, installation du plugin, configuration globale, paramétrage des méta-informations, feuille de route SEO initiale.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h-17h)</h4>
+                <div class="session-content">
+                    <div class="module">
+                        <b>Contenu optimisé:</b> Rédaction web SEO, structuration des contenus, hiérarchie des titres, optimisation des images, balises méta personnalisées.
+                    </div>
+                    <div class="module">
+                        <b>Optimisations techniques:</b> Configuration du sitemap XML, gestion des redirections, optimisation des médias, intégration des données structurées Schema.org.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="jour">
+            <h3>Jour 2: SEO Avancé & Analytics</h3>
+            
+            <div class="session">
+                <h4>Matin (9h-13h)</h4>
+                <div class="session-content">
+                    <div class="module">
+                        <b>Stratégie de mots-clés:</b> Recherche et analyse sémantique, stratégie longue traîne, outils de recherche de mots-clés, densité et pertinence.
+                    </div>
+                    <div class="module">
+                        <b>Netlinking & positionnement:</b> Création de backlinks qualitatifs, linkbuilding interne et externe, mesure d'autorité des sites, suivi des positions SERP.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h-17h)</h4>
+                <div class="session-content">
+                    <div class="module">
+                        <b>Outils d'analyse:</b> Configuration de Google Search Console avec SEOPress, intégration de Google Analytics, rapports SEO périodiques.
+                    </div>
+                    <div class="module">
+                        <b>Optimisation continue:</b> Audit SEO complet, détection et correction d'erreurs techniques, optimisation de la vitesse, stratégie d'amélioration progressive.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modalités pédagogiques et informations complémentaires ultra-compactes -->
+    <section class="section">
+        <div class="section-title">Modalités et informations complémentaires</div>
+        
+        <div class="horizontal-section">
+            <div class="info-box">
+                <h3>Méthodes pédagogiques</h3>
+                <ul class="compact-list">
+                    <li>Démonstrations et exercices pratiques</li>
+                    <li>Études de cas réels avec SEOPress</li>
+                    <li>Travaux dirigés sur sites WordPress</li>
+                    <li>Ressources techniques en ligne</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h3>Évaluation</h3>
+                <p>Quiz EVALBOX (20 questions). Audit SEO d'un site réel. Grille d'analyse des compétences. Travaux pratiques d'optimisation avec SEOPress.</p>
+            </div>
+            
+            <div class="info-box">
+                <h3>Moyens techniques</h3>
+                <ul class="compact-list">
+                    <li>Site WordPress de test</li>
+                    <li>Accès à SEOPress Pro</li>
+                    <li>Outils d'analyse SEO professionnels</li>
+                    <li>Support de formation numérique</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="horizontal-section">
+            <div class="info-box">
+                <h3>Formateur</h3>
+                <p>Aurélien LAVAYSSIÈRE - Consultant formateur spécialisé en référencement naturel et expert WordPress.</p>
+            </div>
+            
+            <div class="info-box">
+                <h3>Accessibilité handicap</h3>
+                <p>Formation accessible. Référent: A. LAVAYSSIÈRE - <a href="mailto:aurelien@gestionmax.fr">aurelien@gestionmax.fr</a> – 06.46.02.24.68</p>
+            </div>
+            
+            <div class="info-box">
+                <h3>Informations administratives</h3>
+                <p>Certification: Attestation de formation. Délai: Mise en place dès réception d'acompte. Facturation au prorata en cas d'abandon.</p>
+            </div>
+        </div>
+    </section>
+           
+    <footer>
+        <div class="footer-info">
+            <strong>Aurélien LAVAYSSIERE - GESTIONMAX</strong> | Les vergers de Valconstance - 300 chemin de la suquette - 06600 Antibes | Siret : 483 797 213 00061
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programme de formation - Backend Headless avec WordPress et Frontend React</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            color: #374151;
+            padding: 1.5rem;
+            max-width: 210mm;
+            margin: 0 auto;
+            background-color: #ffffff;
+            font-size: 0.9rem;
+        }
+        
+        .header {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        
+        .header-content {
+            flex-grow: 1;
+        }
+        
+        .logo {
+            max-height: 70px;
+            max-width: 150px;
+            margin-bottom: 0;
+            object-fit: contain;
+        }
+        
+        h1 {
+            font-size: 1.6rem;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            font-size: 1.3rem;
+            color: #2563eb;
+            margin-bottom: 0.75rem;
+            margin-top: 1.25rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        
+        h3 {
+            font-size: 1.1rem;
+            color: #1e40af;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        h4 {
+            font-size: 1rem;
+            color: #1d4ed8;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 0.75rem;
+            max-width: 100%;
+            line-height: 1.4;
+        }
+        
+        ul, ol {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.25rem;
+            line-height: 1.4;
+        }
+        
+        .info-block {
+            background-color: #f8fafc;
+            border-radius: 4px;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        .info-row {
+            margin-bottom: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: baseline;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #1e40af;
+            min-width: 120px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #6b7280;
+        }
+        
+        .badge-blue {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-green {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge-yellow {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+        
+        .badge-red {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .section {
+            margin-bottom: 1rem;
+            break-inside: auto;
+            padding-bottom: 0.25rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .jour {
+            margin-bottom: 1rem;
+            background-color: #f9fafb;
+            padding: 0.75rem;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .jour-title {
+            font-weight: 600;
+            color: #1e40af;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .session {
+            margin-bottom: 1rem;
+        }
+
+        .module {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            border-left: 2px solid #e5e7eb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                font-size: 9pt;
+            }
+            
+            @page {
+                margin: 1cm;
+                size: A4 portrait;
+            }
+            
+            .header {
+                margin-bottom: 0.75rem;
+                padding-bottom: 0.5rem;
+            }
+            
+            h1 {
+                font-size: 14pt;
+            }
+            
+            h2 {
+                font-size: 12pt;
+            }
+            
+            h3 {
+                font-size: 11pt;
+            }
+            
+            .info-block {
+                padding: 0.5rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .jour {
+                padding: 0.5rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+        }
+        
+        footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        
+        .footer-info {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        
+        /* Optimisation des sections avec un style plus compact */
+        .section:nth-child(even) {
+            background-color: #fafafa;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-left: -0.5rem;
+            margin-right: -0.5rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Programme de formation</h1>
+            <h2>Backend Headless avec WordPress et Frontend React</h2>
+        </div>
+        <img src="/logo.png" alt="Logo GESTIONMAX" class="logo">
+    </div>
+
+    <div class="info-block">
+        <div class="info-row">
+            <div class="info-label">Référence :</div>
+            <div>A016-RE-HL</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Prérequis :</div>
+            <div>Connaissances en développement web et notions de JavaScript.</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Public concerné :</div>
+            <div>Développeurs web, intégrateurs, freelances.</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Durée :</div>
+            <div>35 heures (5 jours)</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Modalité :</div>
+            <div>Présentiel ou distanciel</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Prix :</div>
+            <div>2450€ net de taxes</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Objectifs pédagogiques</h2>
+        <p>À la fin de cette formation, les participants seront capables de :</p>
+        <ul>
+            <li>Configurer et exposer WordPress comme API headless</li>
+            <li>Développer une application frontend moderne avec React</li>
+            <li>Connecter une application React à l'API REST de WordPress</li>
+            <li>Implémenter des fonctionnalités avancées dans une architecture découplée</li>
+            <li>Déployer et maintenir une architecture headless sécurisée et performante</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Programme détaillé</h2>
+        
+        <div class="jour">
+            <div class="jour-title">JOUR 1 : Fondamentaux des architectures headless et configuration de WordPress</div>
+            <div class="session">
+                <h4>Session 1 : Introduction aux architectures headless</h4>
+                <ul>
+                    <li>Comprendre les avantages et inconvénients des architectures headless</li>
+                    <li>Explorer les cas d'usage adaptés aux architectures découplées</li>
+                    <li>Présentation de l'écosystème WordPress et React</li>
+                    <li>Mise en place de l'environnement de développement</li>
+                </ul>
+            </div>
+            <div class="session">
+                <h4>Session 2 : Configuration de WordPress en mode headless</h4>
+                <ul>
+                    <li>Installation et configuration d'un WordPress optimisé pour API</li>
+                    <li>Présentation de l'API REST WordPress</li>
+                    <li>Configuration des Custom Post Types et taxonomies</li>
+                    <li>Exercice pratique : Explorer et tester les endpoints de l'API WordPress</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="jour">
+            <div class="jour-title">JOUR 2 : Bases de React et création du frontend</div>
+            <div class="session">
+                <h4>Session 1 : Introduction à React</h4>
+                <ul>
+                    <li>Comprendre les fondamentaux de React (composants, props, state)</li>
+                    <li>Mise en place d'un projet React avec Create React App ou Next.js</li>
+                    <li>Routing et navigation avec React Router</li>
+                    <li>Travail avec JSX et les hooks de React</li>
+                </ul>
+            </div>
+            <div class="session">
+                <h4>Session 2 : Architecture de l'application frontend</h4>
+                <ul>
+                    <li>Structurer son application React</li>
+                    <li>Gestion d'état avec Context API ou Redux</li>
+                    <li>Création de composants réutilisables</li>
+                    <li>Exercice pratique : Créer la structure de base de l'application React</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="jour">
+            <div class="jour-title">JOUR 3 : Connecter React à l'API WordPress</div>
+            <div class="session">
+                <h4>Session 1 : Requêtes API et gestion de données</h4>
+                <ul>
+                    <li>Utilisation de Fetch API ou Axios pour les requêtes HTTP</li>
+                    <li>Requêtes à l'API WordPress et gestion des réponses</li>
+                    <li>Traitement des erreurs et gestion des états de chargement</li>
+                    <li>Mise en cache des données et optimisation des performances</li>
+                </ul>
+            </div>
+            <div class="session">
+                <h4>Session 2 : Implémentation des fonctionnalités principales</h4>
+                <ul>
+                    <li>Création de la page d'accueil et listing des articles</li>
+                    <li>Affichage des articles, pages et médias depuis l'API</li>
+                    <li>Implémentation de la recherche et du filtrage</li>
+                    <li>Exercice pratique : Développer un affichage dynamique du contenu WordPress</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="jour">
+            <div class="jour-title">JOUR 4 : Fonctionnalités avancées et authentification</div>
+            <div class="session">
+                <h4>Session 1 : Authentification et gestion utilisateur</h4>
+                <ul>
+                    <li>Implémentation de JWT avec WordPress</li>
+                    <li>Création d'un système d'authentification sécurisé</li>
+                    <li>Gestion des droits utilisateurs</li>
+                    <li>Sécurisation des endpoints et protection des données</li>
+                </ul>
+            </div>
+            <div class="session">
+                <h4>Session 2 : Fonctionnalités interactives</h4>
+                <ul>
+                    <li>Mise en place de formulaires dynamiques avec React</li>
+                    <li>Création et modification de contenu via l'API</li>
+                    <li>Implémentation de commentaires et d'interactions utilisateur</li>
+                    <li>Exercice pratique : Développer un système de commentaires avec authentification</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="jour">
+            <div class="jour-title">JOUR 5 : Déploiement et optimisation</div>
+            <div class="session">
+                <h4>Session 1 : Optimisation des performances</h4>
+                <ul>
+                    <li>Techniques d'optimisation pour React (Code splitting, lazy loading)</li>
+                    <li>SEO pour les applications React</li>
+                    <li>Server-Side Rendering (SSR) avec Next.js</li>
+                    <li>Mise en cache avancée et génération de sites statiques</li>
+                </ul>
+            </div>
+            <div class="session">
+                <h4>Session 2 : Déploiement et maintenance</h4>
+                <ul>
+                    <li>Préparation au déploiement (build, environnements)</li>
+                    <li>Déploiement sur différentes plateformes (Vercel, Netlify)</li>
+                    <li>Stratégies de CI/CD pour WordPress et React</li>
+                    <li>Exercice final : Déploiement complet d'une application headless WordPress + React</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Modalités pédagogiques</h2>
+        <ul>
+            <li>Formation dispensée en présentiel ou à distance</li>
+            <li>Alternance de présentations théoriques et d'exercices pratiques</li>
+            <li>Mise en situation avec études de cas réels</li>
+            <li>Support de cours fourni au format électronique</li>
+            <li>Environnement de développement préconfigué pour les participants</li>
+            <li>Accès à des ressources complémentaires en ligne</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Évaluation</h2>
+        <ul>
+            <li>Évaluation continue par la réalisation d'exercices pratiques</li>
+            <li>QCM à la fin de chaque journée pour valider les acquis</li>
+            <li>Projet final : développement complet d'une application headless WordPress + React</li>
+            <li>Évaluation de satisfaction à chaud et à froid</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Certification</h2>
+        <p>Attestation de formation délivrée à l'issue de la formation.</p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Accessibilité</h2>
+        <p>Cette formation est accessible aux personnes en situation de handicap. Notre référent handicap se tient à votre disposition pour mettre en place les adaptations nécessaires en fonction de votre situation.</p>
+    </div>
+
+    <footer>
+        <div class="footer-info">
+            Aurélien LAVAYSSIERE - GESTIONMAX, Les vergers de Valconstance - 300 chemin de la suquette - 06600 Antibes, Siret : 483 797 213 00061
+        </div>
+    </footer>
+</body>
+</html>

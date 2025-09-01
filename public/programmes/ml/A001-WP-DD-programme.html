@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programme de formation - Création de son site internet (WordPress) + Stratégie de développement digital</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            color: #374151;
+            padding: 1.5rem;
+            max-width: 210mm;
+            margin: 0 auto;
+            background-color: #ffffff;
+            font-size: 0.9rem;
+        }
+        
+        .header {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        
+        .header-content {
+            flex-grow: 1;
+        }
+        
+        .logo {
+            max-height: 70px;
+            max-width: 150px;
+            margin-bottom: 0;
+            object-fit: contain;
+        }
+        
+        h1 {
+            font-size: 1.6rem;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            font-size: 1.3rem;
+            color: #2563eb;
+            margin-bottom: 0.75rem;
+            margin-top: 1.25rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        
+        h3 {
+            font-size: 1.1rem;
+            color: #1e40af;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        h4 {
+            font-size: 1rem;
+            color: #1d4ed8;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 0.75rem;
+            max-width: 100%;
+            line-height: 1.4;
+        }
+        
+        ul, ol {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.25rem;
+            line-height: 1.4;
+        }
+        
+        .info-block {
+            background-color: #f8fafc;
+            border-radius: 4px;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 0.75rem;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #1e40af;
+            min-width: 120px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #6b7280;
+        }
+        
+        .badge-blue {
+            background-color: #eff6ff;
+            color: #1e40af;
+        }
+        
+        .badge-green {
+            background-color: #f0fdf4;
+            color: #166534;
+        }
+        
+        .footer {
+            margin-top: 4rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .section {
+            margin-bottom: 1rem;
+            break-inside: auto;
+            padding-bottom: 0.25rem;
+        }
+
+        .section-title {
+            background-color: #e0e7ff;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+        }
+
+        .jour {
+            margin-bottom: 1rem;
+            background-color: #f9fafb;
+            padding: 0.75rem;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .jour-title {
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 0.75rem;
+            font-size: 1.125rem;
+        }
+
+        .session {
+            margin-bottom: 0.75rem;
+            padding-left: 0.75rem;
+            border-left: 1px solid #e5e7eb;
+            margin-top: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                font-size: 9pt;
+            }
+            
+            @page {
+                margin: 1cm;
+                size: A4 portrait;
+            }
+            
+            h1 { font-size: 14pt; }
+            h2 { font-size: 12pt; }
+            h3 { font-size: 11pt; }
+            h4 { font-size: 10pt; }
+            
+            .jour {
+                break-inside: auto;
+            }
+            
+            .info-block {
+                break-inside: avoid;
+            }
+            
+            a {
+                text-decoration: none;
+                color: #1e40af;
+            }
+            
+            p, li {
+                line-height: 1.3;
+            }
+            
+            .section:nth-child(even) {
+                background-color: transparent;
+                padding: 0;
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+        
+        footer {
+            margin-top: 1.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        
+        .footer-info {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        
+        /* Optimisation des sections avec un style plus compact */
+        .section:nth-child(even) {
+            background-color: #fafafa;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-left: -0.5rem;
+            margin-right: -0.5rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Programme de formation</h1>
+            <h2>Création de son site internet (WordPress) + Stratégie de développement digital</h2>
+        </div>
+        <img src="../logo-gestionmax-antibes.png" alt="GestionMax Logo" class="logo" />
+    </div>
+
+    <div class="info-block">
+        <div class="info-row">
+            <div class="info-label">Version :</div>
+            <div>1</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Date :</div>
+            <div>15/10/24</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Code :</div>
+            <div>A001-WP-DD</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Prérequis :</div>
+            <div>Maîtriser son environnement et les fonctions de base pour utiliser un ordinateur.</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Public concerné :</div>
+            <div>Artisans, commerçants ou professions libérales.</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Durée :</div>
+            <div>14 heures ou 2 jours</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Les horaires :</div>
+            <div>9h à 13h et de 14h à 17h.</div>
+        </div>
+    </div>
+
+    <section class="section">
+        <h2>Objectifs pédagogiques</h2>
+        <p>A la fin de la formation, l'apprenant(e) devra être capable de :</p>
+        
+        <div class="jour">
+            <div class="jour-title">Jour 1</div>
+            <p>Apprendre à créer, personnaliser et gérer un site internet avec WordPress, en mettant l'accent sur la gestion du contenu, la personnalisation du design et l'ajout de fonctionnalités essentielles.</p>
+        </div>
+        
+        <div class="jour">
+            <div class="jour-title">Jour 2</div>
+            <p>Comprendre les bases d'une stratégie de développement digital, incluant le SEO, la gestion des réseaux sociaux et l'utilisation de la publicité en ligne pour attirer et convertir des clients potentiels.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Programme détaillé</h2>
+        
+        <div class="jour">
+            <h3>Jour 1 : Création et gestion d'un site internet avec WordPress (7 heures)</h3>
+            
+            <div class="session">
+                <h4>Matin (9h - 13h)</h4>
+                
+                <div class="module">
+                    <div class="session-title">1. Introduction à WordPress</div>
+                    <ul>
+                        <li>Qu'est-ce que WordPress ? Pourquoi choisir WordPress pour créer un site internet.</li>
+                        <li>Installation de WordPress : guide pratique pour installer son site sur son hébergeur.</li>
+                        <li>Configuration initiale : choisir un thème, régler les paramètres généraux (titre, fuseau horaire, langue, permaliens).</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">2. Gestion de la structure du site</div>
+                    <ul>
+                        <li>Création des pages essentielles : Accueil, À propos, Contact, Politique de confidentialité.</li>
+                        <li>Gestion des articles et catégories : pourquoi et comment organiser un blog.</li>
+                        <li>Mise en place des menus de navigation et sous-menus.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h - 17h)</h4>
+                
+                <div class="module">
+                    <div class="session-title">3. Personnalisation de l'apparence du site</div>
+                    <ul>
+                        <li>Choisir un thème adapté à votre activité (thèmes gratuits et payants).</li>
+                        <li>Personnalisation via le customizer : couleurs, typographies, menus et widgets.</li>
+                        <li>Introduction à l'éditeur Gutenberg (bloc de construction) pour une mise en page avancée sans coder.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">4. Ajout de fonctionnalités essentielles</div>
+                    <ul>
+                        <li>Installer des plugins : sécurité (ex. Wordfence), SEO (Yoast SEO), formulaires de contact (ex. Contact Form 7).</li>
+                        <li>Introduction à un constructeur de pages (ex. Elementor) pour personnaliser davantage le design.</li>
+                        <li>Gérer la sécurité et les sauvegardes de votre site.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="jour">
+            <h3>Jour 2 : Stratégie de développement digital (7 heures)</h3>
+            
+            <div class="session">
+                <h4>Matin (9h - 13h)</h4>
+                
+                <div class="module">
+                    <div class="session-title">1. Définir les objectifs commerciaux sur internet</div>
+                    <ul>
+                        <li>Déterminer les objectifs spécifiques de votre site : acquisition de trafic, conversion des visiteurs en clients, fidélisation.</li>
+                        <li>Identifier votre audience cible : définition des personas et de leurs besoins.</li>
+                        <li>Analyser la concurrence et les tendances du marché.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">2. Introduction au référencement naturel (SEO)</div>
+                    <ul>
+                        <li>Comprendre les bases du SEO : recherche de mots-clés, optimisation du contenu, importance des balises HTML (title, méta description, H1, H2…).</li>
+                        <li>Optimisation on-page : amélioration de la vitesse du site, structure des URL, maillage interne.</li>
+                        <li>Utilisation de plugins SEO (ex. Yoast SEO) pour optimiser vos pages et articles.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h - 17h)</h4>
+                
+                <div class="module">
+                    <div class="session-title">3. Stratégie sur les réseaux sociaux</div>
+                    <ul>
+                        <li>Importance des réseaux sociaux pour accroître la visibilité de votre site.</li>
+                        <li>Choisir les bonnes plateformes : Facebook, LinkedIn, Instagram, YouTube, etc.</li>
+                        <li>Stratégie de contenu : créer des publications engageantes et régulières adaptées à votre audience.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">4. Publicité en ligne et autres outils de développement digital</div>
+                    <ul>
+                        <li>Introduction aux publicités payantes : Facebook Ads, Google Ads.</li>
+                        <li>Définir un budget et cibler votre audience : comment atteindre les bonnes personnes avec un petit budget.</li>
+                        <li>Outils pour analyser et suivre la performance de votre site : Google Analytics, vs Matomo.</li>
+                        <li>Automatisation de la communication : gestion des campagnes d'emailing (Mailchimp, Brevo).</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <div class="session-title">5. Conclusion et mise en place d'un plan d'action digital</div>
+                    <ul>
+                        <li>Élaboration d'un plan d'action : étapes pour mettre en œuvre une stratégie complète de développement digital.</li>
+                        <li>Suivi et ajustement des actions : comment évaluer et améliorer les résultats.</li>
+                        <li>Séance de questions-réponses pour résoudre les problèmes spécifiques des participants.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Informations complémentaires</h2>
+        
+        <h3>Modalités et délais d'accès</h3>
+        <p>A réception de votre accord de prise en charge pour les professionnels.</p>
+        
+        <h3>Tarif de la formation</h3>
+        <p>Le tarif de la formation s'élève à 980€ Nets de taxes Art-293 du CGI.</p>
+        
+        <h3>Modalités de règlement</h3>
+        <p>Chèque ou virement à réception de facture.</p>
+        
+        <h3>Contact de l'organisme, référent pédagogique, référent qualité</h3>
+        <p>L'apprenant(e) recevra un soutien continu de la part du formateur tout au long de sa formation. Pendant toute la durée du programme, chaque stagiaire pourra le contacter par courriel à l'adresse aurelien@gestionmax.fr ou par téléphone/SMS au 06.46.02.24.68.</p>
+        
+        <h3>Modalités techniques et pédagogiques</h3>
+        <p>Formation en présentiel individuel (méthode expositive et démonstrative) avec alternance d'exposés théoriques et de cas pratiques. Cette méthode permet de varier les modes d'apprentissage pour favoriser l'acquisition des connaissances et des compétences. Les exposés théoriques permettent de présenter les concepts et les principes fondamentaux sur Brevo, tandis que les cas pratiques permettent de mettre en application ces notions dans des situations concrètes. Cette alternance permet de favoriser l'engagement de l'apprenant(e) dans leur propre processus d'apprentissage en leur donnant des occasions d'appliquer directement ce qu'ils ont appris. Cette méthode est particulièrement adaptée pour les formations professionnelles qui ont pour objectif de développer des compétences pratiques chez les apprenants notamment les adultes.</p>
+        
+        <h3>Formateur</h3>
+        <p>Aurélien LAVAYSSIERE est un consultant formateur en informatique de gestion, spécialisé dans la formation des adultes et plus particulièrement dans le domaine du CMS WordPress. Doté d'une solide expérience dans le domaine de la formation, Aurélien possède une expertise approfondie en matière de gestion de sites web, avec une attention particulière portée à l'utilisation efficace du CMS WordPress.</p>
+        
+        <h3>L'organisme de formation mettra à disposition de l'apprenant(e)</h3>
+        <p>Sa salle de formation équipée de son matériel informatique haut de gamme connectée à internet, afin de pouvoir aisément garantir le bon déroulement de la formation du point de vue pédagogique et technique. Un support de cours (Projet et ressources téléchargeables sur Notion, un hébergement Web, quizz, fiches pratiques).</p>
+        
+        <h3>Modalités d'évaluation</h3>
+        <p>Afin de permettre d'évaluer les compétences acquises par l'apprenant(e), il lui sera demandé, à l'issue de chaque bloc de compétences, de se soumettre à un quizz d'une dizaine de questions par l'intermédiaire de notre plateforme d'évaluation en ligne EVALBOX. Grille d'analyse des compétences, travaux pratiques.</p>
+        
+        <h3>Sanction de la formation</h3>
+        <p>Un certificat de réalisation de formation. Une feuille d'émargement individuelle sera conjointement signée par le formateur et chaque stagiaire, pour chaque demi-journée de formation, permettant d'attester de l'exécution de l'action de formation.</p>
+        
+        <h3>Niveau/certification obtenue</h3>
+        <p>Aucune</p>
+        
+        <h3>Délai d'acceptation</h3>
+        <p>Mise en place de votre parcours de formation dès réception de votre acompte ou votre accord de prise en charge.</p>
+        
+        <h3>Accessibilité handicapée</h3>
+        <p>Votre organisme est engagé dans une démarche d'accueil et d'accompagnement en formation des personnes en situation de handicap. Dans ce cadre, je vous propose :</p>
+        <ul>
+            <li>Un entretien téléphonique pour vous accompagner individuellement,</li>
+            <li>D'évaluer vos besoins spécifiques au regard d'une situation de handicap,</li>
+            <li>De mettre en œuvre les adaptations pédagogiques, organisationnelles et matériels nécessaires.</li>
+        </ul>
+        <p>Référent handicap de l'organisme : Aurélien LAVAYSSIERE - aurelien@gestionmax.fr – 06.46.02.24.68</p>
+        
+        <h3>Cessation anticipée de la formation ou abandon en cours de formation</h3>
+        <ul>
+            <li>En cas de renonciation de l'apprenant(e) avant le début de la formation, aucune facturation.</li>
+            <li>En cas de renonciation en cours de formation, la facturation se fera au pro rata de l'assiduité de l'apprenant(e).</li>
+        </ul>
+    </section>
+           
+    <footer>
+        <div class="footer-info">
+            <strong>Aurélien LAVAYSSIERE - GESTIONMAX</strong>
+        </div>
+        <div class="footer-info">
+            Les vergers de Valconstance - 300 chemin de la suquette - 06600 Antibes
+        </div>
+        <div class="footer-info">
+            Siret : 483 797 213 00061
+        </div>
+    </footer>
+</body>
+</html>

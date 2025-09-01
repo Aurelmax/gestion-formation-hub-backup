@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programme de formation - Maîtriser Canva pour le web, les réseaux sociaux et la vente en ligne</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            color: #374151;
+            padding: 1.5rem;
+            max-width: 210mm;
+            margin: 0 auto;
+            background-color: #ffffff;
+            font-size: 0.9rem;
+        }
+        
+        .header {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        
+        .header-content {
+            flex-grow: 1;
+        }
+        
+        .logo {
+            max-height: 70px;
+            max-width: 150px;
+            margin-bottom: 0;
+            object-fit: contain;
+        }
+        
+        h1 {
+            font-size: 1.6rem;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            font-size: 1.3rem;
+            color: #2563eb;
+            margin-bottom: 0.75rem;
+            margin-top: 1.25rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        
+        h3 {
+            font-size: 1.1rem;
+            color: #1e40af;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        h4 {
+            font-size: 1rem;
+            color: #1d4ed8;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 0.75rem;
+            max-width: 100%;
+            line-height: 1.4;
+        }
+        
+        ul, ol {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.25rem;
+            line-height: 1.4;
+        }
+        
+        .info-block {
+            background-color: #f8fafc;
+            border-radius: 4px;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        .info-row {
+            margin-bottom: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: baseline;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #1e40af;
+            min-width: 120px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #6b7280;
+        }
+        
+        .badge-blue {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-green {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge-yellow {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+        
+        .badge-red {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .section {
+            margin-bottom: 1rem;
+            break-inside: auto;
+            padding-bottom: 0.25rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .jour {
+            margin-bottom: 1rem;
+            background-color: #f9fafb;
+            padding: 0.75rem;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .jour-title {
+            font-weight: 600;
+            color: #1e40af;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .session {
+            margin-bottom: 1rem;
+        }
+
+        .module {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            border-left: 2px solid #e5e7eb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                font-size: 9pt;
+            }
+            
+            @page {
+                margin: 1cm;
+                size: A4 portrait;
+            }
+            
+            .header {
+                margin-bottom: 0.75rem;
+                padding-bottom: 0.5rem;
+            }
+            
+            h1 {
+                font-size: 14pt;
+            }
+            
+            h2 {
+                font-size: 12pt;
+            }
+            
+            h3 {
+                font-size: 11pt;
+            }
+            
+            .info-block {
+                padding: 0.5rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .jour {
+                padding: 0.5rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+        }
+        
+        footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        
+        .footer-info {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        
+        /* Optimisation des sections avec un style plus compact */
+        .section:nth-child(even) {
+            background-color: #fafafa;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-left: -0.5rem;
+            margin-right: -0.5rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Programme de formation</h1>
+            <h2>Maîtriser Canva pour le web, les réseaux sociaux et la vente en ligne</h2>
+        </div>
+        <img src="/logo.png" alt="Logo GESTIONMAX" class="logo">
+    </div>
+
+    <div class="info-block">
+        <div class="info-row">
+            <div class="info-label">Référence :</div>
+            <div>A012-CV-WEB-WC</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Date :</div>
+            <div>25/11/24</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Prérequis :</div>
+            <div>Maîtriser son environnement et les fonctions de base pour utiliser un ordinateur.</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Public concerné :</div>
+            <div>Artisans, commerçants ou professions libérales.</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Durée :</div>
+            <div>14 heures ou 2 jours</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Horaires :</div>
+            <div>9h à 13h et de 14h à 17h</div>
+        </div>
+    </div>
+
+    <section class="section">
+        <h2>Objectifs pédagogiques</h2>
+        <p>A la fin de la formation, l'apprenant(e) sera en mesure de créer et optimiser des visuels professionnels attractifs adaptés au web et aux réseaux sociaux, tout en respectant les principes du design graphique.</p>
+    </section>
+
+    <section class="section">
+        <h2>Programme détaillé</h2>
+        
+        <div class="jour">
+            <h3>Jour 1 : Découvrir Canva et créer des visuels attractifs</h3>
+            
+            <div class="session">
+                <h4>Matin (9h00 - 13h00)</h4>
+                
+                <div class="module">
+                    <h4>Introduction à Canva</h4>
+                    <ul>
+                        <li>Présentation de Canva : version gratuite et Pro.</li>
+                        <li>Création d'un compte et prise en main de l'interface.</li>
+                        <li>Exploration des modèles existants : affiches, posts, bannières, stories.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h4>Principes de conception graphique</h4>
+                    <ul>
+                        <li>Les fondamentaux du design : couleurs, typographies, alignements.</li>
+                        <li>Choisir les formats adaptés pour chaque plateforme (Facebook, Instagram, LinkedIn).</li>
+                        <li>Optimiser les visuels pour une communication professionnelle et cohérente.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h00 - 17h00)</h4>
+                
+                <div class="module">
+                    <h4>Création de visuels pour les réseaux sociaux</h4>
+                    <ul>
+                        <li>Concevoir des publications engageantes : post carrousel, stories, visuels de couverture.</li>
+                        <li>Pratique : création de visuels pour Instagram et Facebook.</li>
+                        <li>Ajouter des éléments interactifs : icônes, stickers, animations.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h4>Personnalisation avec Canva</h4>
+                    <ul>
+                        <li>Importer des images, polices et logos pour une identité de marque unique.</li>
+                        <li>Utiliser les bibliothèques Canva : photos, vidéos et illustrations.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="jour">
+            <h3>Jour 2 : Stratégie de contenu et optimisation pour le web</h3>
+            
+            <div class="session">
+                <h4>Matin (9h00 - 13h00)</h4>
+                
+                <div class="module">
+                    <h4>Optimiser ses visuels pour le web</h4>
+                    <ul>
+                        <li>Adapter la taille et la résolution des visuels (SEO et rapidité de chargement).</li>
+                        <li>Exporter les fichiers aux formats appropriés (PNG, JPEG, PDF, MP4).</li>
+                        <li>Intégrer les visuels dans un site WordPress ou blog.</li>
+                        <li>Créer des fiches produits optimisées et intégrer des images professionnelles.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h4>Créer des visuels pour la publicité en ligne</h4>
+                    <ul>
+                        <li>Réaliser des visuels adaptés aux publicités Facebook Ads et Google Ads.</li>
+                        <li>Exercice pratique : création d'une annonce visuelle.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h00 - 17h00)</h4>
+                
+                <div class="module">
+                    <h4>Planifier et diffuser le contenu visuel</h4>
+                    <ul>
+                        <li>Planification des publications avec des outils gratuits (Meta Business Suite, Canva Planner).</li>
+                        <li>Analyse des performances des visuels grâce aux statistiques des réseaux sociaux.</li>
+                    </ul>
+                </div>
+                
+                <div class="module">
+                    <h4>Étude de cas personnalisée</h4>
+                    <ul>
+                        <li>Création d'une série de visuels adaptés aux besoins professionnels de chaque participant.</li>
+                        <li>Présentation et feedback.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="section">
+        <h2>Modalités et informations complémentaires</h2>
+        
+        <h3>Modalités, délais moyens d'accès</h3>
+        <p>A réception de votre accord de prise en charge pour les professionnels.</p>
+        
+        <h3>Tarif de la formation</h3>
+        <p>Le tarif de la formation s'élève à 980€ Nets de taxes Art-293 du CGI.</p>
+        <p>Modalités de règlement : chèque ou virement à réception de facture.</p>
+        
+        <h3>Contact de l'organisme, référent pédagogique, référent qualité</h3>
+        <p>L'apprenant(e) recevra un soutien continu de la part du formateur tout au long de sa formation. Pendant toute la durée du programme, chaque stagiaire pourra le contacter par courriel à l'adresse aurelien@gestionmax.fr ou par téléphone/SMS au 06.46.02.24.68</p>
+        
+        <h3>Modalités techniques et pédagogiques</h3>
+        <p>La formation est dispensée en présentiel individuel en utilisant une méthode expositive et démonstrative, adaptée aux besoins des professionnels en formation continue. Elle repose sur une alternance d'exposés théoriques et de cas pratiques, favorisant ainsi une acquisition rapide des compétences et une application immédiate des connaissances acquises.</p>
+        
+        <h4>Exposés théoriques</h4>
+        <p>Cette phase permet de présenter les concepts et fonctionnalités essentiels de Canva pour la création et l'optimisation de contenu visuel. Les thématiques abordées incluent :</p>
+        <ul>
+            <li>Introduction à Canva : découverte de l'interface et des outils.</li>
+            <li>Principes de design graphique : typographie, couleurs, hiérarchie visuelle, et composition.</li>
+            <li>Formats adaptés aux supports web et réseaux sociaux :
+                <ul>
+                    <li>Création de visuels pour les publications Instagram, Facebook et LinkedIn.</li>
+                    <li>Design de bannières pour sites web et newsletters.</li>
+                    <li>Conception d'infographies et de présentations professionnelles.</li>
+                </ul>
+            </li>
+            <li>Optimisation des visuels pour le web : poids, dimensions, et résolution des images pour garantir performance et qualité.</li>
+        </ul>
+        
+        <h4>Cas pratiques</h4>
+        <p>L'apprenant réalise des exercices concrets pour appliquer immédiatement les notions abordées :</p>
+        <ol>
+            <li>Création de publications pour les réseaux sociaux :
+                <ul>
+                    <li>Concevoir un post Instagram attractif avec texte et image.</li>
+                    <li>Élaborer une bannière Facebook optimisée pour les campagnes publicitaires.</li>
+                </ul>
+            </li>
+            <li>Design de contenu professionnel :
+                <ul>
+                    <li>Réaliser une présentation visuelle claire et structurée.</li>
+                    <li>Créer une infographie simple pour illustrer des données.</li>
+                </ul>
+            </li>
+            <li>Personnalisation des modèles :
+                <ul>
+                    <li>Adapter des templates Canva pour une identité visuelle cohérente.</li>
+                    <li>Intégrer logos, polices et couleurs d'une marque.</li>
+                </ul>
+            </li>
+            <li>Optimisation et exportation des visuels :
+                <ul>
+                    <li>Ajuster les paramètres d'exportation pour une utilisation sur différents supports (web, impression, réseaux).</li>
+                    <li>Réaliser des tests pour assurer l'impact visuel et l'engagement.</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <h3>Formateur</h3>
+        <p>Aurélien Lavayssière, consultant formateur certifié, spécialisé en digitalisation de la relation client et création de contenus visuels pour le web.</p>
+        
+        <h3>L'organisme de formation mettra à disposition de l'apprenant(e)</h3>
+        <p>Sa salle de formation équipée de son matériel informatique haut de gamme connectée à internet, afin de pouvoir aisément garantir le bon déroulement de la formation du point de vue pédagogique et technique. Un support de cours (Projet et ressources téléchargeables sur Notion, un hébergement Web, quizz, fiches pratiques) et un accès à Canva Pro.</p>
+        
+        <h3>Modalités d'évaluation</h3>
+        <p>Afin de permettre d'évaluer les compétences acquises par l'apprenant(e), il lui sera demandé, à l'issue de chaque bloc de compétences, de se soumettre à un quizz d'une dizaine de questions par l'intermédiaire de notre plateforme d'évaluation en ligne EVALBOX. Grille d'analyse des compétences, travaux pratiques.</p>
+        
+        <h3>Sanction de la formation</h3>
+        <p>Un certificat de réalisation de formation. Une feuille d'émargement individuelle sera conjointement signée par le formateur et chaque stagiaire, pour chaque demi-journée de formation, permettant d'attester de l'exécution de l'action de formation.</p>
+        
+        <h3>Niveau/certification obtenue</h3>
+        <p>Cette formation n'est pas certifiante, cependant, elle permet de maîtriser les fonctionnalités essentielles de Canva et d'optimiser la création de contenus visuels pour une utilisation professionnelle sur le web et les réseaux sociaux.</p>
+        
+        <h3>Délai d'acceptation</h3>
+        <p>Mise en place de votre parcours de formation dès réception de votre acompte ou votre accord de prise en charge.</p>
+        
+        <h3>Accessibilité handicapée</h3>
+        <p>Votre organisme est engagé dans une démarche d'accueil et d'accompagnement en formation des personnes en situation de handicap. Dans ce cadre, je vous propose :</p>
+        <ul>
+            <li>Un entretien téléphonique pour vous accompagner individuellement,</li>
+            <li>D'évaluer vos besoins spécifiques au regard d'une situation de handicap,</li>
+            <li>De mettre en œuvre les adaptations pédagogiques, organisationnelles et matériels nécessaires.</li>
+        </ul>
+        <p>Référent handicap de l'organisme : Aurélien LAVAYSSIERE - aurelien@gestionmax.fr – 06.46.02.24.68</p>
+        
+        <h3>Cessation anticipée de la formation ou abandon en cours de formation</h3>
+        <ul>
+            <li>En cas de renonciation de l'apprenant(e) avant le début de la formation, aucune facturation.</li>
+            <li>En cas de renonciation en cours de formation, la facturation se fera au pro rata de l'assiduité de l'apprenant(e).</li>
+        </ul>
+    </section>
+           
+    <footer>
+        <div class="footer-info">
+            <strong>Aurélien LAVAYSSIERE - GESTIONMAX</strong>
+        </div>
+        <div class="footer-info">
+            Les vergers de Valconstance - 300 chemin de la suquette - 06600 Antibes
+        </div>
+        <div class="footer-info">
+            Siret : 483 797 213 00061
+        </div>
+    </footer>
+</body>
+</html>

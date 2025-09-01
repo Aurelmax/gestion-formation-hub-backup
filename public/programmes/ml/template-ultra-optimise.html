@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template ultra-optimisé - Programme de formation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.2;
+            color: #374151;
+            padding: 0.8rem;
+            max-width: 210mm;
+            margin: 0 auto;
+            background-color: #ffffff;
+            font-size: 0.75rem;
+        }
+        
+        .header {
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        
+        .header-content {
+            flex-grow: 1;
+        }
+        
+        .logo {
+            max-height: 50px;
+            max-width: 110px;
+            margin-bottom: 0;
+            object-fit: contain;
+        }
+        
+        h1 {
+            font-size: 1.2rem;
+            color: #1e3a8a;
+            margin-bottom: 0.2rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        
+        h2 {
+            font-size: 1rem;
+            color: #2563eb;
+            margin-bottom: 0.3rem;
+            margin-top: 0.7rem;
+            font-weight: 600;
+            line-height: 1.1;
+        }
+        
+        h3 {
+            font-size: 0.9rem;
+            color: #1e40af;
+            margin-top: 0.5rem;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+        }
+        
+        h4 {
+            font-size: 0.8rem;
+            color: #1d4ed8;
+            margin-top: 0.3rem;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        p {
+            margin-bottom: 0.3rem;
+            max-width: 100%;
+            line-height: 1.2;
+        }
+        
+        ul, ol {
+            margin-bottom: 0.3rem;
+            padding-left: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.1rem;
+            line-height: 1.2;
+        }
+        
+        /* Bloc d'information ultra-compact */
+        .info-block {
+            border-radius: 3px;
+            padding: 0.3rem;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 0.5rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.3rem;
+            font-size: 0.7rem;
+            background-color: #f8fafc;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 0.2rem;
+            align-items: baseline;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #1e40af;
+            min-width: 60px;
+            margin-right: 0.2rem;
+        }
+        
+        .section {
+            margin-bottom: 0.5rem;
+            break-inside: auto;
+            padding-bottom: 0.1rem;
+        }
+
+        .section-title {
+            background-color: #e0e7ff;
+            padding: 0.2rem 0.4rem;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+        }
+
+        .jour {
+            margin-bottom: 0.4rem;
+            padding: 0.3rem;
+            border-left: 2px solid #3b82f6;
+            background-color: #f9fafb;
+        }
+
+        .session {
+            margin-bottom: 0.3rem;
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 0.3rem;
+        }
+        
+        .session-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .module {
+            flex: 1;
+            min-width: 45%;
+        }
+        
+        /* Grille ultra-compact pour les jours */
+        .programme-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .jour-grid {
+            padding: 0.3rem;
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+        }
+        
+        .jour-titre {
+            font-weight: 600;
+            color: #1e3a8a;
+            border-bottom: 1px solid #d1d5db;
+            margin-bottom: 0.3rem;
+            padding-bottom: 0.2rem;
+            font-size: 0.8rem;
+        }
+
+        /* Mise en colonnes multiples pour maximiser l'espace */
+        .three-columns {
+            column-count: 3;
+            column-gap: 0.7rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .two-columns {
+            column-count: 2;
+            column-gap: 0.7rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .compact-list li {
+            margin-bottom: 0.1rem;
+            padding-left: 0;
+        }
+        
+        /* Section horizontale */
+        .horizontal-section {
+            display: flex;
+            gap: 0.7rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .horizontal-section > div {
+            flex: 1;
+        }
+        
+        /* Boîtes avec informations condensées */
+        .info-box {
+            border: 1px solid #e5e7eb;
+            padding: 0.3rem;
+            margin-bottom: 0.4rem;
+            background-color: #f9fafb;
+        }
+        
+        .info-box h3 {
+            font-size: 0.8rem;
+            margin-top: 0;
+            margin-bottom: 0.2rem;
+            color: #1e40af;
+        }
+        
+        /* Pied de page plus compact */
+        footer {
+            margin-top: 0.8rem;
+            padding-top: 0.3rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.7rem;
+            color: #6b7280;
+            text-align: center;
+        }
+        
+        .footer-info {
+            margin-bottom: 0.1rem;
+            line-height: 1.2;
+        }
+        
+        /* Optimisations pour l'impression */
+        @media print {
+            body {
+                padding: 0.5rem;
+                font-size: 8pt;
+            }
+            
+            @page {
+                margin: 0.5cm;
+                size: A4 portrait;
+            }
+            
+            h1 {
+                font-size: 12pt;
+            }
+            
+            h2 {
+                font-size: 10pt;
+            }
+            
+            h3 {
+                font-size: 9pt;
+            }
+            
+            h4 {
+                font-size: 8pt;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Programme de formation</h1>
+            <h2>Titre de la formation (à remplacer)</h2>
+        </div>
+        <img src="../logo-gestionmax-antibes.png" alt="GestionMax Logo" class="logo" />
+    </div>
+
+    <!-- Bloc d'information ultra-compact -->
+    <div class="info-block">
+        <div>
+            <div class="info-row">
+                <div class="info-label">Version:</div>
+                <div>1</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Date:</div>
+                <div>12/08/2025</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Code:</div>
+                <div>A000-XX</div>
+            </div>
+        </div>
+        <div>
+            <div class="info-row">
+                <div class="info-label">Durée:</div>
+                <div>21h (3j)</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Horaires:</div>
+                <div>9h-13h/14h-17h</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Tarif:</div>
+                <div>1200€ HT</div>
+            </div>
+        </div>
+        <div>
+            <div class="info-row">
+                <div class="info-label">Public:</div>
+                <div>TPE, artisans</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Prérequis:</div>
+                <div>Usage PC/Internet</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Modalité:</div>
+                <div>Présentiel/Distanciel</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Objectifs ultra-compacts -->
+    <section class="section">
+        <div class="section-title">Objectifs pédagogiques</div>
+        <div class="three-columns compact-list">
+            <ul>
+                <li>Objectif 1 très spécifique à la formation</li>
+                <li>Objectif 2 très spécifique à la formation</li>
+                <li>Objectif 3 très spécifique à la formation</li>
+                <li>Objectif 4 très spécifique à la formation</li>
+                <li>Objectif 5 très spécifique à la formation</li>
+                <li>Objectif 6 très spécifique à la formation</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Programme ultra-compact -->
+    <section class="section">
+        <div class="section-title">Programme détaillé</div>
+        
+        <div class="programme-grid">
+            <div class="jour-grid">
+                <div class="jour-titre">Jour 1: Module 1</div>
+                <ul class="compact-list">
+                    <li><strong>Matin:</strong> Thème 1 (détails techniques) + Thème 2 (détails pratiques)</li>
+                    <li><strong>A-midi:</strong> Thème 3 (détails clés) + Exercices pratiques</li>
+                </ul>
+            </div>
+            
+            <div class="jour-grid">
+                <div class="jour-titre">Jour 2: Module 2</div>
+                <ul class="compact-list">
+                    <li><strong>Matin:</strong> Thème 4 (points techniques) + Thème 5 (applications)</li>
+                    <li><strong>A-midi:</strong> Thème 6 (cas pratiques) + Ateliers</li>
+                </ul>
+            </div>
+            
+            <div class="jour-grid">
+                <div class="jour-titre">Jour 3: Module 3</div>
+                <ul class="compact-list">
+                    <li><strong>Matin:</strong> Thème 7 (méthodes) + Thème 8 (stratégies)</li>
+                    <li><strong>A-midi:</strong> Thème 9 (application finale) + Évaluation</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Détail plus précis mais toujours ultra-compact -->
+        <div class="jour">
+            <h3>Jour 1: Module 1 - Titre détaillé</h3>
+            
+            <div class="session">
+                <h4>Matin (9h-13h)</h4>
+                <div class="session-content">
+                    <div class="module">
+                        <b>Thème 1:</b> Liste très concise des points abordés, techniques clés et applications principales avec focus sur les compétences visées.
+                    </div>
+                    <div class="module">
+                        <b>Thème 2:</b> Liste très concise des points abordés, techniques clés et applications principales avec focus sur les compétences visées.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="session">
+                <h4>Après-midi (14h-17h)</h4>
+                <div class="session-content">
+                    <div class="module">
+                        <b>Thème 3:</b> Liste très concise des points abordés, techniques clés et applications principales avec focus sur les compétences visées.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modalités pédagogiques et informations complémentaires ultra-compactes -->
+    <section class="section">
+        <div class="section-title">Modalités et informations complémentaires</div>
+        
+        <div class="horizontal-section">
+            <div class="info-box">
+                <h3>Méthodes pédagogiques</h3>
+                <ul class="compact-list">
+                    <li>Apports théoriques et pratiques</li>
+                    <li>Études de cas concrets</li>
+                    <li>Mises en situation professionnelles</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h3>Évaluation</h3>
+                <p>Quiz EVALBOX (20 questions). Travaux pratiques. Grille d'analyse des compétences.</p>
+            </div>
+            
+            <div class="info-box">
+                <h3>Moyens techniques</h3>
+                <ul class="compact-list">
+                    <li>Salle équipée, ordinateurs</li>
+                    <li>Support de formation numérique</li>
+                    <li>Plateforme en ligne</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="horizontal-section">
+            <div class="info-box">
+                <h3>Formateur</h3>
+                <p>Aurélien LAVAYSSIERE - Consultant formateur spécialisé, expert en technologies numériques.</p>
+            </div>
+            
+            <div class="info-box">
+                <h3>Accessibilité handicap</h3>
+                <p>Formation accessible. Référent: A. LAVAYSSIERE - <a href="mailto:aurelien@gestionmax.fr">aurelien@gestionmax.fr</a> – 06.46.02.24.68</p>
+            </div>
+            
+            <div class="info-box">
+                <h3>Informations administratives</h3>
+                <p>Certification: Attestation de formation. Délai: Mise en place dès réception d'acompte. Facturation au prorata en cas d'abandon.</p>
+            </div>
+        </div>
+    </section>
+           
+    <footer>
+        <div class="footer-info">
+            <strong>Aurélien LAVAYSSIERE - GESTIONMAX</strong> | Les vergers de Valconstance - 300 chemin de la suquette - 06600 Antibes | Siret : 483 797 213 00061
+        </div>
+    </footer>
+</body>
+</html>
