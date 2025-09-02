@@ -3,8 +3,6 @@ import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import AboutSection from '@/components/AboutSection';
 import FormationsPreview from '@/components/FormationsPreview';
-import IllustrationSection from '@/components/IllustrationSection';
-import OffreEntreprise from '@/components/OffreEntreprise';
 import Footer from '@/components/Footer';
 import { ArrowDownCircle } from 'lucide-react';
 import { redirect } from 'next/navigation';

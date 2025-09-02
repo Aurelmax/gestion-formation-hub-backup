@@ -161,10 +161,16 @@ export default function Catalogue() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Fonction pour ouvrir la modale de détail
+  // Fonction pour gérer l'ouverture de la modale de détail
   const openDetailModal = (formation: ProgrammeFormation) => {
     setSelectedFormation(formation);
     setShowDetailModal(true);
+  };
+
+  // Fonction pour gérer le clic sur le bouton de positionnement
+  const onPositionnement = (titre: string) => {
+    // Rediriger vers la page de rendez-vous de positionnement avec le titre de la formation en paramètre
+    router.push(`/rendezvous-positionnement?formation=${encodeURIComponent(titre)}`);
   };
 
   // Fonction pour fermer la modale de détail

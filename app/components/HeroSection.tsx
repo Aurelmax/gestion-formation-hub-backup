@@ -1,7 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Award, CheckCircle } from "lucide-react";
+import { Award, CheckCircle, Phone } from "lucide-react";
 import Link from "next/link";
 
 const HeroSection = () => {
@@ -22,17 +21,20 @@ const HeroSection = () => {
           </h1>
           <p className="text-xl mb-8 max-w-3xl mx-auto leading-relaxed">
             Développez vos compétences WordPress avec un formateur certifié. 
-            Formations éligibles CPF et conformes Qualiopi.
+            Formations éligibles FAF & OPCO et conformes Qualiopi.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-            <Link href="/catalogue">
+            <a href="tel:+33612345678">
               <Button size="lg" variant="secondary" className="text-lg px-8 py-4">
-                Voir le catalogue
+                <Phone className="h-5 w-5 mr-2" />
+                Appeler maintenant
+              </Button>
+            </a>
+            <Link href="/contact?rdv=positionnement">
+              <Button size="lg" variant="outline" className="text-lg px-8 py-4 bg-white/10 hover:bg-white/20 border-white text-white hover:text-white">
+                RDV de positionnement
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-4 bg-accent/90 hover:bg-accent border-white text-white">
-              Demander un devis
-            </Button>
           </div>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Badge variant="secondary" className="text-lg px-4 py-2">
@@ -41,7 +43,7 @@ const HeroSection = () => {
             </Badge>
             <Badge variant="secondary" className="text-lg px-4 py-2">
               <CheckCircle className="h-5 w-5 mr-2" />
-              Éligible CPF
+              Éligible FAF & OPCO
             </Badge>
           </div>
         </div>

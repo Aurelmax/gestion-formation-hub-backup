@@ -1,3 +1,4 @@
+"use client";
 
 import { useState } from "react";
 import { useConfetti } from "@/hooks/useConfetti";
@@ -11,6 +12,7 @@ import CoordonneesSection from "./CoordonneesSection";
 import ExperienceObjectifsSection from "./ExperienceObjectifsSection";
 import { Label } from "@/components/ui/label";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
+import { Loader2 } from "lucide-react";
 
 interface PositionnementFormProps {
   onSubmit: (data: any) => void;
@@ -18,7 +20,7 @@ interface PositionnementFormProps {
   formationTitre?: string;
 }
 
-const PositionnementForm = ({ onSubmit, onCancel, formationTitre = "WordPress : concevoir et réaliser un site vitrine • webmarketing initial" }: PositionnementFormProps) => {
+const PositionnementForm = ({ onSubmit, onCancel, formationTitre = "" }: PositionnementFormProps) => {
   const [formData, setFormData] = useState({
     // Formation sélectionnée
     formationSelectionnee: formationTitre,
@@ -29,7 +31,7 @@ const PositionnementForm = ({ onSubmit, onCancel, formationTitre = "WordPress : 
     sexe: "",
     situationHandicap: "",
     // Date et heure du rendez-vous
-    dateRdv: undefined,
+    dateRdv: undefined as Date | undefined,
     // Coordonnées
     email: "",
     telephone: "",
@@ -44,7 +46,7 @@ const PositionnementForm = ({ onSubmit, onCancel, formationTitre = "WordPress : 
     // Objectifs
     objectifsPrincipaux: "",
     // Niveau de maîtrise
-    niveauMaitrise: "non",
+    niveauMaitrise: "débutant",
     // Programme de formation
     programmeFormation: "",
   });
@@ -52,26 +54,49 @@ const PositionnementForm = ({ onSubmit, onCancel, formationTitre = "WordPress : 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { fireConfetti } = useConfetti();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.nomBeneficiaire.trim()) {
+      newErrors.nomBeneficiaire = "Le nom est requis";
+    }
+    
+    if (!formData.prenomBeneficiaire.trim()) {
+      newErrors.prenomBeneficiaire = "Le prénom est requis";
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = "L'email est requis";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "L'email n'est pas valide";
+    }
+    
+    if (!formData.telephone.trim()) {
+      newErrors.telephone = "Le téléphone est requis";
+    } else if (!/^[0-9\s\-.]{10,20}$/.test(formData.telephone)) {
+      newErrors.telephone = "Le numéro de téléphone n'est pas valide";
+    }
+    
+    if (!formData.dateRdv) {
+      newErrors.dateRdv = "Veuillez sélectionner une date de rendez-vous";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation basique
-    if (!formData.nomBeneficiaire || !formData.prenomBeneficiaire || !formData.email || !formData.telephone) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs obligatoires.",
-        variant: "destructive",
-      });
+    if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      console.log("Données envoyées:", formData);
-      
-      // Utilisation de l'API qui interagit avec Prisma - Route unifiée Rendezvous
       const response = await api.post('/api/rendezvous', {
         // Champs obligatoires pour la création d'un rendez-vous
         nom: formData.nomBeneficiaire,
@@ -85,39 +110,50 @@ const PositionnementForm = ({ onSubmit, onCancel, formationTitre = "WordPress : 
         dateNaissance: formData.dateNaissance || null,
         sexe: formData.sexe,
         // Situation de handicap
-        hasHandicap: formData.situationHandicap ? true : false,
-        detailsHandicap: formData.situationHandicap,
+        hasHandicap: !!formData.situationHandicap,
+        detailsHandicap: formData.situationHandicap || null,
         // Adresse
-        adresseEntreprise: `${formData.adresse}, ${formData.codePostal} ${formData.ville}`,
+        adresse: formData.adresse,
+        codePostal: formData.codePostal,
+        ville: formData.ville,
         // Statut professionnel
-        situationActuelle: formData.statut,
+        statut: formData.statut,
         // Expérience et objectifs
-        pratiqueActuelle: formData.experienceWordPress,
+        experience: formData.experienceWordPress,
         objectifs: formData.objectifsPrincipaux,
         niveau: formData.niveauMaitrise,
         // Date et statut du rendez-vous
         dateRdv: formData.dateRdv,
-        status: 'nouveau', // Statut initial d'une demande de positionnement
-        type: 'positionnement'
+        status: 'nouveau',
+        type: 'positionnement',
+        source: 'site-internet'
       });
 
-      const { data } = response;
-      console.log('Demande créée avec succès, ID:', data.id);
+      console.log('Demande créée avec succès, ID:', response.data.id);
 
       toast({
         title: "Demande envoyée",
-        description: "Votre demande de rendez-vous de positionnement a été envoyée avec succès. Nous vous recontacterons rapidement.",
+        description: "Votre demande de rendez-vous de positionnement a été enregistrée. Nous vous recontacterons rapidement pour confirmer la date et l'heure.",
       });
       
-      // Lancer l'effet de confetti pour célébrer la soumission réussie
       fireConfetti();
       
+      // Appeler la fonction de soumission du parent
       onSubmit(formData);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de l\'envoi:', error);
+      
+      let errorMessage = "Une erreur est survenue lors de l'envoi de votre demande.";
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Erreur",
-        description: `Une erreur est survenue lors de l'envoi de votre demande : ${error instanceof Error ? error.message : error?.response?.data?.message || 'Erreur inconnue'}`,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -127,59 +163,95 @@ const PositionnementForm = ({ onSubmit, onCancel, formationTitre = "WordPress : 
 
   const handleChange = (field: string, value: string | boolean | Date | undefined) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Effacer l'erreur du champ quand il est modifié
+    if (errors[field]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <Card>
+    <div className="max-w-4xl mx-auto p-4 sm:p-6">
+      <Card className="border-0 shadow-lg">
         <PositionnementFormHeader formationTitre={formationTitre} />
         <CardContent className="mt-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="bg-gray-50 p-4 rounded">
-              <p className="text-sm text-gray-700 mb-4">
-                Ce formulaire nous aidera dans un premier temps à identifier vos acquis, 
-                expériences et besoins de formation. Il en ressortira un premier entretien 
-                téléphonique de positionnement pédagogique.
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+              <p className="text-sm text-blue-800">
+                <span className="font-semibold">Information importante :</span> Ce formulaire nous aide à mieux cerner vos attentes et votre niveau actuel. 
+                Un conseiller vous contactera dans les 24-48h pour finaliser votre inscription et convenir d'un créneau pour votre entretien de positionnement.
               </p>
             </div>
 
-            <BeneficiaireInfoSection formData={formData} handleChange={handleChange} />
-            <CoordonneesSection formData={formData} handleChange={handleChange} />
-            <ExperienceObjectifsSection formData={formData} handleChange={handleChange} />
+            <BeneficiaireInfoSection 
+              formData={formData} 
+              handleChange={handleChange} 
+              errors={errors}
+            />
+            
+            <CoordonneesSection 
+              formData={formData} 
+              handleChange={handleChange} 
+              errors={errors}
+            />
 
-            {/* Date et heure du rendez-vous */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Planification du rendez-vous</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Date du rendez-vous</h3>
               <div className="space-y-2">
-                <Label htmlFor="dateRdv">Date et heure souhaitées</Label>
+                <Label>Date et heure du positionnement *</Label>
                 <DateTimePicker
-                  date={formData.dateRdv instanceof Date ? formData.dateRdv : formData.dateRdv ? new Date(formData.dateRdv) : undefined}
+                  date={formData.dateRdv}
                   setDate={(date) => handleChange("dateRdv", date)}
+                  className="w-full"
                 />
+                {errors.dateRdv && (
+                  <p className="text-sm text-red-600">{errors.dateRdv}</p>
+                )}
+                <p className="text-sm text-gray-500">
+                  Cette date est indicative. Notre équipe vous contactera pour confirmer le créneau.
+                </p>
               </div>
             </div>
 
-            {/* Programme de formation */}
-            <div className="bg-blue-50 p-4 rounded space-y-2">
-              <h3 className="font-semibold text-blue-900">Programme de formation</h3>
-              <p className="text-sm text-blue-800">
-                Le programme de la formation sera personnalisé suite à l'entretien de positionnement.
-              </p>
-            </div>
+            <ExperienceObjectifsSection 
+              formData={formData} 
+              handleChange={handleChange} 
+            />
 
-            {/* Boutons */}
-            <div className="flex gap-4 pt-6">
-              <Button 
-                type="submit" 
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
+            <div className="pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
                 disabled={isSubmitting}
+                className="w-full sm:w-auto"
               >
-                {isSubmitting ? "Envoi en cours..." : "Envoyer ma demande"}
-              </Button>
-              <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
                 Annuler
               </Button>
+              <Button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Envoi en cours...
+                  </>
+                ) : (
+                  "Envoyer ma demande"
+                )}
+              </Button>
             </div>
+            
+            <p className="text-xs text-gray-500 text-center">
+              En soumettant ce formulaire, vous acceptez que vos informations soient utilisées pour traiter votre demande 
+              conformément à notre <a href="/politique-confidentialite" className="text-blue-600 hover:underline">politique de confidentialité</a>.
+            </p>
           </form>
         </CardContent>
       </Card>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -162,9 +161,11 @@ const Catalogue = () => {
   const categoriesToDisplay = categoriesFormations;
 
   const handlePositionnement = (formationTitre: string) => {
-    console.log(`Ouverture du formulaire de positionnement pour: ${formationTitre}`);
-    setSelectedFormation(formationTitre);
-    setShowPositionnementForm(true);
+    console.log(`Redirection vers la page de rendez-vous de positionnement pour: ${formationTitre}`);
+    // Encoder le titre de la formation pour l'URL
+    const encodedTitre = encodeURIComponent(formationTitre);
+    // Rediriger vers la page de rendez-vous avec le titre de la formation en paramètre
+    window.location.href = `/rendezvous-positionnement?formation=${encodedTitre}`;
   };
 
   const handlePositionnementSubmit = (data: any) => {

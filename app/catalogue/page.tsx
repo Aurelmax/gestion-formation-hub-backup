@@ -3,6 +3,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CatalogueClient from '@/components/client/CatalogueClient';
 import WordPressFAQ from '@/components/wordpress/WordPressFAQ';
+import FormationsAdaptabilite from '@/components/catalogue/FormationsAdaptabilite';
 
 export const metadata: Metadata = {
   title: 'Catalogue des Formations | GestionMax',
@@ -38,6 +39,9 @@ export default function CataloguePage() {
             <CatalogueClient />
           </div>
         </div>
+
+        {/* Section Adaptabilité des formations */}
+        <FormationsAdaptabilite />
 
         {/* Section FAQ WordPress */}
         <WordPressFAQ />

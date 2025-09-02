@@ -5,7 +5,7 @@ const CatalogueHero = () => {
       <div className="absolute inset-0 z-0">
         <img 
           src="/formation-wordpress-antibes.webp" 
-          alt="Formation WordPress Antibes" 
+          alt="Formation WordPress Antibes pour les artisans" 
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-blue-900/70"></div>
@@ -17,7 +17,7 @@ const CatalogueHero = () => {
           </h2>
           <p className="text-xl max-w-3xl mx-auto">
             Découvrez nos formations professionnelles adaptées à tous les niveaux. 
-            Certifiées Qualiopi et éligibles CPF.
+            Certifiées Qualiopi et éligibles FAF & OPCO.
           </p>
         </div>
       </div>
