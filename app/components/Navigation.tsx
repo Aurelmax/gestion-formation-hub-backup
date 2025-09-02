@@ -12,18 +12,10 @@ const Navigation = () => {
 
   return (
     <nav className="flex items-center gap-4" aria-label="Menu principal">
-      <Link href="/">
-        <Button 
-          variant={isActive("/") ? "default" : "ghost"}
-          className="text-base"
-        >
-          Accueil
-        </Button>
-      </Link>
       <Link href="/catalogue">
         <Button 
-          variant={isActive("/catalogue") ? "default" : "ghost"}
-          className="text-base"
+          variant={isActive("/catalogue") || pathname === "/" ? "default" : "ghost"}
+          className="text-base font-medium"
         >
           Catalogue
         </Button>

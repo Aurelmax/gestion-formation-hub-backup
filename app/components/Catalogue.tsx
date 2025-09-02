@@ -288,16 +288,17 @@ export default function Catalogue() {
               <CardFooter className="flex flex-col space-y-2">
                 <Button 
                   variant="outline" 
-                  className="w-full"
+                  className="w-full border-primary text-primary hover:bg-primary/10"
                   onClick={() => openDetailModal(programme)}
                 >
                   Détails du parcours
                 </Button>
-                <Link href={`/formations/${programme.id}`} className="w-full">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                    En savoir plus
-                  </Button>
-                </Link>
+                <Button 
+                  className="w-full bg-primary hover:bg-primary/90 text-white"
+                  onClick={() => onPositionnement(programme.titre)}
+                >
+                  Réserver un RDV de positionnement
+                </Button>
               </CardFooter>
             </Card>
           ))}

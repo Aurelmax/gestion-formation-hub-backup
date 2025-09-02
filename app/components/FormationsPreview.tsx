@@ -125,8 +125,8 @@ const FormationsPreview = () => {
                         RDV de positionnement
                       </Button>
                       <Button 
-                        variant="outline" 
-                        className="w-full border-secondary/20 text-secondary hover:bg-secondary/10"
+                        variant="ghost" 
+                        className="w-full text-blue-600 hover:bg-blue-50 hover:text-blue-700"
                         onClick={() => {
                           setSelectedFormationDetails(formation);
                           setModalOpen(true);

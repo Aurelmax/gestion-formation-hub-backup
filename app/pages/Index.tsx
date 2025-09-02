@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
@@ -6,7 +5,6 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import FormationsPreview from "@/components/FormationsPreview";
-import PartenaireFormations from "@/components/PartenaireFormations";
 import IllustrationSection from "@/components/IllustrationSection";
 import OffreEntreprise from "@/components/OffreEntreprise";
 import Footer from "@/components/Footer";
@@ -120,25 +118,6 @@ const Index = () => {
           />
         </svg>
       </div>
-      
-      {/* Section Partenariats */}
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={sectionVariants}
-        className="relative z-10 bg-gray-50 pt-6 pb-16"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-          <h2 className="text-center text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">
-            <span className="text-indigo-700">Partenariats internationaux</span>
-          </h2>
-          <div className="flex justify-center mb-12">
-            <div className="h-1 w-24 bg-indigo-600 rounded"></div>
-          </div>
-        </div>
-        <PartenaireFormations />
-      </motion.div>
       
       {/* Section Offre Entreprise */}
       <OffreEntreprise />

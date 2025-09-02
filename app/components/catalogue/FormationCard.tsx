@@ -88,14 +88,15 @@ const FormationCard = ({ formation, onPositionnement }: FormationCardProps) => {
           {/* Boutons */}
           <div className="flex flex-col space-y-2">
             <Button 
-              className="w-full bg-accent hover:bg-accent/80"
+              variant="outline" 
+              className="w-full border-primary text-primary hover:bg-primary/10"
               onClick={() => onPositionnement(formation.titre)}
             >
-              RDV de positionnement
+              Réserver un RDV de positionnement
             </Button>
             <Button 
-              variant="outline" 
-              className="w-full border-secondary/20 text-secondary hover:bg-secondary/10"
+              variant="ghost" 
+              className="w-full text-blue-600 hover:bg-blue-50 hover:text-blue-700"
               onClick={() => router.push(`/formations/${formation.id}`)}
             >
               En savoir plus
