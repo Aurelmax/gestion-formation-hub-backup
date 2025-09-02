@@ -43,26 +43,36 @@ export interface CategorieFormation {
 
 export const useProgrammesCatalogue = () => {
   const [programmes, setProgrammes] = useState<ProgrammeFormation[]>([]);
-  const [categories, setCategories] = useState<CategorieFormation[]>([]); // Ajout pour les catégories
+  const [categories, setCategories] = useState<CategorieFormation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProgrammes = async () => {
     try {
       setLoading(true);
-      // Utilise le nouvel endpoint pour les programmes HTML groupés par catégorie
-      const response = await axios.get('/api/programmes-html/par-categorie/groupes');
+      // Utilisation du nouvel endpoint pour récupérer les programmes groupés par catégorie
+      const response = await axios.get('/api/programmes-formation/par-categorie/groupes');
       
-      // Stockage des catégories avec leurs programmes
+      // Les données sont déjà formatées comme attendu par le composant
       setCategories(response.data);
       
       // Extraction de tous les programmes pour la compatibilité avec le code existant
-      const allProgrammes = response.data.flatMap((categorie: CategorieFormation) => categorie.formations);
-      setProgrammes(allProgrammes);
+      const allProgrammes = response.data.flatMap((categorie: CategorieFormation) => 
+        categorie.formations.map(formation => ({
+          ...formation,
+          categorie: {
+            id: categorie.id,
+            code: categorie.code,
+            titre: categorie.titre,
+            couleur: categorie.couleur
+          }
+        }))
+      );
       
+      setProgrammes(allProgrammes);
       setError(null);
     } catch (err) {
-      console.error("Erreur lors de la récupération des programmes HTML:", err);
+      console.error("Erreur lors de la récupération des programmes:", err);
       setError("Impossible de charger les programmes de formation");
     } finally {
       setLoading(false);
@@ -125,7 +135,7 @@ export const useProgrammesCatalogue = () => {
 
   return { 
     programmes, 
-    categories, // Ajout des catégories pour l'affichage groupé
+    categories, 
     loading, 
     error, 
     refreshProgrammes: fetchProgrammes,

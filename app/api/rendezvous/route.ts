@@ -21,7 +21,7 @@ const rendezvousSchema = z.object({
 export async function GET() {
   try {
     const rendezvous = await prisma.rendezvous.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { date_creation: 'desc' },
       take: 100,
     });
     return NextResponse.json(rendezvous);

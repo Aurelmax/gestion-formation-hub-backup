@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
 
     const actions = await prisma.actionCorrective.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       include: {
         reclamation: {
           select: {

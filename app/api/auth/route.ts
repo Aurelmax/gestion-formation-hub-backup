@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    // Implémentation à compléter
     return NextResponse.json({ message: 'Route auth fonctionnelle' });
   } catch (error) {
     return NextResponse.json(
@@ -18,7 +17,6 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
-    // Implémentation à compléter
     return NextResponse.json({ message: 'Création auth', data });
   } catch (error) {
     return NextResponse.json(

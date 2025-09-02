@@ -1,34 +1,20 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { ClientProviders } from './components/providers/ClientProviders';
-import { ReactQueryProvider } from './components/providers/ReactQueryProvider';
-import { AuthProvider } from "./hooks/useAuth";
+'use client';
+
 import './globals.css';
+import { ReactNode } from 'react';
+import Providers from './providers';
 
-const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'GestionMax Formation Hub',
-  description: 'Plateforme de gestion de formations professionnelles',
+type LayoutProps = {
+  children: ReactNode;
 };
 
-
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="fr">
-      <body className={inter.className}>
-        <ReactQueryProvider>
-          <AuthProvider>
-            <ClientProviders>
-              {children}
-            </ClientProviders>
-          </AuthProvider>
-        </ReactQueryProvider>
+      <body style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

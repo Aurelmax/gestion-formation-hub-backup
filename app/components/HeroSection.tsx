@@ -25,7 +25,7 @@ const HeroSection = () => {
             Formations éligibles CPF et conformes Qualiopi.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-            <Link href="/catalogue" legacyBehavior passHref>
+            <Link href="/catalogue">
               <Button size="lg" variant="secondary" className="text-lg px-8 py-4">
                 Voir le catalogue
               </Button>

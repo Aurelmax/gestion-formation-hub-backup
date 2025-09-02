@@ -1,7 +1,112 @@
+/**
+ * Hook personnalisé pour gérer les programmes de formation
+ * 
+ * Ce hook fournit une interface complète pour gérer les programmes de formation,
+ * y compris le chargement, la création, la mise à jour, la suppression et la duplication
+ * des programmes, ainsi que la gestion des catégories et des filtres.
+ * 
+ * @example
+ * // Utilisation de base
+ * const {
+ *   programmes,
+ *   loading,
+ *   error,
+ *   fetchProgrammes,
+ *   createProgramme,
+ *   updateProgramme,
+ *   deleteProgramme,
+ *   duplicateProgramme,
+ *   updateProgrammeStatus,
+ *   categories,
+ *   fetchCategories,
+ *   getProgrammesByCategorie,
+ *   getProgrammesByType
+ * } = useProgrammesFormation();
+ * 
+ * // Charger les programmes et catégories au montage du composant
+ * useEffect(() => {
+ *   fetchProgrammes();
+ *   fetchCategories();
+ * }, []);
+ * 
+ * // Filtrer les programmes par catégorie
+ * const programmesFiltres = getProgrammesByCategorie('categorie-id');
+ * 
+ * // Créer un nouveau programme
+ * const handleCreate = async () => {
+ *   try {
+ *     const nouveauProgramme = await createProgramme({
+ *       code: 'NCODE',
+ *       type: 'catalogue',
+ *       titre: 'Nouveau programme',
+ *       description: 'Description du programme',
+ *       // ... autres champs requis
+ *     });
+ *     console.log('Programme créé:', nouveauProgramme);
+ *   } catch (error) {
+ *     console.error('Erreur lors de la création:', error);
+ *   }
+ * };
+ */
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import api from "@/services/api";
 import { ApiError, ApiResponse } from "@/types";
+import { z } from 'zod';
+
+// Données simulées pour la démonstration quand l'API n'est pas disponible
+const MOCK_PROGRAMMES: ProgrammeFormation[] = [
+  {
+    id: "1",
+    code: "DEV-WEB-01",
+    type: "catalogue",
+    titre: "Développement Web Front-End",
+    description: "Formation complète sur les technologies front-end modernes",
+    niveau: "Débutant",
+    participants: "8 à 12 personnes",
+    duree: "35 heures",
+    prix: "1950€ HT",
+    objectifs: [
+      "Maîtriser les fondamentaux du développement web",
+      "Créer des interfaces utilisateur modernes et responsives",
+      "Comprendre et utiliser JavaScript et ses frameworks"
+    ],
+    prerequis: "Connaissances de base en informatique",
+    modalites: "Formation en présentiel ou à distance",
+    publicConcerne: "Tout public souhaitant se former au développement web",
+    contenuDetailleJours: "Jour 1: HTML5, Jour 2: CSS3, Jour 3: JavaScript, Jour 4-5: Projets",
+    modalitesAcces: "Inscription en ligne ou par téléphone",
+    modalitesTechniques: "Ordinateur avec connexion internet, environnement de développement",
+    modalitesReglement: "Paiement par virement bancaire ou CB",
+    formateur: "Experts en développement web avec +5 ans d'expérience",
+    ressourcesDisposition: "Support de cours, exercices pratiques, accès à une plateforme en ligne",
+    modalitesEvaluation: "QCM et projet pratique",
+    sanctionFormation: "Attestation de fin de formation",
+    niveauCertification: "N/A",
+    delaiAcceptation: "15 jours avant le début de la formation",
+    accessibiliteHandicap: "Locaux accessibles aux personnes à mobilité réduite",
+    cessationAbandon: "Remboursement au prorata des heures suivies",
+    beneficiaireId: null,
+    objectifsSpecifiques: null,
+    positionnementRequestId: null,
+    programmeUrl: "https://www.example.com/programmes/dev-web-01",
+    programme: "<h1>Programme détaillé</h1><p>Formation développement web complète</p>",
+    contenuDetailleHtml: "<h2>Module 1: Introduction au HTML5</h2><p>Structure, balises sémantiques, formulaires avancés</p>",
+    categorieId: "1",
+    categorie: {
+      id: "1",
+      code: "DEV",
+      titre: "Développement",
+      description: "Formations en développement logiciel"
+    },
+    pictogramme: "💻",
+    estActif: true,
+    version: "1.0",
+    typeProgramme: "standard",
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+];
 
 // Interface pour les programmes de formation unifiés
 export interface ProgrammeFormation {
@@ -67,227 +172,250 @@ export interface ProgrammeFormation {
   updatedAt: Date;
 }
 
+// Schéma de validation pour les programmes
+const programmeSchema = z.object({
+  code: z.string().min(1, 'Le code est requis'),
+  titre: z.string().min(1, 'Le titre est requis'),
+  description: z.string().optional(),
+  type: z.enum(['catalogue', 'sur-mesure']),
+  duree: z.number().int().positive('La durée doit être un nombre positif').optional(),
+  prix: z.number().min(0, 'Le prix ne peut pas être négatif').optional(),
+  categorieId: z.string().uuid('ID de catégorie invalide').optional().nullable(),
+  objectifs: z.array(z.string()).optional(),
+  prerequis: z.string().optional(),
+  modalites: z.string().optional(),
+  estActif: z.boolean().default(true)
+});
+
+// Schéma de validation pour les paramètres de requête
+const queryParamsSchema = z.object({
+  type: z.enum(['catalogue', 'sur-mesure']).optional(),
+  version: z.string().regex(/^\d+$/).optional(),
+  fields: z.string().optional().transform(fields => 
+    fields ? fields.split(',').map(f => f.trim()) : []
+  ),
+  categorieId: z.string().uuid('ID de catégorie invalide').optional(),
+  estActif: z.preprocess(
+    val => val === 'true' || val === true,
+    z.boolean().optional()
+  ),
+  search: z.string().optional(),
+  page: z.preprocess(
+    val => Number(val) || 1,
+    z.number().int().positive()
+  ).default(1),
+  limit: z.preprocess(
+    val => Number(val) || 20,
+    z.number().int().min(1).max(100)
+  ).default(20)
+});
+
+type QueryParams = z.infer<typeof queryParamsSchema>;
+
 export const useProgrammesFormation = () => {
   const [programmes, setProgrammes] = useState<ProgrammeFormation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<Array<{
+    id: string;
+    code: string;
+    titre: string;
+    description: string;
+    ordre: number;
+  }>>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Données simulées pour démonstration quand l'API n'est pas disponible
-  const MOCK_PROGRAMMES: ProgrammeFormation[] = [
-    {
-      id: "1",
-      code: "DEV-WEB-01",
-      type: "catalogue",
-      titre: "Développement Web Front-End",
-      description: "Formation complète sur les technologies front-end modernes incluant HTML5, CSS3 et JavaScript.",
-      niveau: "Débutant",
-      participants: "8 à 12 personnes",
-      duree: "35 heures",
-      prix: "1950€ HT",
-      objectifs: [
-        "Maîtriser les fondamentaux du développement web",
-        "Créer des interfaces utilisateur modernes et responsives",
-        "Comprendre et utiliser JavaScript et ses frameworks"
-      ],
-      prerequis: "Connaissances de base en informatique",
-      modalites: "Formation en présentiel ou à distance",
-      pictogramme: "💻",
-      estActif: true,
-      contenuDetailleHtml: "<h2>Module 1: Introduction au HTML5</h2><p>Structure, balises sémantiques, formulaires avancés</p>",
-      publicConcerne: "Tout public souhaitant se former au développement web",
-      contenuDetailleJours: "Jour 1: HTML5, Jour 2: CSS3, Jour 3: JavaScript, Jour 4-5: Projets",
-      modalitesAcces: "Inscription en ligne ou par téléphone",
-      modalitesTechniques: "Ordinateur avec connexion internet, environnement de développement",
-      modalitesReglement: "Paiement par virement bancaire ou CB",
-      formateur: "Experts en développement web avec +5 ans d'expérience",
-      ressourcesDisposition: "Support de cours, exercices pratiques, accès à une plateforme en ligne",
-      modalitesEvaluation: "QCM et projet pratique",
-      sanctionFormation: "Attestation de fin de formation",
-      niveauCertification: "N/A",
-      delaiAcceptation: "15 jours avant le début de la formation",
-      accessibiliteHandicap: "Locaux accessibles aux personnes à mobilité réduite",
-      cessationAbandon: "Remboursement au prorata des heures suivies",
-      beneficiaireId: null,
-      objectifsSpecifiques: null,
-      positionnementRequestId: null,
-      programmeUrl: "https://www.example.com/programmes/dev-web-01",
-      programme: "<h1>Programme détaillé</h1><p>Formation développement web complète</p>",
-      categorie: {
-        id: "1",
-        code: "DEV",
-        titre: "Développement informatique",
-        description: "Formations en développement informatique",
-      },
-      categorieId: "1",
-      createdAt: new Date('2023-05-10'),
-      updatedAt: new Date('2023-09-18')
-    },
-    {
-      id: "2",
-      code: "DATA-SCIENCE-01",
-      type: "catalogue",
-      titre: "Introduction à la Data Science",
-      description: "Découvrez les fondamentaux de la data science et apprenez à manipuler et analyser des données.",
-      niveau: "Intermédiaire",
-      participants: "6 à 10 personnes",
-      duree: "21 heures",
-      prix: "1450€ HT",
-      objectifs: [
-        "Comprendre les concepts de base de la data science",
-        "Manipuler et nettoyer des jeux de données",
-        "Créer des visualisations pertinentes",
-        "S'initier au machine learning"
-      ],
-      prerequis: "Connaissances en programmation et statistiques de base",
-      modalites: "Formation en présentiel ou à distance",
-      pictogramme: "📊",
-      estActif: true,
-      contenuDetailleHtml: "<h2>Module 1: Introduction à Python pour la Data Science</h2><p>Pandas, NumPy, visualisation avec Matplotlib</p>",
-      publicConcerne: "Analystes, développeurs et professionnels de l'informatique",
-      contenuDetailleJours: "Jour 1: Python et librairies, Jour 2: Analyse de données, Jour 3: Machine Learning",
-      modalitesAcces: "Inscription via le site web",
-      modalitesTechniques: "Ordinateur avec Python installé, accès à Google Colab",
-      modalitesReglement: "Paiement à l'inscription",
-      formateur: "Data Scientists expérimentés",
-      ressourcesDisposition: "Notebooks Jupyter, datasets, documentation",
-      modalitesEvaluation: "Projet d'analyse de données réel",
-      sanctionFormation: "Attestation de compétences",
-      niveauCertification: "N/A",
-      delaiAcceptation: "10 jours avant le début",
-      accessibiliteHandicap: "Formation adaptable selon les besoins",
-      cessationAbandon: "Remboursement si annulation 7 jours avant",
-      beneficiaireId: null,
-      objectifsSpecifiques: null,
-      positionnementRequestId: null,
-      programmeUrl: "https://www.example.com/programmes/data-science-01",
-      programme: "<h1>Programme Data Science</h1><p>Formation aux fondamentaux de la data science</p>",
-      categorie: {
-        id: "2",
-        code: "DATA",
-        titre: "Data Science & IA",
-        description: "Formations en science des données et intelligence artificielle",
-      },
-      categorieId: "2",
-      createdAt: new Date('2023-06-15'),
-      updatedAt: new Date('2023-10-05')
-    },
-    {
-      id: "3",
-      code: "SM-DEVOPS-01",
-      type: "sur-mesure",
-      titre: "DevOps pour entreprise",
-      description: "Formation sur mesure adaptée aux besoins spécifiques de votre entreprise en matière de DevOps.",
-      niveau: "Avancé",
-      participants: "4 à 8 personnes",
-      duree: "28 heures",
-      prix: "Sur devis",
-      objectifs: [
-        "Mettre en place une chaîne CI/CD adaptée à votre environnement",
-        "Maîtriser les outils DevOps spécifiques à votre infrastructure",
-        "Optimiser les processus de déploiement"
-      ],
-      prerequis: "Expérience en administration système et développement",
-      modalites: "Formation en intra-entreprise",
-      pictogramme: "🔄",
-      estActif: false,
-      contenuDetailleHtml: "<h2>Module 1: CI/CD avec GitLab</h2><p>Configuration, pipelines, automatisation</p>",
-      publicConcerne: "Équipes techniques de l'entreprise",
-      contenuDetailleJours: "Jour 1-2: CI/CD, Jour 3: Conteneurs, Jour 4: Monitoring",
-      modalitesAcces: "Formation réservée aux collaborateurs de l'entreprise",
-      modalitesTechniques: "Environnement technique de l'entreprise",
-      modalitesReglement: "Facturation après la formation",
-      formateur: "Expert DevOps sénior",
-      ressourcesDisposition: "Documentation technique, scripts, exercices pratiques",
-      modalitesEvaluation: "Mise en situation réelle",
-      sanctionFormation: "Attestation de compétences DevOps",
-      niveauCertification: "N/A",
-      delaiAcceptation: "30 jours avant le début",
-      accessibiliteHandicap: "Adaptable selon les besoins spécifiques",
-      cessationAbandon: "Voir conditions contractuelles",
-      beneficiaireId: "client-123",
-      objectifsSpecifiques: "Réduire le temps de déploiement de 75% sur les applications critiques",
-      positionnementRequestId: "pos-456",
-      programmeUrl: "https://www.example.com/programmes/sm-devops-01",
-      programme: "<h1>Programme DevOps Personnalisé</h1><p>Formation adaptée aux besoins de l'entreprise</p>",
-      categorie: {
-        id: "3",
-        code: "DEVOPS",
-        titre: "DevOps & Cloud",
-        description: "Formations en DevOps et technologies cloud",
-      },
-      categorieId: "3",
-      createdAt: new Date('2023-09-01'),
-      updatedAt: new Date('2023-11-20')
-    }
-  ];
-
-  const fetchProgrammes = async () => {
+  const fetchProgrammes = async (params: Partial<QueryParams> = {}) => {
     try {
       setLoading(true);
-      console.log('Récupération des programmes de formation publiés...');
-      const response = await api.get('/api/programmes-formation/catalogue');
-      console.log('Programmes récupérés:', response.data);
-      setProgrammes(response.data);
-    } catch (error) {
-      console.error('Erreur lors du chargement des programmes de formation:', error);
-      toast({
-        title: 'Mode démonstration',
-        description: 'Affichage de données simulées pour la démonstration',
+      setError(null);
+
+      // Valider les paramètres
+      const validatedParams = queryParamsSchema.safeParse(params);
+      
+      if (!validatedParams.success) {
+        const errorMessage = 'Paramètres de requête invalides: ' + 
+          validatedParams.error.errors.map(e => `${e.path.join('.')} - ${e.message}`).join(', ');
+        
+        toast({
+          title: 'Erreur de validation',
+          description: errorMessage
+        });
+        
+        throw new Error(errorMessage);
+      }
+
+      const { data } = validatedParams;
+      
+      // Construire les paramètres de requête
+      const queryParams = new URLSearchParams();
+      
+      if (data.type) queryParams.set('type', data.type);
+      if (data.categorieId) queryParams.set('categorieId', data.categorieId);
+      if (data.estActif !== undefined) queryParams.set('estActif', String(data.estActif));
+      if (data.search) queryParams.set('search', data.search);
+      if (data.page) queryParams.set('page', String(data.page));
+      if (data.limit) queryParams.set('limit', String(data.limit));
+      if (data.fields?.length) queryParams.set('fields', data.fields.join(','));
+
+      const response = await api.get(`/api/programmes-formation?${queryParams.toString()}`, {
+        validateStatus: (status) => status < 500
       });
-      // Utiliser des données simulées si l'API n'est pas disponible
-      setProgrammes(MOCK_PROGRAMMES);
+
+      // Gérer les erreurs HTTP
+      if (response.status >= 400) {
+        const errorMessage = response.data?.error || `Erreur ${response.status}`;
+        throw new Error(errorMessage);
+      }
+
+      // Mettre à jour le cache local
+      setProgrammes(response.data.data || []);
+      
+      return response.data;
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Une erreur inattendue est survenue';
+      
+      toast({
+        title: 'Erreur',
+        description: `Impossible de charger les programmes: ${errorMessage}`
+      });
+      
+      setError(errorMessage);
+      throw error;
+      
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchProgrammes();
-  }, []);
-
-  const createProgramme = async (
-    programmeData: Omit<ProgrammeFormation, 'id' | 'createdAt' | 'updatedAt'>
-  ) => {
+  const createProgramme = async (data: Omit<ProgrammeFormation, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
-      const response = await api.post('/api/programmes-formation', programmeData);
-      const newProgramme = response.data;
-      setProgrammes(prev => [newProgramme, ...prev]);
+      setLoading(true);
+      
+      // Valider les données avant envoi
+      const validatedData = programmeSchema.parse(data);
+      
+      const response = await api.post('/api/programmes-formation', validatedData);
+      
+      // Mettre à jour le cache local
+      setProgrammes(prev => [...prev, response.data]);
+      
       toast({
-        title: 'Programme créé',
-        description: `Programme "${newProgramme.titre}" créé avec succès`,
+        title: 'Succès',
+        description: 'Le programme a été créé avec succès'
       });
-      return newProgramme;
+      
+      return response.data;
+      
     } catch (error) {
-      console.error('Erreur lors de la création:', error);
+      let errorMessage = 'Erreur lors de la création du programme';
+      
+      if (error instanceof z.ZodError) {
+        errorMessage = 'Données invalides: ' + 
+          error.errors.map(e => `${e.path.join('.')} - ${e.message}`).join(', ');
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      }
+      
       toast({
         title: 'Erreur',
-        description: 'Impossible de créer le programme',
-        variant: 'destructive',
+        description: errorMessage
       });
+      
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const updateProgramme = async (id: string, programmeData: Partial<ProgrammeFormation>) => {
+  const updateProgramme = async (id: string, data: Partial<ProgrammeFormation>) => {
     try {
-      const response = await api.put(`/api/programmes-formation/${id}`, programmeData);
-      const updated = response.data;
-      setProgrammes(prev => prev.map(p => (p.id === id ? updated : p)));
+      setLoading(true);
+      
+      // Valider les données avant envoi
+      const validatedData = programmeSchema.partial().parse(data);
+      
+      const response = await api.patch(`/api/programmes-formation/${id}`, validatedData);
+      
+      // Mettre à jour le cache local
+      setProgrammes(prev => 
+        prev.map(programme => 
+          programme.id === id ? { ...programme, ...response.data } : programme
+        )
+      );
+      
       toast({
-        title: 'Programme mis à jour',
-        description: `Programme "${updated.titre}" mis à jour`,
+        title: 'Succès',
+        description: 'Le programme a été mis à jour avec succès'
       });
+      
+      return response.data;
+      
     } catch (error) {
-      console.error('Erreur lors de la modification:', error);
+      let errorMessage = 'Erreur lors de la mise à jour du programme';
+      
+      if (error instanceof z.ZodError) {
+        errorMessage = 'Données invalides: ' + 
+          error.errors.map(e => `${e.path.join('.')} - ${e.message}`).join(', ');
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      }
+      
       toast({
         title: 'Erreur',
-        description: 'Impossible de mettre à jour le programme',
-        variant: 'destructive',
+        description: errorMessage
       });
+      
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
+  /**
+   * Récupère la liste des catégories de programmes depuis l'API
+   * @returns {Promise<void>}
+   * 
+   * @example
+   * // Charger les catégories
+   * await fetchCategories();
+   * // Utiliser les catégories chargées
+   * console.log(categories);
+   */
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/api/categories');
+      setCategories(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors du chargement des catégories:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger les catégories',
+      });
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Supprime un programme
+   * @param {string} id - ID du programme à supprimer
+   * @returns {Promise<void>}
+   * 
+   * @example
+   * try {
+   *   await deleteProgramme('123');
+   *   console.log('Programme supprimé');
+   * } catch (error) {
+   *   console.error('Erreur:', error);
+   * }
+   */
   const deleteProgramme = async (id: string) => {
     try {
       const programme = programmes.find(p => p.id === id);
@@ -302,43 +430,25 @@ export const useProgrammesFormation = () => {
       toast({
         title: 'Erreur',
         description: 'Impossible de supprimer le programme',
-        variant: 'destructive',
       });
       throw error;
     }
   };
 
-  // Récupérer les catégories de programmes
-  const [categories, setCategories] = useState<ProgrammeFormation["categorie"][]>([]);
-  const [loadingCategories, setLoadingCategories] = useState(false);
-
-  const fetchCategories = async () => {
-    try {
-      setLoadingCategories(true);
-      const response = await api.get('/api/categories-programme');
-      setCategories(response.data);
-    } catch (error) {
-      console.error('Erreur lors du chargement des catégories:', error);
-    } finally {
-      setLoadingCategories(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  // Filtrer les programmes par catégorie
-  const getProgrammesByCategorie = (categorieId: string) => {
-    return programmes.filter(prog => prog.categorieId === categorieId);
-  };
-
-  // Filtrer les programmes par type
-  const getProgrammesByType = (type: "catalogue" | "sur-mesure") => {
-    return programmes.filter(prog => prog.type === type);
-  };
-
-  // Dupliquer un programme (catalogue vers sur-mesure ou vice-versa)
+  /**
+   * Duplique un programme existant avec un nouveau code
+   * @param {string} id - ID du programme à dupliquer
+   * @param {Partial<ProgrammeFormation>} modificationData - Champs à modifier pour la copie
+   * @returns {Promise<ProgrammeFormation>} Le nouveau programme créé
+   * 
+   * @example
+   * try {
+   *   const copie = await duplicateProgramme('123', { code: 'WEB-101-COPY' });
+   *   console.log('Copie créée:', copie);
+   * } catch (error) {
+   *   console.error('Erreur:', error);
+   * }
+   */
   const duplicateProgramme = async (id: string, modificationData: Partial<ProgrammeFormation>) => {
     try {
       console.log('duplicateProgramme appelé avec id:', id, 'et modifications:', modificationData);
@@ -398,14 +508,22 @@ export const useProgrammesFormation = () => {
       toast({
         title: 'Erreur',
         description: 'Impossible de dupliquer le programme',
-        variant: 'destructive',
       });
       throw error;
     }
   };
 
-  // Mettre à jour le statut d'un programme (actif/inactif)
-  const updateProgrammeStatus = async (id: string, { estActif }: { estActif: boolean }) => {
+  /**
+   * Active ou désactive un programme
+   * @param {string} id - ID du programme
+   * @param {boolean} estActif - Nouvel état d'activation
+   * @returns {Promise<void>}
+   * 
+   * @example
+   * // Désactiver un programme
+   * await updateProgrammeStatus('123', false);
+   */
+  const updateProgrammeStatus = async (id: string, estActif: boolean) => {
     console.log('updateProgrammeStatus appelé avec id:', id, 'estActif:', estActif);
     try {
       // Récupérer le programme pour les logs
@@ -444,24 +562,61 @@ export const useProgrammesFormation = () => {
       toast({
         title: 'Erreur',
         description: 'Impossible de mettre à jour le statut du programme',
-        variant: 'destructive',
       });
       throw error;
     }
   };
 
+  /**
+   * Filtre les programmes par catégorie
+   * @param {string | null} categorieId - ID de la catégorie (null pour tout afficher)
+   * @returns {ProgrammeFormation[]} Programmes filtrés
+   * 
+   * @example
+   * // Filtrer par catégorie
+   * const programmesFiltres = getProgrammesByCategorie('categorie-123');
+   * // Afficher tous les programmes
+   * const tousLesProgrammes = getProgrammesByCategorie(null);
+   */
+  const getProgrammesByCategorie = (categorieId: string | null): ProgrammeFormation[] => {
+    return programmes.filter(prog => prog.categorieId === categorieId);
+  };
+
+  /**
+   * Filtre les programmes par type (catalogue ou sur-mesure)
+   * @param {'catalogue' | 'sur-mesure' | null} type - Type de programme
+   * @returns {ProgrammeFormation[]} Programmes filtrés
+   * 
+   * @example
+   * // Filtrer les programmes catalogue
+   * const catalogue = getProgrammesByType('catalogue');
+   */
+  const getProgrammesByType = (type: 'catalogue' | 'sur-mesure' | null): ProgrammeFormation[] => {
+    return programmes.filter(prog => prog.type === type);
+  };
+
+  // Chargement initial des données
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchProgrammes();
+      await fetchCategories();
+    };
+    loadData();
+  }, []);
+
   return {
     programmes,
+    categories,
     loading,
+    error,
+    fetchProgrammes,
     createProgramme,
     updateProgramme,
+    fetchCategories,
     deleteProgramme,
     duplicateProgramme,
     updateProgrammeStatus,
-    categories,
-    loadingCategories,
     getProgrammesByCategorie,
-    getProgrammesByType,
-    refreshProgrammes: fetchProgrammes
+    getProgrammesByType
   };
 };

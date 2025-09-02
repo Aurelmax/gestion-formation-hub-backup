@@ -1,119 +1,113 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn as nextAuthSignIn, signOut as nextAuthSignOut, useSession } from 'next-auth/react';
 
-interface User {
+// Types
+export interface User {
   id: string;
-  email: string;
-  name?: string;
+  email?: string | null;
+  name?: string | null;
+  role?: string;
+  image?: string | null;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
-  logout: () => void;
+  signIn: (email: string, password: string) => Promise<boolean>;
+  signOut: () => Promise<void>;
   loading: boolean;
   error: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const { data: session, status } = useSession();
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const loading = status === 'loading';
 
   useEffect(() => {
-    // Vérifier l'authentification au chargement
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem('auth-token');
-        if (token) {
-          // Ici, normalement, tu validerais le token avec ton API
-          // Pour l'instant, simulation
-          setUser({ id: '1', email: 'user@example.com' });
-        }
-      } catch (err) {
-        console.error('Auth check failed:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!loading) {
+      setError(null);
+    }
+  }, [loading]);
 
-    checkAuth();
-  }, []);
-
-  const login = async (email: string, password: string) => {
-    setLoading(true);
-    setError(null);
+  const signIn = async (email: string, password: string): Promise<boolean> => {
     try {
-      // Simulation de login - à remplacer par un appel API réel
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      setError(null);
+      const result = await nextAuthSignIn('credentials', {
+        redirect: false,
+        email,
+        password,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('auth-token', data.token);
-        setUser(data.user);
-        router.push('/dashboard');
-      } else {
-        throw new Error('Échec de la connexion');
+      if (result?.error) {
+        const errorMessage = result.error === 'CredentialsSignin' 
+          ? 'Email ou mot de passe incorrect' 
+          : 'Erreur lors de la connexion';
+        
+        setError(errorMessage);
+        console.error('Erreur de connexion:', result.error);
+        return false;
       }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+
+      return true;
+    } catch (error) {
+      const errorMessage = 'Une erreur est survenue lors de la connexion';
+      setError(errorMessage);
+      console.error('Erreur lors de la connexion:', error);
+      return false;
     }
   };
 
-  const register = async (email: string, password: string, name: string) => {
-    setLoading(true);
-    setError(null);
+  const signOut = async () => {
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('auth-token', data.token);
-        setUser(data.user);
-        router.push('/dashboard');
-      } else {
-        throw new Error('Échec de l\'inscription');
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      await nextAuthSignOut({ redirect: false });
+      router.push('/auth');
+    } catch (error) {
+      setError('Erreur lors de la déconnexion');
+      console.error('Erreur lors de la déconnexion:', error);
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('auth-token');
-    setUser(null);
-    router.push('/auth');
+  // Ensure user object always has required fields
+  const user = session?.user ? {
+    id: session.user.id || '',
+    email: session.user.email || null,
+    name: session.user.name || null,
+    role: (session.user as any).role, // Cast to any to avoid TypeScript errors for custom properties
+    image: session.user.image || null
+  } : null;
+
+  const value: AuthContextType = {
+    user,
+    signIn,
+    signOut,
+    loading,
+    error,
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading, error }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
+}
+
+// Export types
+export type { AuthContextType, User };

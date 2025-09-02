@@ -176,19 +176,19 @@ const Index = () => {
               transition={{ duration: 0.6, delay: 0.6 }}
               className="flex flex-col sm:flex-row justify-center gap-4">
               {user ? (
-                <Link href="/dashboard" legacyBehavior passHref>
+                <Link href="/dashboard">
                   <Button size="lg" variant="secondary" className="w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300">
                     Accéder au Dashboard
                   </Button>
                 </Link>
               ) : (
-                <Link href="/auth" legacyBehavior passHref>
+                <Link href="/auth">
                   <Button size="lg" variant="secondary" className="w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300">
                     Se connecter
                   </Button>
                 </Link>
               )}
-              <Link href="/catalogue" legacyBehavior passHref>
+              <Link href="/catalogue">
                 <Button 
                   size="lg" 
                   variant="outline" 

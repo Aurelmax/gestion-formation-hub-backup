@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +17,7 @@ const AuthPage = () => {
   const [nom, setNom] = useState("");
   const [prenom, setPrenom] = useState("");
   const { toast } = useToast();
-  const { login, register, loading, error } = useAuth();
+  const { signIn: login, register, loading, error } = useAuth();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();

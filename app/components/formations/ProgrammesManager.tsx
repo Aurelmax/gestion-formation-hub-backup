@@ -7,6 +7,8 @@ import { ProgrammeFormation } from '@/hooks/useProgrammesFormation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, BookOpen, FileSpreadsheet, FileUp } from 'lucide-react';
 import ImportProgrammesHtml from '../admin/ImportProgrammesHtml';
+import { useProgrammesFormation } from '@/hooks/useProgrammesFormation';
+import { useToast } from '@/components/ui/use-toast';
 
 // Composant pour visualiser les détails d'un programme spécifique
 const ProgrammeDetails = ({ programme, onBack }: { programme: ProgrammeFormation; onBack: () => void }) => {
@@ -216,6 +218,8 @@ const ProgrammeDetails = ({ programme, onBack }: { programme: ProgrammeFormation
 export default function ProgrammesManager() {
   const [view, setView] = useState<'list' | 'create' | 'edit' | 'detail'>('list');
   const [selectedProgramme, setSelectedProgramme] = useState<ProgrammeFormation | null>(null);
+  const { createProgramme, updateProgramme } = useProgrammesFormation();
+  const { toast } = useToast();
 
   const handleCreateClick = () => {
     setSelectedProgramme(null);
@@ -232,9 +236,31 @@ export default function ProgrammesManager() {
     setView('detail');
   };
 
-  const handleSubmit = (data: any) => {
-    // Implémenter la logique de soumission (déjà gérée dans les hooks)
-    setView('list');
+  const handleSubmit = async (data: any) => {
+    try {
+      if (view === 'edit' && selectedProgramme?.id) {
+        // Mise à jour d'un programme existant
+        await updateProgramme(selectedProgramme.id, data);
+        toast({
+          title: 'Succès',
+          description: 'Le programme a été mis à jour avec succès.',
+        });
+      } else {
+        // Création d'un nouveau programme
+        await createProgramme(data);
+        toast({
+          title: 'Succès',
+          description: 'Le programme a été créé avec succès.',
+        });
+      }
+      setView('list');
+    } catch (error) {
+      console.error('Erreur lors de la soumission du formulaire:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Une erreur est survenue lors de la sauvegarde du programme.',
+      });
+    }
   };
 
   const handleBack = () => {
@@ -245,11 +271,13 @@ export default function ProgrammesManager() {
   // Rendu conditionnel selon la vue active
   if (view === 'create' || view === 'edit') {
     return (
-      <ProgrammeFormEnhanced 
-        programme={view === 'edit' ? selectedProgramme : null} 
-        onSubmit={handleSubmit} 
-        onCancel={handleBack} 
-      />
+      <div className="container mx-auto p-6">
+        <ProgrammeFormEnhanced 
+          programme={view === 'edit' && selectedProgramme ? selectedProgramme : undefined} 
+          onSubmit={handleSubmit} 
+          onCancel={handleBack} 
+        />
+      </div>
     );
   }
 
