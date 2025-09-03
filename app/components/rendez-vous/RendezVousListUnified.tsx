@@ -73,12 +73,14 @@ const RendezVousListUnified = () => {
         toast({
           title: "Succès",
           description: "Le rendez-vous a été mis à jour.",
+          className: "bg-green-500 text-white"
         });
       } else {
         await createRendezvous(formData);
         toast({
           title: "Succès",
           description: "Le rendez-vous a été créé.",
+          className: "bg-green-500 text-white"
         });
       }
       
@@ -90,7 +92,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de l'enregistrement.",
-        variant: "destructive",
+        className: "bg-red-500 text-white"
       });
     }
   };
@@ -146,6 +148,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Rendez-vous d'impact planifié",
         description: `Un rendez-vous d'impact a été planifié pour le ${format(new Date(dateImpact), 'dd MMMM yyyy', { locale: fr })}.`,
+        className: "bg-green-500 text-white"
       });
       
       await fetchRendezvous();
@@ -154,7 +157,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la planification du rendez-vous d'impact.",
-        variant: "destructive",
+        className: "bg-red-500 text-white"
       });
     }
   };
@@ -174,6 +177,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Évaluation d'impact enregistrée",
         description: "L'évaluation d'impact a été enregistrée avec succès.",
+        className: "bg-green-500 text-white"
       });
       
       setShowImpactForm(false);
@@ -184,7 +188,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de l'enregistrement de l'évaluation d'impact.",
-        variant: "destructive",
+        className: "bg-red-500 text-white"
       });
     }
   };
@@ -196,6 +200,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Rendez-vous d'impact terminé",
         description: "Le rendez-vous d'impact a été marqué comme terminé.",
+        className: "bg-green-500 text-white"
       });
       
       await fetchRendezvous();
@@ -204,7 +209,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la clôture du rendez-vous d'impact.",
-        variant: "destructive",
+        className: "bg-red-500 text-white"
       });
     }
   };
@@ -222,7 +227,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la génération du rapport d'impact.",
-        variant: "destructive",
+        className: "bg-red-500 text-white"
       });
       setLoadingReport(false);
     }
@@ -260,7 +265,7 @@ const RendezVousListUnified = () => {
         toast({
           title: "Erreur",
           description: "Veuillez sélectionner une date et une heure",
-          variant: "destructive",
+          className: "bg-red-500 text-white"
         });
         return;
       }
@@ -278,6 +283,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Succès",
         description: `Rendez-vous reprogrammé pour le ${new Date(newDateRdv).toLocaleDateString('fr-FR')} à ${new Date(newDateRdv).toLocaleTimeString('fr-FR')}.`,
+        className: "bg-green-500 text-white"
       });
       
       // Rafraîchir la liste pour montrer les changements
@@ -292,7 +298,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Impossible de reprogrammer le rendez-vous.",
-        variant: "destructive",
+        className: "bg-red-500 text-white"
       });
     } finally {
       setLoadingActions(prev => ({ ...prev, [`reschedule-${rdvToReschedule?.id}`]: false }));
@@ -309,6 +315,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Succès",
         description: "Le rendez-vous a été annulé.",
+        className: "bg-green-500 text-white"
       });
       
       // Rafraîchir la liste pour montrer les changements
@@ -318,7 +325,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Impossible d'annuler le rendez-vous.",
-        variant: "destructive",
+        className: "bg-red-500 text-white"
       });
     } finally {
       setLoadingActions(prev => ({ ...prev, [`cancel-${rdv.id}`]: false }));
@@ -333,6 +340,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Terminé",
         description: "Le workflow de positionnement est terminé et le dossier a été créé.",
+        className: "bg-green-500 text-white"
       });
     }
     
@@ -511,7 +519,8 @@ const RendezVousListUnified = () => {
                                         await validerRendezvous(rdv.id, 'visio');
                                         toast({
                                           title: "Rendez-vous validé", 
-                                          description: "Le rendez-vous a été planifié automatiquement en visio."
+                                          description: "Le rendez-vous a été planifié automatiquement en visio.",
+                                          className: "bg-green-500 text-white"
                                         });
                                         
                                         // Rafraîchir la liste pour montrer les changements
@@ -520,7 +529,7 @@ const RendezVousListUnified = () => {
                                         toast({
                                           title: "Erreur",
                                           description: "Impossible de valider le rendez-vous.",
-                                          variant: "destructive"
+                                          className: "bg-red-500 text-white"
                                         });
                                       } finally {
                                         setLoadingActions(prev => ({ ...prev, [`validate-${rdv.id}`]: false }));
@@ -655,7 +664,7 @@ const RendezVousListUnified = () => {
                                             toast({
                                               title: "Erreur",
                                               description: "Impossible de planifier le suivi d'impact.",
-                                              variant: "destructive"
+                                              className: "bg-red-500 text-white"
                                             });
                                           });
                                       }

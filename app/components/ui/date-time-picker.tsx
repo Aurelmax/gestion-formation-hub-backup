@@ -25,6 +25,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 interface DateTimePickerProps {
   date?: Date
   setDate: (date: Date | undefined) => void
+  className?: string
 }
 
 // Génère des options pour les heures de 8h à 20h
@@ -39,7 +40,7 @@ const minutesOptions = Array.from({ length: 4 }, (_, i) => i * 15).map(minute =>
   label: minute.toString().padStart(2, '0')
 }))
 
-export function DateTimePicker({ date, setDate }: DateTimePickerProps) {
+export function DateTimePicker({ date, setDate, className }: DateTimePickerProps) {
   // États pour gérer les heures et minutes sélectionnées
   const [selectedHour, setSelectedHour] = React.useState<string>(
     date ? format(date, "HH") : "09"
@@ -85,7 +86,8 @@ export function DateTimePicker({ date, setDate }: DateTimePickerProps) {
           variant={"outline"}
           className={cn(
             "w-full justify-start text-left font-normal",
-            !date && "text-muted-foreground"
+            !date && "text-muted-foreground",
+            className
           )}
         >
           <div className="flex items-center">

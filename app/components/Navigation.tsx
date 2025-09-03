@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 const Navigation = () => {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { user, logout } = useAuth(); // ✅ hook maison
   const isActive = (path: string) => pathname === path;
 
   return (
@@ -44,7 +44,8 @@ const Navigation = () => {
           Contact
         </Button>
       </Link>
-      {session ? (
+
+      {user ? (
         <>
           <Link href="/apprenant/dashboard">
             <Button 
@@ -62,9 +63,16 @@ const Navigation = () => {
               Administration
             </Button>
           </Link>
+          <Button
+            variant="outline"
+            className="text-base"
+            onClick={logout} // ✅ bouton logout
+          >
+            Déconnexion
+          </Button>
         </>
       ) : (
-        <Link href="/auth">
+        <Link href="/login">
           <Button 
             variant="outline"
             className="text-base"

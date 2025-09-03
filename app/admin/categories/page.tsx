@@ -1,36 +1,28 @@
-import { Metadata } from 'next';
-import { getServerSession } from 'next-auth';
-import { redirect } from 'next/navigation';
-import CategoriesManager from '@/components/admin/CategoriesManager';
-import AdminNav from '@/components/admin/AdminNav';
-import { authOptions } from '@/lib/auth';
+"use client";
 
-export const metadata: Metadata = {
-  title: 'Gestion des catégories - Administration',
-  description: 'Gérez les catégories de formations',
-};
+import { useAuth } from "@/app/components/providers/AuthProvider";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export default async function AdminCategoriesPage() {
-  const session = await getServerSession(authOptions);
+export default function AdminCategoriesPage() {
+  const { user } = useAuth();
+  const router = useRouter();
 
-  // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-  if (!session) {
-    redirect('/auth?callbackUrl=/admin/categories');
-  }
+  useEffect(() => {
+    if (!user || user.role !== "admin") {
+      router.push("/login"); // redirige si non connecté ou pas admin
+    }
+  }, [user, router]);
 
-  // Vérifier les permissions si nécessaire
-  // if (session.user.role !== 'admin') {
-  //   redirect('/unauthorized');
-  // }
+  if (!user || user.role !== "admin") return <p>Redirection...</p>;
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-4">Administration</h1>
-      <AdminNav />
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-2xl font-semibold mb-6">Gestion des catégories</h2>
-        <CategoriesManager />
-      </div>
+    <div>
+      <h1>Catégories Admin</h1>
+      <p>Bienvenue {user.email} !</p>
+      {/* Liste des catégories, boutons CRUD, etc. */}
     </div>
   );
 }
+
+

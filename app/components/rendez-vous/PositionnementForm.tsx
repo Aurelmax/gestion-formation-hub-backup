@@ -134,6 +134,7 @@ const PositionnementForm = ({ onSubmit, onCancel, formationTitre = "" }: Positio
       toast({
         title: "Demande envoyée",
         description: "Votre demande de rendez-vous de positionnement a été enregistrée. Nous vous recontacterons rapidement pour confirmer la date et l'heure.",
+        className: "bg-green-500 text-white"
       });
       
       fireConfetti();
@@ -154,7 +155,7 @@ const PositionnementForm = ({ onSubmit, onCancel, formationTitre = "" }: Positio
       toast({
         title: "Erreur",
         description: errorMessage,
-        variant: "destructive",
+        className: "bg-red-500 text-white"
       });
     } finally {
       setIsSubmitting(false);
@@ -203,11 +204,12 @@ const PositionnementForm = ({ onSubmit, onCancel, formationTitre = "" }: Positio
               <h3 className="text-lg font-semibold text-gray-900">Date du rendez-vous</h3>
               <div className="space-y-2">
                 <Label>Date et heure du positionnement *</Label>
-                <DateTimePicker
-                  date={formData.dateRdv}
-                  setDate={(date) => handleChange("dateRdv", date)}
-                  className="w-full"
-                />
+                <div className="w-full">
+                  <DateTimePicker
+                    date={formData.dateRdv}
+                    setDate={(date) => handleChange("dateRdv", date)}
+                  />
+                </div>
                 {errors.dateRdv && (
                   <p className="text-sm text-red-600">{errors.dateRdv}</p>
                 )}
