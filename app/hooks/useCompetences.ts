@@ -13,7 +13,7 @@ export const useCompetences = () => {
   const fetchCompetences = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/competences');
+      const response = await api.get('/api/competences');
       
       setCompetences(response.data);
     } catch (error) {
@@ -35,7 +35,7 @@ export const useCompetences = () => {
       const userId = "system"; // Valeur temporaire à remplacer par l'identité de l'utilisateur réel
 
       try {
-        await api.post('/competences', {
+        await api.post('/api/competences', {
           ...competenceData,
           formateurId: userId
         });
@@ -71,7 +71,7 @@ export const useCompetences = () => {
   const updateCompetence = async (id: string, competenceData: Omit<Competence, "id" | "dateCreation" | "dateModification">) => {
     try {
       try {
-        await api.put(`/competences/${id}`, competenceData);
+        await api.put(`/api/competences/${id}`, competenceData);
       } catch (error) {
         console.error('Erreur lors de la mise à jour de la compétence:', error);
         toast({
@@ -104,7 +104,7 @@ export const useCompetences = () => {
   const deleteCompetence = async (id: string) => {
     try {
       try {
-        await api.delete(`/competences/${id}`);
+        await api.delete(`/api/competences/${id}`);
       } catch (error) {
         console.error('Erreur lors de la suppression de la compétence:', error);
         toast({

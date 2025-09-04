@@ -36,7 +36,7 @@ export const useReclamations = () => {
   const fetchReclamations = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/reclamations');
+      const response = await api.get('/api/reclamations');
       
       setReclamations(response.data);
     } catch (error) {
@@ -53,7 +53,7 @@ export const useReclamations = () => {
 
   const createReclamation = async (data: CreateReclamationData) => {
     try {
-      await api.post('/reclamations', {
+      await api.post('/api/reclamations', {
         nom: data.nom,
         email: data.email,
         telephone: data.telephone,
@@ -84,7 +84,7 @@ export const useReclamations = () => {
   const updateReclamation = async (id: string, updates: Partial<Reclamation>) => {
     try {
       // Utiliser directement l'API pour mettre à jour
-      await api.put(`/reclamations/${id}`, updates);
+      await api.put(`/api/reclamations/${id}`, updates);
 
       toast({
         title: "Réclamation mise à jour",
