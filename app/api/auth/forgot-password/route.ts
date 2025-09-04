@@ -1,27 +1,22 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import jwt from 'jsonwebtoken';
+// app/api/auth/forgot-password/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 
-const SECRET = process.env.JWT_SECRET || 'super-secret';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+export async function POST(req: NextRequest) {
+  try {
+    const { email } = await req.json();
 
-export async function POST(req: Request) {
-  const { email } = await req.json();
+    if (!email) {
+      return NextResponse.json({ error: 'Email requis' }, { status: 400 });
+    }
 
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    // Ne pas révéler si l'email existe ou non
-    return NextResponse.json({ success: true });
+    // Ici tu peux appeler ton service pour envoyer l'email
+    // Exemple : await sendResetPasswordEmail(email);
+
+    console.log(`Demande de réinitialisation pour : ${email}`);
+
+    return NextResponse.json({ message: 'Email de réinitialisation envoyé si le compte existe.' });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
-
-  // Générer un token de réinitialisation
-  const token = jwt.sign({ id: user.id }, SECRET, { expiresIn: '1h' });
-
-  // URL de réinitialisation
-  const resetUrl = `${FRONTEND_URL}/reset-password?token=${token}`;
-
-  // TODO: envoyer le mail avec ton service d'email
-  console.log(`Lien de réinitialisation : ${resetUrl}`);
-
-  return NextResponse.json({ success: true });
 }
