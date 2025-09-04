@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -10,13 +10,30 @@ import { LayoutDashboard, Shield } from "lucide-react";
 export default function AdminAccessPage() {
   const { status } = useSession();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  // Protection contre l'hydratation
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Si déjà connecté, aller directement au dashboard
   useEffect(() => {
+    if (!mounted) return;
+    
     if (status === "authenticated") {
       router.push("/dashboard");
     }
-  }, [status, router]);
+  }, [status, router, mounted]);
+
+  // Ne rien rendre côté serveur pour éviter les différences d'hydratation
+  if (!mounted || status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-lg">Chargement...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
