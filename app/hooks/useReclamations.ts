@@ -12,7 +12,7 @@ export interface Reclamation {
   message: string;
   statut: 'nouvelle' | 'en_cours' | 'resolue' | 'fermee';
   priorite: 'basse' | 'normale' | 'haute' | 'urgente';
-  assignee_id?: string;
+  assigneeId?: string;
   notes_internes?: string;
   date_resolution?: Date;
   created_at: Date;
