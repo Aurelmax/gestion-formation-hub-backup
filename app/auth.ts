@@ -1,11 +1,11 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { NextAuthOptions, Session } from "next-auth";
+import type { AuthOptions, Session } from "next-auth";
 import { prisma } from "./lib/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import EmailProvider from "next-auth/providers/email";
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma as any),
   session: {
     strategy: "jwt",
@@ -64,25 +64,27 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.role = user.role || 'user';
-        token.email = user.email;
-        token.name = user.name;
-        token.prenom = user.prenom;
-        token.nom = user.nom;
-        token.phone = user.phone;
+        const customUser = user as any; // Assertion temporaire pour les propriétés personnalisées
+        token.id = customUser.id;
+        token.role = customUser.role || 'user';
+        token.email = customUser.email;
+        token.name = customUser.name;
+        token.prenom = customUser.prenom;
+        token.nom = customUser.nom;
+        token.phone = customUser.phone;
       }
       return token;
     },
     async session({ session, token }): Promise<Session> {
       if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.email = token.email;
-        session.user.name = token.name;
-        session.user.prenom = token.prenom;
-        session.user.nom = token.nom;
-        session.user.phone = token.phone;
+        const customUser = session.user as any; // Assertion temporaire pour les propriétés personnalisées
+        customUser.id = token.id as string;
+        customUser.role = token.role as string;
+        customUser.email = token.email;
+        customUser.name = token.name;
+        customUser.prenom = token.prenom;
+        customUser.nom = token.nom;
+        customUser.phone = token.phone;
       }
       return session;
     },
