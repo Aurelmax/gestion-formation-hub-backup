@@ -1,9 +1,9 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import type { AuthOptions, Session } from "next-auth";
 import { prisma } from "./lib/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import EmailProvider from "next-auth/providers/email";
 import * as bcrypt from 'bcryptjs';
+import type { AuthOptions } from "next-auth/core/types";
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma as any),
@@ -75,7 +75,7 @@ export const authOptions: AuthOptions = {
       }
       return token;
     },
-    async session({ session, token }): Promise<Session> {
+    async session({ session, token }) {
       if (session.user) {
         const customUser = session.user as any; // Assertion temporaire pour les propriétés personnalisées
         customUser.id = token.id as string;
