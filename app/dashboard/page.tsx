@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, BookOpen, Calendar, FileCheck, Accessibility, Search, MessageSquareWarning, ClipboardCheck, Database } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { Users, BookOpen, Calendar, FileCheck, Accessibility, Search, MessageSquareWarning, ClipboardCheck, Database, LogOut } from "lucide-react";
 import FormationsList from "@/components/formations/FormationsList";
 import ProgrammesManager from "@/components/formations/ProgrammesManager";
 import ApprenantsList from "@/components/apprenants/ApprenantsList";
@@ -17,24 +19,54 @@ import CompetenceManager from "@/components/competences/CompetenceManager";
 import ReclamationsList from "@/components/reclamations/ReclamationsList";
 import ActionsCorrectivesList from "@/components/actions-correctives/ActionsCorrectivesList";
 import Header from "@/components/Header";
-import { Metadata } from "next";
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("formations");
-  const { user, logout } = useAuth();
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  // Vérification de l'authentification
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/admin/login");
+    }
+  }, [status, router]);
+
+  // Affichage de chargement pendant la vérification
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="text-lg font-medium">Chargement...</div>
+          <div className="text-sm text-gray-500 mt-2">Vérification de l'authentification</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Si pas authentifié, ne pas afficher le dashboard (redirection en cours)
+  if (status === "unauthenticated") {
+    return null;
+  }
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/admin/login" });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center border-b bg-white">
         <div>
-          {user && (
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard Admin</h1>
+          {session?.user && (
             <p className="text-sm text-gray-500">
-              Connecté en tant que: {user.email}
+              Connecté en tant que: {session.user.email}
             </p>
           )}
         </div>
-        <Button variant="outline" onClick={logout}>
+        <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
+          <LogOut className="h-4 w-4" />
           Se déconnecter
         </Button>
       </div>
