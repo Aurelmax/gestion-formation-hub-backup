@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from '@/app/auth';
+import { authOptions } from '@/auth';
 import { getServerSession } from 'next-auth/next';
+import type { Session } from 'next-auth';
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as Session | null;
     
     if (!session?.user) {
       return NextResponse.json({ user: null }, { status: 401 });
