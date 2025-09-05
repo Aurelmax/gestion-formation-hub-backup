@@ -1,8 +1,7 @@
 import { Metadata } from 'next';
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import AdminNav from '@/components/admin/AdminNav';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/auth';
 
 export const metadata: Metadata = {
   title: 'Tableau de bord - Administration',
@@ -10,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminDashboardPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
   if (!session) {

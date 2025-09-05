@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,14 +21,14 @@ const CompetenceManager = () => {
   const [filterCategorie, setFilterCategorie] = useState<CategorieCompetence | "all">("all");
   const [filterStatut, setFilterStatut] = useState<StatutCompetence | "all">("all");
 
-  const handleCreateCompetence = async (competenceData: Omit<Competence, "id" | "dateCreation" | "dateModification">) => {
+  const handleCreateCompetence = useCallback(async (competenceData: Omit<Competence, "id" | "dateCreation" | "dateModification">) => {
     const success = await createCompetence(competenceData);
     if (success) {
       setCurrentView('dashboard');
     }
-  };
+  }, [createCompetence]);
 
-  const handleUpdateCompetence = async (competenceData: Omit<Competence, "id" | "dateCreation" | "dateModification">) => {
+  const handleUpdateCompetence = useCallback(async (competenceData: Omit<Competence, "id" | "dateCreation" | "dateModification">) => {
     if (selectedCompetence) {
       const success = await updateCompetence(selectedCompetence.id, competenceData);
       if (success) {
@@ -36,19 +36,19 @@ const CompetenceManager = () => {
         setSelectedCompetence(null);
       }
     }
-  };
+  }, [selectedCompetence, updateCompetence]);
 
-  const handleDeleteCompetence = async (id: string) => {
+  const handleDeleteCompetence = useCallback(async (id: string) => {
     const success = await deleteCompetence(id);
     if (success && currentView === 'detail') {
       setCurrentView('dashboard');
       setSelectedCompetence(null);
     }
-  };
+  }, [deleteCompetence, currentView]);
 
-  const handleExportCSV = () => {
+  const handleExportCSV = useCallback(() => {
     exportCompetencesToCSV(competences);
-  };
+  }, [competences]);
 
   const getCategorieColor = (categorie: CategorieCompetence) => {
     const colors = {
@@ -70,14 +70,16 @@ const CompetenceManager = () => {
     return colors[statut];
   };
 
-  const filteredCompetences = competences.filter(competence => {
-    const matchesSearch = competence.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         competence.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategorie = filterCategorie === "all" || competence.categorie === filterCategorie;
-    const matchesStatut = filterStatut === "all" || competence.statut === filterStatut;
-    
-    return matchesSearch && matchesCategorie && matchesStatut;
-  });
+  const filteredCompetences = useMemo(() => {
+    return competences.filter(competence => {
+      const matchesSearch = competence.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           competence.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategorie = filterCategorie === "all" || competence.categorie === filterCategorie;
+      const matchesStatut = filterStatut === "all" || competence.statut === filterStatut;
+      
+      return matchesSearch && matchesCategorie && matchesStatut;
+    });
+  }, [competences, searchTerm, filterCategorie, filterStatut]);
 
   if (currentView === 'form') {
     return (

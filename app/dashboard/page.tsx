@@ -1,19 +1,39 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from 'next/dynamic';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, BookOpen, Calendar, FileCheck, Accessibility, Search, MessageSquareWarning, ClipboardCheck, Database } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+
+// Composant de chargement réutilisable
+const LazyLoadingSpinner = () => (
+  <div className="flex justify-center items-center py-8">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <span className="ml-2 text-gray-600">Chargement...</span>
+  </div>
+);
+
+// Lazy loading pour les gros composants uniquement
+const RendezVousListUnified = dynamic(() => import("@/components/rendez-vous/RendezVousListUnified"), {
+  loading: () => <LazyLoadingSpinner />,
+  ssr: false
+});
+
+const CompetenceManager = dynamic(() => import("@/components/competences/CompetenceManager"), {
+  loading: () => <LazyLoadingSpinner />,
+  ssr: false
+});
+
+// Imports normaux pour les composants plus petits
 import FormationsList from "@/components/formations/FormationsList";
 import ProgrammesManager from "@/components/formations/ProgrammesManager";
 import ApprenantsList from "@/components/apprenants/ApprenantsList";
-import RendezVousListUnified from "@/components/rendez-vous/RendezVousListUnified";
 import ConformiteQualiopi from "@/components/conformite/ConformiteQualiopi";
 import AccessibiliteManager from "@/components/accessibilite/AccessibiliteManager";
 import VeilleManager from "@/components/veille/VeilleManager";
-import CompetenceManager from "@/components/competences/CompetenceManager";
 import ReclamationsList from "@/components/reclamations/ReclamationsList";
 import ActionsCorrectivesList from "@/components/actions-correctives/ActionsCorrectivesList";
 import Header from "@/components/Header";

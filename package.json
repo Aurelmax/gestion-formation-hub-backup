@@ -7,6 +7,8 @@
     "dev": "next dev",
     "dev:auth": "concurrently \"cd backend && npm run dev\" \"next dev\"",
     "build": "next build",
+    "build:no-lint": "NEXT_LINT_IGNORE_ESLING=true next build",
+    "analyze": "ANALYZE=true npm run build",
     "build:html-parser": "node scripts/build-html-parser.js",
     "lint": "eslint .",
     "auth-server": "cd backend && npm run dev",
@@ -92,6 +94,7 @@
   "devDependencies": {
     "@axe-core/react": "^4.10.2",
     "@eslint/js": "^9.9.0",
+    "@next/bundle-analyzer": "^15.5.2",
     "@tailwindcss/typography": "^0.5.15",
     "@types/bcrypt": "^6.0.0",
     "@types/fs-extra": "^11.0.4",

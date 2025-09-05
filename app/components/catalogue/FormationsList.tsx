@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import FormationCard from "./FormationCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Formation, CategorieFormation } from "./types";
@@ -9,12 +9,17 @@ interface FormationsListProps {
 }
 
 const FormationsList = ({ categoriesFormations, onPositionnement }: FormationsListProps) => {
-  const [activeTab, setActiveTab] = useState(categoriesFormations[0]?.id || "");
+  const defaultTabId = useMemo(() => categoriesFormations[0]?.id || "", [categoriesFormations]);
+  const [activeTab, setActiveTab] = useState(defaultTabId);
+
+  const handleTabChange = useCallback((value: string) => {
+    setActiveTab(value);
+  }, []);
 
   return (
     <div className="bg-white py-16">
       <div className="container mx-auto px-4">
-        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs defaultValue={defaultTabId} onValueChange={handleTabChange} className="w-full">
           <div className="border-b sticky top-0 bg-white z-10 pb-2">
             <h2 className="text-3xl font-bold text-gray-900 mb-5">Nos formations par catégorie</h2>
             <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-2 bg-gray-100 p-1">

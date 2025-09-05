@@ -1,8 +1,19 @@
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProgrammeListEnhanced from './ProgrammeListEnhanced';
-import ProgrammeFormEnhanced from './ProgrammeFormEnhanced';
+
+// Lazy load du formulaire (gros composant utilisé conditionnellement)
+const ProgrammeFormEnhanced = dynamic(() => import('./ProgrammeFormEnhanced'), {
+  loading: () => (
+    <div className="flex justify-center items-center py-8">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <span className="ml-2 text-gray-600">Chargement du formulaire...</span>
+    </div>
+  ),
+  ssr: false
+});
 import { ProgrammeFormation } from '@/hooks/useProgrammesFormation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, BookOpen, FileSpreadsheet, FileUp } from 'lucide-react';

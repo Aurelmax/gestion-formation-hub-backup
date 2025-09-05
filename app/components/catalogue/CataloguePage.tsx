@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useProgrammesCatalogue, ProgrammeFormation, CategorieFormation } from '../../hooks/useProgrammesCatalogue';
 import { Box, Typography, Grid, Card, CardContent, CardActions, Button, Chip, CircularProgress, Alert, Container, Tabs, Tab } from '@mui/material';
 import Link from 'next/link';
@@ -18,9 +18,19 @@ const CataloguePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<number>(0);
   
   // Gérer le changement d'onglet
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = useCallback((_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
-  };
+  }, []);
+
+  // Memoize categories with formations
+  const categoriesWithFormations = useMemo(() => {
+    return categories.filter(category => category.formations && category.formations.length > 0);
+  }, [categories]);
+
+  // Memoize current active category
+  const activeCategory = useMemo(() => {
+    return activeTab > 0 ? categories[activeTab - 1] : null;
+  }, [categories, activeTab]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

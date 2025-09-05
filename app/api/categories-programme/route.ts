@@ -111,7 +111,8 @@ export async function GET(request: NextRequest) {
 }
 
 // GET /api/categories-programme/simple - Récupérer les catégories de programmes
-export async function GETSimple() {
+// Temporarily commented out as this is not a valid Next.js route export
+/* export async function GETSimple() {
   try {
     const categories = await prisma.categorieProgramme.findMany({
       select: {
@@ -139,7 +140,7 @@ export async function GETSimple() {
       { status: 500 }
     );
   }
-}
+} */
 
 // POST /api/categories-programme - Créer une nouvelle catégorie
 export async function POST(request: NextRequest) {

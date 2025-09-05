@@ -1,11 +1,16 @@
-import { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from 'next/dynamic';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Users, CheckCircle, Globe, Laptop, Code, BookOpen, BarChart, Search, ShoppingBag, Lightbulb, Sparkles, Calendar, FileDown } from "lucide-react";
 import { Formation } from "./types";
-import FormationDetailsModal from "./FormationDetailsModal";
+
+// Lazy load de la modale de détail (ne se charge que quand nécessaire)
+const FormationDetailsModal = dynamic(() => import("./FormationDetailsModal"), {
+  ssr: false
+});
 
 interface FormationCardProps {
   formation: Formation;
@@ -41,15 +46,17 @@ const FormationCard = ({ formation, onPositionnement }: FormationCardProps) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const router = useRouter();
 
-  const handlePositionnementClick = (e: React.MouseEvent) => {
+  const formationIcon = useMemo(() => getFormationIcon(formation), [formation]);
+
+  const handlePositionnementClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     onPositionnement(formation.titre);
-  };
+  }, [formation.titre, onPositionnement]);
 
-  const handleDetailsClick = (e: React.MouseEvent) => {
+  const handleDetailsClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setModalOpen(true);
-  };
+  }, []);
 
   return (
     <>
@@ -76,7 +83,7 @@ const FormationCard = ({ formation, onPositionnement }: FormationCardProps) => {
               <CardTitle className="text-base font-bold text-blue-900 uppercase pr-8">{formation.titre}</CardTitle>
             </div>
             <div className="absolute top-3 right-4 bg-white rounded-full p-1 shadow-sm">
-              {getFormationIcon(formation)}
+              {formationIcon}
             </div>
           </div>
         </CardHeader>
@@ -125,4 +132,4 @@ const FormationCard = ({ formation, onPositionnement }: FormationCardProps) => {
   );
 };
 
-export default FormationCard;
+export default React.memo(FormationCard);

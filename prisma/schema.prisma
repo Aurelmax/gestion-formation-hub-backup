@@ -62,6 +62,12 @@ model ProgrammeFormation {
   rendezvous              Rendezvous[]
 
   @@map("programmes_formation")
+  @@index([categorieId])
+  @@index([estActif])
+  @@index([estVisible])
+  @@index([type])
+  @@index([dateCreation])
+  @@index([categorieId, estActif, estVisible])
 }
 
 model CategorieProgramme {
