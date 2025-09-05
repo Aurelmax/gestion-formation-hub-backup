@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import AdminNav from '@/components/admin/AdminNav';
-import { auth } from '@/auth';
+import { auth } from '../../app/auth';
 
 export const metadata: Metadata = {
   title: 'Tableau de bord - Administration',

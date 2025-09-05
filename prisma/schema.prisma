@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model ProgrammeFormation {
@@ -61,13 +62,13 @@ model ProgrammeFormation {
   versionsDerivees        ProgrammeFormation[]   @relation("VersionsProgramme")
   rendezvous              Rendezvous[]
 
-  @@map("programmes_formation")
   @@index([categorieId])
   @@index([estActif])
   @@index([estVisible])
   @@index([type])
   @@index([dateCreation])
   @@index([categorieId, estActif, estVisible])
+  @@map("programmes_formation")
 }
 
 model CategorieProgramme {
@@ -438,7 +439,6 @@ model Rendezvous {
   telephone               String?
   objectifs               String?
   competencesActuelles    String?                @map("competences_actuelles")
-  competencesRecherchees  String?                @map("competences_recherchees")
   niveau                  String?
   formatSouhaite          String?                @map("format_souhaite")
   disponibilites          String?
@@ -471,23 +471,23 @@ model Rendezvous {
   dateContact             DateTime?              @map("date_contact")
   dateDebutSouhaitee      DateTime?              @map("date_debut_souhaitee")
   dateFinSouhaitee        DateTime?              @map("date_fin_souhaitee")
-  // Champs spécifiques aux rendez-vous d'impact
-  dateImpact              DateTime?              @map("date_impact")
-  satisfactionImpact      Int?                   @map("satisfaction_impact") // Note de 1-5
-  competencesAppliquees   String?                @map("competences_appliquees")
-  ameliorationsSuggeres   String?                @map("ameliorations_suggerees")
-  commentairesImpact      String?                @map("commentaires_impact")
-  rendezvousParentId      String?                @map("rendezvous_parent_id")
-  rendezvousParent        Rendezvous?            @relation("RendezvousImpact", fields: [rendezvousParentId], references: [id])
-  rendezvousImpacts       Rendezvous[]           @relation("RendezvousImpact")
   createdAt               DateTime               @default(now()) @map("created_at")
   updatedAt               DateTime               @default(now()) @updatedAt @map("updated_at")
   formationId             String?                @map("formation_id")
   dossierFormationId      String?                @map("dossier_formation_id")
   programmePersonnaliseId String?                @map("programme_personnalise_id")
+  ameliorationsSuggeres   String?                @map("ameliorations_suggerees")
+  commentairesImpact      String?                @map("commentaires_impact")
+  competencesAppliquees   String?                @map("competences_appliquees")
+  dateImpact              DateTime?              @map("date_impact")
+  rendezvousParentId      String?                @map("rendezvous_parent_id")
+  satisfactionImpact      Int?                   @map("satisfaction_impact")
+  competencesRecherchees  String?                @map("competences_recherchees")
   dossierFormation        DossierFormation?      @relation(fields: [dossierFormationId], references: [id], map: "rendezvous_dossier_formation_fkey")
   programmeFormation      ProgrammeFormation?    @relation(fields: [formationId], references: [id], map: "rendezvous_formation_fkey")
   programmePersonnalise   ProgrammePersonnalise? @relation(fields: [programmePersonnaliseId], references: [id], map: "rendezvous_programme_personnalise_fkey")
+  rendezvousParent        Rendezvous?            @relation("RendezvousImpact", fields: [rendezvousParentId], references: [id])
+  rendezvousImpacts       Rendezvous[]           @relation("RendezvousImpact")
 
   @@map("rendezvous")
 }

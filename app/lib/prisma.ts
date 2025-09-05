@@ -1,22 +1,26 @@
 import { PrismaClient } from '@prisma/client';
 
 declare global {
-  // PrismaClient est attaché à `global` en développement pour empêcher
-  // d'avoir trop d'instances de PrismaClient lors du rechargement à chaud (HMR).
-  // @ts-ignore
-  var prisma: PrismaClient | undefined;
+  // PrismaClient est attaché à `global` pour réutilisation
+  // eslint-disable-next-line no-var
+  var __prisma: PrismaClient | undefined;
 }
 
-// Initialise PrismaClient une seule fois et le réutilise dans toute l'application
-const prisma = global.prisma || new PrismaClient({
+// Configuration optimisée pour Vercel + Prisma Accelerate
+const prisma = global.__prisma || new PrismaClient({
   log: process.env.NODE_ENV === 'development' 
-    ? ['query', 'error', 'warn'] 
+    ? ['error', 'warn'] // Moins de logs en dev pour la perf
     : ['error'],
 });
 
-// En développement, attache PrismaClient à `global` pour le rechargement à chaud (HMR)
+// Éviter les fuites de connexion en production
 if (process.env.NODE_ENV !== 'production') {
-  global.prisma = prisma;
+  global.__prisma = prisma;
+} else {
+  // En production, assurer la fermeture propre
+  process.on('beforeExit', async () => {
+    await prisma.$disconnect();
+  });
 }
 
 export { prisma };

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import CategoriesManager from '@/components/admin/CategoriesManager';
 import AdminNav from '@/components/admin/AdminNav';
-import { auth } from '@/auth';
+import { auth } from '../../../app/auth';
 
 export const metadata: Metadata = {
   title: 'Gestion des catégories - Administration',
