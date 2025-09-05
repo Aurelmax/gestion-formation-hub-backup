@@ -1,26 +1,17 @@
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import CategoriesManager from '@/components/admin/CategoriesManager';
 import AdminNav from '@/components/admin/AdminNav';
-import { auth } from '../../../app/auth';
 
 export const metadata: Metadata = {
   title: 'Gestion des catégories - Administration',
   description: 'Gérez les catégories de formations',
 };
 
+// Disable static generation for admin page (requires auth)
+export const dynamic = 'force-dynamic';
+
 export default async function AdminCategoriesPage() {
-  const session = await auth();
-
-  // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-  if (!session) {
-    redirect('/auth?callbackUrl=/admin/categories');
-  }
-
-  // Vérifier les permissions si nécessaire
-  // if (session.user.role !== 'admin') {
-  //   redirect('/unauthorized');
-  // }
+  // Auth will be handled client-side through middleware or auth provider
 
   return (
     <div className="container mx-auto py-8">

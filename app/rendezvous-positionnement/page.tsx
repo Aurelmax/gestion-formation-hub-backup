@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import PositionnementForm from '@/components/rendez-vous/PositionnementForm';
 
-export default function RendezvousPositionnementPage() {
+function PositionnementContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const formationTitre = searchParams.get('formation') || '';
@@ -37,5 +38,13 @@ export default function RendezvousPositionnementPage() {
         />
       </div>
     </div>
+  );
+}
+
+export default function RendezVousPositionnementPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Chargement...</div>}>
+      <PositionnementContent />
+    </Suspense>
   );
 }
