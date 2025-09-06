@@ -1,59 +1,11 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { z } from 'zod';
 
 const prisma = new PrismaClient();
 
-// Schéma de validation des paramètres de requête
-export const querySchema = z.object({
-  page: z
-    .string()
-    .regex(/^\d+$/, "Le numéro de page doit être un nombre positif")
-    .transform(Number)
-    .refine((n) => n > 0, {
-      message: "Le numéro de page doit être supérieur à 0"
-    })
-    .default('1'),
-
-  limit: z
-    .string()
-    .regex(/^\d+$/, "La limite doit être un nombre positif")
-    .transform(Number)
-    .refine((n) => n > 0 && n <= 100, {
-      message: "La limite doit être comprise entre 1 et 100"
-    })
-    .default('6'),
-
-  categorieId: z
-    .string()
-    .uuid("L'ID de catégorie doit être un UUID valide")
-    .nullable()
-    .optional()
-    .transform(val => val || undefined),
-
-  search: z
-    .string()
-    .trim()
-    .min(1, "Le terme de recherche ne peut pas être vide")
-    .max(100, "Le terme de recherche est trop long")
-    .nullable()
-    .optional()
-    .transform(val => val || undefined),
-
-  includeInactive: z
-    .union([
-      z.literal('true'),
-      z.literal('false'),
-      z.boolean()
-    ])
-    .transform(val => val === true || val === 'true')
-    .default('false')
-    .optional()
-});
-
 export async function GET() {
   try {
-    console.log('Requête reçue sur /api/programmes-formation/par-categorie/groupes');
+    console.log('Requête reçue sur /api/programmes-formation/par-categorie/groups');
 
     // Récupérer toutes les catégories avec leurs programmes actifs et visibles
     const categories = await prisma.categorieProgramme.findMany({
@@ -108,5 +60,7 @@ export async function GET() {
       },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }

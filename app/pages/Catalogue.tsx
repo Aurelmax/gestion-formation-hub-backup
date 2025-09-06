@@ -52,53 +52,52 @@ const Catalogue = () => {
       try {
         setLoading(true);
         
-        // Récupérer les templates HTML depuis l'API (nouvelles routes)
-        const htmlResponse = await axios.get('/api/programmes-html/par-categorie/groupes');
+        // Récupérer les programmes de formation depuis l'API
+        const dbResponse = await axios.get('/api/programmes-formation/par-categorie/groupes');
         let allCategories: CategorieFormation[] = [];
         
-        if (htmlResponse.data && Array.isArray(htmlResponse.data)) {
-          // Transformation des données des templates HTML
-          const htmlData = transformBackendData(htmlResponse.data);
-          allCategories = htmlData;
-          console.log('Templates HTML chargés:', htmlData);
+        if (dbResponse.data && Array.isArray(dbResponse.data)) {
+          // Transformation des données de la base de données
+          const dbData = transformBackendData(dbResponse.data);
+          allCategories = dbData;
+          console.log('Programmes de formation chargés:', dbData);
         }
         
         try {
-          // Aussi récupérer les données de la base de données (route existante)
-          const dbResponse = await axios.get('/api/programmes-formation/par-categorie');
+          // Essayer aussi de récupérer des données supplémentaires si disponibles
+          const additionalResponse = await axios.get('/api/programmes-formation/par-categorie');
           
-          if (dbResponse.data && Array.isArray(dbResponse.data)) {
-            // Transformation des données de la base de données
-            const dbData = transformBackendData(dbResponse.data);
+          if (additionalResponse.data && Array.isArray(additionalResponse.data)) {
+            // Transformation des données supplémentaires
+            const additionalData = transformBackendData(additionalResponse.data);
             
-            // Fusion des deux sources de données (templates HTML et base de données)
-            // Pour chaque catégorie dans dbData
-            dbData.forEach(dbCategory => {
+            // Fusion des deux sources de données
+            additionalData.forEach(additionalCategory => {
               // Vérifier si cette catégorie existe déjà dans allCategories
-              const existingCategoryIndex = allCategories.findIndex(cat => cat.id === dbCategory.id);
+              const existingCategoryIndex = allCategories.findIndex(cat => cat.id === additionalCategory.id);
               
               if (existingCategoryIndex >= 0) {
                 // La catégorie existe, fusionner les formations
-                dbCategory.formations.forEach(dbFormation => {
+                additionalCategory.formations.forEach(additionalFormation => {
                   // Ne pas ajouter les formations en double
                   const existingFormationIndex = allCategories[existingCategoryIndex].formations
-                    .findIndex(f => f.id === dbFormation.id || f.titre === dbFormation.titre);
+                    .findIndex(f => f.id === additionalFormation.id || f.titre === additionalFormation.titre);
                   
                   if (existingFormationIndex < 0) {
-                    allCategories[existingCategoryIndex].formations.push(dbFormation);
+                    allCategories[existingCategoryIndex].formations.push(additionalFormation);
                   }
                 });
               } else {
                 // La catégorie n'existe pas, l'ajouter
-                allCategories.push(dbCategory);
+                allCategories.push(additionalCategory);
               }
             });
             
             console.log('Données combinées:', allCategories);
           }
-        } catch (dbErr) {
-          console.warn("Erreur lors du chargement des données de la base:", dbErr);
-          // On continue avec uniquement les données HTML si la base est indisponible
+        } catch (additionalErr) {
+          console.warn("Erreur lors du chargement des données supplémentaires:", additionalErr);
+          // On continue avec les données principales
         }
         
         if (allCategories.length > 0) {

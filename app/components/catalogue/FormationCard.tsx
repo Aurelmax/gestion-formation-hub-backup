@@ -1,10 +1,9 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import dynamic from 'next/dynamic';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Users, CheckCircle, Globe, Laptop, Code, BookOpen, BarChart, Search, ShoppingBag, Lightbulb, Sparkles, Calendar, FileDown } from "lucide-react";
+import { Globe, Code, BookOpen, BarChart, Search, ShoppingBag, Lightbulb, Sparkles, Calendar, FileDown, Share2, Palette, Shield, Bot, TrendingUp } from "lucide-react";
 import { Formation } from "./types";
 
 // Lazy load de la modale de détail (ne se charge que quand nécessaire)
@@ -17,25 +16,53 @@ interface FormationCardProps {
   onPositionnement: (titre: string) => void;
 }
 
-// Fonction pour déterminer l'icône à afficher en fonction de l'ID ou du titre de la formation
+// Fonction pour déterminer l'icône à afficher en fonction du titre de la formation
 const getFormationIcon = (formation: Formation) => {
-  const id = formation.id.toLowerCase();
   const titre = formation.titre.toLowerCase();
   
-  if (id.includes('wp') || titre.includes('wordpress')) {
-    return <Globe className="h-6 w-6 text-blue-600" />;
-  } else if (id.includes('wc') || titre.includes('woocommerce') || titre.includes('e-commerce')) {
-    return <ShoppingBag className="h-6 w-6 text-purple-600" />;
-  } else if (id.includes('seo') || titre.includes('référencement')) {
+  // IA / ChatGPT (priorité haute car spécifique)
+  if (titre.includes('chatgpt') || titre.includes('intelligence artificielle') || titre.includes('génération de contenu')) {
+    return <Bot className="h-6 w-6 text-indigo-600" />;
+  }
+  // Design / Canva (priorité haute car spécifique)
+  else if (titre.includes('canva') || titre.includes('design')) {
+    return <Palette className="h-6 w-6 text-pink-600" />;
+  }
+  // Réseaux sociaux / Facebook / LinkedIn (priorité haute car spécifique)
+  else if (titre.includes('facebook') || titre.includes('linkedin') || titre.includes('ads')) {
+    return <Share2 className="h-6 w-6 text-blue-500" />;
+  }
+  // SEO (priorité haute car spécifique)
+  else if (titre.includes('seo') || titre.includes('seopress') || titre.includes('référencement')) {
     return <Search className="h-6 w-6 text-green-600" />;
-  } else if (id.includes('marketing') || titre.includes('marketing')) {
-    return <BarChart className="h-6 w-6 text-orange-600" />;
-  } else if (id.includes('dev') || titre.includes('développement')) {
-    return <Code className="h-6 w-6 text-gray-700" />;
-  } else if (titre.includes('stratégie') || titre.includes('inbound')) {
+  }
+  // Analyse / Matomo (priorité haute car spécifique)
+  else if (titre.includes('matomo') || titre.includes('analyse') || titre.includes('statistique')) {
+    return <BarChart className="h-6 w-6 text-cyan-600" />;
+  }
+  // Sécurité (priorité haute car spécifique)
+  else if (titre.includes('sécurité') || titre.includes('maintenance')) {
+    return <Shield className="h-6 w-6 text-red-600" />;
+  }
+  // E-commerce / WooCommerce
+  else if (titre.includes('woocommerce') || titre.includes('e-commerce') || titre.includes('vente en ligne')) {
+    return <ShoppingBag className="h-6 w-6 text-purple-600" />;
+  }
+  // WordPress
+  else if (titre.includes('wordpress') || titre.includes('site internet')) {
+    return <Globe className="h-6 w-6 text-blue-600" />;
+  }
+  // Marketing / Publicité
+  else if (titre.includes('marketing') || titre.includes('publicitaire') || titre.includes('brevo')) {
+    return <TrendingUp className="h-6 w-6 text-orange-600" />;
+  }
+  // Stratégie / Inbound Marketing
+  else if (titre.includes('stratégie') || titre.includes('inbound') || titre.includes('développement digital')) {
     return <Lightbulb className="h-6 w-6 text-yellow-600" />;
-  } else if (titre.includes('avancé')) {
-    return <Sparkles className="h-6 w-6 text-purple-500" />;
+  }
+  // Développement
+  else if (titre.includes('développement') || titre.includes('code')) {
+    return <Code className="h-6 w-6 text-gray-700" />;
   }
   
   // Icône par défaut
@@ -44,7 +71,6 @@ const getFormationIcon = (formation: Formation) => {
 
 const FormationCard = ({ formation, onPositionnement }: FormationCardProps) => {
   const [isModalOpen, setModalOpen] = useState(false);
-  const router = useRouter();
 
   const formationIcon = useMemo(() => getFormationIcon(formation), [formation]);
 
