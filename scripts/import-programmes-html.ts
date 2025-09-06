@@ -22,16 +22,17 @@ interface ProgrammeData {
 
 // Mapping des codes vers les catégories
 const categorieMappings: { [key: string]: string } = {
-  'WP': 'WEB-DEV', // WordPress → Conception et gestion de site web
-  'WC': 'WEB-DEV', // WooCommerce → Conception et gestion de site web  
-  'FB': 'DIGITAL-COM', // Facebook → Relation client et communication digitale
-  'LI': 'DIGITAL-COM', // LinkedIn → Relation client et communication digitale
-  'IA': 'WEB-OPS', // IA → Exploitation, maintenance et sécurité
-  'SEO': 'DIGITAL-COM', // SEO → Relation client et communication digitale
-  'BD': 'WEB-DEV', // Base de données → Conception et gestion de site web
-  'SW': 'WEB-OPS', // Software → Exploitation, maintenance et sécurité
-  'CV': 'WEB-DEV', // CV → Conception et gestion de site web
-  'MA': 'DIGITAL-COM' // Marketing → Relation client et communication digitale
+  'WP': 'WEB_CONCEPTION', // WordPress → Conception et gestion de site web
+  'WC': 'DIGI_RELATION', // WooCommerce → Relation client et communication digitale  
+  'FB': 'DIGI_RELATION', // Facebook → Relation client et communication digitale
+  'LI': 'DIGI_RELATION', // LinkedIn → Relation client et communication digitale
+  'IA': 'WEB_EXPLOIT_SEC', // IA → Exploitation, maintenance et sécurité
+  'SEO': 'DIGI_RELATION', // SEO → Relation client et communication digitale
+  'BD': 'DIGI_RELATION', // Base de données → Relation client et communication digitale
+  'SW': 'WEB_EXPLOIT_SEC', // Software → Exploitation, maintenance et sécurité
+  'CV': 'WEB_CONCEPTION', // CV → Conception et gestion de site web
+  'MA': 'DIGI_RELATION', // Marketing → Relation client et communication digitale
+  'DD': 'WEB_CONCEPTION' // Développement Digital → Conception et gestion de site web
 };
 
 function determinerCategorie(code: string): string {
@@ -42,7 +43,7 @@ function determinerCategorie(code: string): string {
     }
   }
   // Par défaut, conception web
-  return 'WEB-DEV';
+  return 'WEB_CONCEPTION';
 }
 
 function extractTextContent($: cheerio.CheerioAPI, selector: string): string {
@@ -104,10 +105,22 @@ function parseHtmlFile(filePath: string): ProgrammeData | null {
     let publicConcerne = '';
     let horaires = '';
     
-    // Extraire le titre depuis h1 ou title
-    titre = $('h1').first().text().trim() || 
-            $('h2').first().text().trim() || 
-            $('title').text().replace('Programme de formation - ', '').trim();
+    // Extraire le titre depuis title en priorité, puis h1/h2 si nécessaire
+    const titleFromTag = $('title').text().replace('Programme de formation - ', '').trim();
+    const h1Title = $('h1').first().text().trim();
+    const h2Title = $('h2').first().text().trim();
+    
+    // Prioriser le titre de la balise title si il est différent de "Programme de formation"
+    if (titleFromTag && titleFromTag !== 'Programme de formation') {
+      titre = titleFromTag;
+    } else if (h1Title && h1Title !== 'Programme de formation') {
+      titre = h1Title;
+    } else if (h2Title && h2Title !== 'Programme de formation') {
+      titre = h2Title;
+    } else {
+      // Fallback: essayer d'extraire depuis le nom du fichier
+      titre = titleFromTag || 'Programme de formation';
+    }
     
     // Extraire les informations depuis les info-row
     $('.info-row').each((_, row) => {
