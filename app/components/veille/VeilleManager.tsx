@@ -5,52 +5,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Plus, Eye, FileText, Cog, Lightbulb } from "lucide-react";
+import { Plus, Eye, FileText, Cog, Lightbulb, Loader2, AlertCircle } from "lucide-react";
 import { Veille, TypeVeille, StatutVeille } from "@/types/veille";
+import { useVeille } from "@/hooks/useVeille";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import VeilleDetail from "./VeilleDetail";
 import VeilleForm from "./VeilleForm";
 
 const VeilleManager = () => {
-  const [veilles, setVeilles] = useState<Veille[]>([
-    {
-      id: "1",
-      titre: "Nouvelle réglementation accessibilité",
-      description: "Suivi des évolutions RGAA et normes d'accessibilité",
-      type: "reglementaire",
-      statut: "en-cours",
-      avancement: 65,
-      dateCreation: new Date("2024-01-15"),
-      dateEcheance: new Date("2024-03-15"),
-      commentaires: ["Analyse en cours", "Contact pris avec expert"],
-      documents: [],
-      historique: []
-    },
-    {
-      id: "2",
-      titre: "Évolution WordPress 6.5",
-      description: "Nouvelles fonctionnalités et impact sur les formations",
-      type: "metier",
-      statut: "nouvelle",
-      avancement: 0,
-      dateCreation: new Date("2024-01-20"),
-      commentaires: [],
-      documents: [],
-      historique: []
-    },
-    {
-      id: "3",
-      titre: "IA et outils no-code",
-      description: "Impact de l'intelligence artificielle sur les formations",
-      type: "innovation",
-      statut: "terminee",
-      avancement: 100,
-      dateCreation: new Date("2023-12-01"),
-      dateEcheance: new Date("2024-01-30"),
-      commentaires: ["Analyse terminée", "Formations mises à jour"],
-      documents: [],
-      historique: []
-    }
-  ]);
+  const { 
+    veilles, 
+    loading, 
+    error, 
+    createVeille, 
+    updateStatut, 
+    updateAvancement, 
+    addCommentaire 
+  } = useVeille();
 
   const [selectedVeille, setSelectedVeille] = useState<Veille | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -85,35 +56,37 @@ const VeilleManager = () => {
     ? veilles 
     : veilles.filter(v => v.type === selectedType);
 
-  const handleUpdateStatut = (id: string, statut: StatutVeille) => {
-    setVeilles(prev => prev.map(v => 
-      v.id === id ? { ...v, statut } : v
-    ));
+  const handleUpdateStatut = async (id: string, statut: StatutVeille) => {
+    try {
+      await updateStatut(id, statut);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du statut:', error);
+    }
   };
 
-  const handleUpdateAvancement = (id: string, avancement: number) => {
-    setVeilles(prev => prev.map(v => 
-      v.id === id ? { ...v, avancement } : v
-    ));
+  const handleUpdateAvancement = async (id: string, avancement: number) => {
+    try {
+      await updateAvancement(id, avancement);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de l\'avancement:', error);
+    }
   };
 
-  const handleAddCommentaire = (id: string, commentaire: string) => {
-    setVeilles(prev => prev.map(v => 
-      v.id === id ? { ...v, commentaires: [...v.commentaires, commentaire] } : v
-    ));
+  const handleAddCommentaire = async (id: string, commentaire: string) => {
+    try {
+      await addCommentaire(id, commentaire);
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout du commentaire:', error);
+    }
   };
 
-  const handleCreateVeille = (nouvelleVeille: Omit<Veille, "id" | "dateCreation" | "commentaires" | "documents" | "historique">) => {
-    const veille: Veille = {
-      ...nouvelleVeille,
-      id: Date.now().toString(),
-      dateCreation: new Date(),
-      commentaires: [],
-      documents: [],
-      historique: []
-    };
-    setVeilles(prev => [...prev, veille]);
-    setShowForm(false);
+  const handleCreateVeille = async (nouvelleVeille: Omit<Veille, "id" | "dateCreation" | "commentaires" | "documents" | "historique">) => {
+    try {
+      await createVeille(nouvelleVeille);
+      setShowForm(false);
+    } catch (error) {
+      console.error('Erreur lors de la création de la veille:', error);
+    }
   };
 
   if (selectedVeille) {
@@ -137,8 +110,27 @@ const VeilleManager = () => {
     );
   }
 
+  // Affichage du chargement
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin mr-2" />
+        <span>Chargement des veilles...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      {/* Affichage des erreurs */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+      )}
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Gestion de la Veille</h2>

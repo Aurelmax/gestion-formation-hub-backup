@@ -404,16 +404,56 @@ model ProgrammePersonnalise {
 }
 
 model Veille {
-  id           String    @id @default(uuid())
-  titre        String
-  description  String
-  type         String
-  statut       String    @default("nouvelle")
-  avancement   Int       @default(0)
-  dateCreation DateTime  @default(now()) @map("date_creation")
-  dateEcheance DateTime? @map("date_echeance")
+  id                String                @id @default(uuid())
+  titre             String
+  description       String
+  type              String                // 'reglementaire' | 'metier' | 'innovation'
+  statut            String                @default("nouvelle") // 'nouvelle' | 'en-cours' | 'terminee'
+  avancement        Int                   @default(0) // pourcentage 0-100
+  dateCreation      DateTime              @default(now()) @map("date_creation")
+  dateModification  DateTime              @default(now()) @updatedAt @map("date_modification")
+  dateEcheance      DateTime?             @map("date_echeance")
+  commentaires      VeilleCommentaire[]
+  documents         VeilleDocument[]
+  historique        VeilleHistorique[]
 
   @@map("veilles")
+}
+
+model VeilleCommentaire {
+  id           String   @id @default(uuid())
+  veilleId     String   @map("veille_id")
+  contenu      String
+  dateCreation DateTime @default(now()) @map("date_creation")
+  utilisateur  String?  // Pour plus tard si on ajoute l'authentification
+  veille       Veille   @relation(fields: [veilleId], references: [id], onDelete: Cascade)
+
+  @@map("veille_commentaires")
+}
+
+model VeilleDocument {
+  id           String   @id @default(uuid())
+  veilleId     String   @map("veille_id")
+  nom          String
+  url          String
+  type         String   // type MIME
+  taille       Int      // en octets
+  dateAjout    DateTime @default(now()) @map("date_ajout")
+  veille       Veille   @relation(fields: [veilleId], references: [id], onDelete: Cascade)
+
+  @@map("veille_documents")
+}
+
+model VeilleHistorique {
+  id           String   @id @default(uuid())
+  veilleId     String   @map("veille_id")
+  action       String
+  details      String?
+  dateAction   DateTime @default(now()) @map("date_action")
+  utilisateur  String?  // Pour plus tard si on ajoute l'authentification
+  veille       Veille   @relation(fields: [veilleId], references: [id], onDelete: Cascade)
+
+  @@map("veille_historique")
 }
 
 model ConformiteQualiopi {
