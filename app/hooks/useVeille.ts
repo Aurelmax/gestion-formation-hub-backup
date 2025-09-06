@@ -156,6 +156,39 @@ export function useVeille() {
     }
   }, [fetchVeilles]);
 
+  // Mettre à jour une veille complètement
+  const updateVeille = useCallback(async (id: string, veilleData: Partial<Omit<Veille, "id" | "dateCreation" | "commentaires" | "documents" | "historique">>) => {
+    try {
+      const response = await fetch(`/api/veille/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(veilleData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la mise à jour de la veille');
+      }
+
+      const veilleUpdated = await response.json();
+      
+      // Transformer les dates
+      const veilleFormatee = {
+        ...veilleUpdated,
+        dateCreation: new Date(veilleUpdated.dateCreation),
+        dateEcheance: veilleUpdated.dateEcheance ? new Date(veilleUpdated.dateEcheance) : undefined
+      };
+
+      setVeilles(prev => prev.map(v => v.id === id ? veilleFormatee : v));
+      
+      return veilleFormatee;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      throw err;
+    }
+  }, []);
+
   // Supprimer une veille
   const deleteVeille = useCallback(async (id: string) => {
     try {
@@ -185,6 +218,7 @@ export function useVeille() {
     error,
     fetchVeilles,
     createVeille,
+    updateVeille,
     updateStatut,
     updateAvancement,
     addCommentaire,

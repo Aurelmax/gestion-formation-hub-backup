@@ -1,47 +1,72 @@
-// app/api/auth/[...nextauth]/route.ts
-import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+import { auth } from "@/auth"
+import NextAuth from "next-auth"
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import { PrismaClient } from '@prisma/client';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { compare } from 'bcryptjs';
 
-const authOptions = {
+const prisma = new PrismaClient();
+
+const handler = NextAuth({
   adapter: PrismaAdapter(prisma),
+  session: { strategy: 'jwt' },
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Mot de passe", type: "password" },
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Mot de passe', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error('Email et mot de passe requis');
+        }
 
-        // Cherche l'utilisateur dans Prisma
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+          where: { email: credentials.email as string },
         });
 
-        if (!user) return null;
+        if (!user || !user.password) {
+          throw new Error('Identifiants invalides');
+        }
 
-        // Vérifie le mot de passe hashé avec bcrypt
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isValid) return null;
+        const isValid = await compare(credentials.password as string, user.password);
 
-        return user;
+        if (!isValid) {
+          throw new Error('Mot de passe incorrect');
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        };
       },
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET,
-  session: { strategy: "jwt" },
   callbacks: {
     async session({ session, token }) {
-      if (session.user) session.user.id = token.sub!;
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+      }
       return session;
     },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
+      return token;
+    },
   },
-};
+  pages: {
+    signIn: '/auth',
+    error: '/auth/error',
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
+})
 
-// App Router : déclaration explicite des méthodes
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+export { handler as GET, handler as POST }

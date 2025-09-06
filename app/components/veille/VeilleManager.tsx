@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Plus, Eye, FileText, Cog, Lightbulb, Loader2, AlertCircle } from "lucide-react";
+import { Plus, Eye, Edit, Trash2, FileText, Cog, Lightbulb, Loader2, AlertCircle } from "lucide-react";
 import { Veille, TypeVeille, StatutVeille } from "@/types/veille";
 import { useVeille } from "@/hooks/useVeille";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -18,13 +18,16 @@ const VeilleManager = () => {
     loading, 
     error, 
     createVeille, 
+    updateVeille,
     updateStatut, 
     updateAvancement, 
-    addCommentaire 
+    addCommentaire,
+    deleteVeille 
   } = useVeille();
 
   const [selectedVeille, setSelectedVeille] = useState<Veille | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingVeille, setEditingVeille] = useState<Veille | null>(null);
   const [selectedType, setSelectedType] = useState<TypeVeille | "all">("all");
 
   const getStatutBadgeVariant = (statut: StatutVeille) => {
@@ -89,6 +92,29 @@ const VeilleManager = () => {
     }
   };
 
+  const handleUpdateVeille = async (veilleData: Partial<Omit<Veille, "id" | "dateCreation" | "commentaires" | "documents" | "historique">>) => {
+    if (!editingVeille) return;
+    
+    try {
+      await updateVeille(editingVeille.id, veilleData);
+      setEditingVeille(null);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la veille:', error);
+    }
+  };
+
+  const handleDeleteVeille = async (id: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette veille ?')) {
+      return;
+    }
+    
+    try {
+      await deleteVeille(id);
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la veille:', error);
+    }
+  };
+
   if (selectedVeille) {
     return (
       <VeilleDetail
@@ -107,6 +133,31 @@ const VeilleManager = () => {
         onSubmit={handleCreateVeille}
         onCancel={() => setShowForm(false)}
       />
+    );
+  }
+
+  if (editingVeille) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Modifier la veille</h2>
+          <Button variant="outline" onClick={() => setEditingVeille(null)}>
+            Annuler
+          </Button>
+        </div>
+        <VeilleForm
+          onSubmit={handleUpdateVeille}
+          onCancel={() => setEditingVeille(null)}
+        />
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <strong>Modification de:</strong> {editingVeille.titre}
+          </p>
+          <p className="text-xs text-blue-600 mt-1">
+            Créé le {editingVeille.dateCreation.toLocaleDateString()}
+          </p>
+        </div>
+      </div>
     );
   }
 
@@ -186,15 +237,38 @@ const VeilleManager = () => {
                     )}
                   </div>
 
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full"
-                    onClick={() => setSelectedVeille(veille)}
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    Voir détails
-                  </Button>
+                  <div className="space-y-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => setSelectedVeille(veille)}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Voir détails
+                    </Button>
+                    
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1"
+                        onClick={() => setEditingVeille(veille)}
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Éditer
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 text-red-600 hover:text-red-700 hover:border-red-300"
+                        onClick={() => handleDeleteVeille(veille.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Supprimer
+                      </Button>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from 'next/dynamic';
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, BookOpen, Calendar, FileCheck, Accessibility, Search, MessageSquareWarning, ClipboardCheck, Database } from "lucide-react";
+import { Users, BookOpen, Calendar, FileCheck, Accessibility, Search, MessageSquareWarning, ClipboardCheck, Database, Folder } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 // Composant de chargement réutilisable
@@ -36,12 +37,39 @@ import AccessibiliteManager from "@/components/accessibilite/AccessibiliteManage
 import VeilleManager from "@/components/veille/VeilleManager";
 import ReclamationsList from "@/components/reclamations/ReclamationsList";
 import ActionsCorrectivesList from "@/components/actions-correctives/ActionsCorrectivesList";
+import CategoriesManager from "@/components/admin/CategoriesManager";
 import Header from "@/components/Header";
 import { Metadata } from "next";
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("formations");
-  const { user, logout } = useAuth();
+  const [activeSubTab, setActiveSubTab] = useState("publiees");
+  const searchParams = useSearchParams();
+  const { user, signOut } = useAuth();
+
+  // Gérer les paramètres d'URL pour la navigation directe vers un programme
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    const subtab = searchParams.get('subtab');
+    const programme = searchParams.get('programme');
+
+    if (tab) setActiveTab(tab);
+    if (subtab) setActiveSubTab(subtab);
+    
+    // Si un programme spécifique est demandé, s'assurer qu'on est dans le bon onglet
+    if (programme && tab === 'formations' && subtab === 'bibliotheque') {
+      setActiveTab('formations');
+      setActiveSubTab('bibliotheque');
+    }
+    
+    // Redirection des anciennes URLs
+    if (subtab === 'admin') {
+      setActiveSubTab('bibliotheque');
+    }
+    if (subtab === 'publiees') {
+      setActiveSubTab('catalogue');
+    }
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -54,7 +82,7 @@ export default function DashboardPage() {
             </p>
           )}
         </div>
-        <Button variant="outline" onClick={logout}>
+        <Button variant="outline" onClick={signOut}>
           Se déconnecter
         </Button>
       </div>
@@ -106,22 +134,36 @@ export default function DashboardPage() {
                 <CardTitle className="text-xl">Gestion des formations</CardTitle>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="publiees" className="w-full">
-                  <TabsList className="w-full grid grid-cols-2">
-                    <TabsTrigger value="publiees" className="flex items-center justify-center gap-1">
+                <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
+                  <TabsList className="w-full grid grid-cols-3">
+                    <TabsTrigger value="catalogue" className="flex items-center justify-center gap-1">
                       <BookOpen className="h-4 w-4" />
-                      Formations Publiées
+                      Catalogue Public
                     </TabsTrigger>
-                    <TabsTrigger value="admin" className="flex items-center justify-center gap-1">
+                    <TabsTrigger value="bibliotheque" className="flex items-center justify-center gap-1">
                       <Database className="h-4 w-4" />
-                      Administration
+                      Bibliothèque
+                    </TabsTrigger>
+                    <TabsTrigger value="categories" className="flex items-center justify-center gap-1">
+                      <Folder className="h-4 w-4" />
+                      Catégories
                     </TabsTrigger>
                   </TabsList>
-                  <TabsContent value="publiees" className="mt-4">
+                  <TabsContent value="catalogue" className="mt-4">
                     <FormationsList />
                   </TabsContent>
-                  <TabsContent value="admin" className="mt-4">
+                  <TabsContent value="bibliotheque" className="mt-4">
                     <ProgrammesManager />
+                  </TabsContent>
+                  <TabsContent value="categories" className="mt-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-xl">Gestion des catégories</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <CategoriesManager />
+                      </CardContent>
+                    </Card>
                   </TabsContent>
                 </Tabs>
               </CardContent>
@@ -159,6 +201,7 @@ export default function DashboardPage() {
           <TabsContent value="conformite">
             <ConformiteQualiopi />
           </TabsContent>
+
         </Tabs>
       </main>
     </div>

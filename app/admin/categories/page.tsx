@@ -1,25 +1,21 @@
-import { Metadata } from 'next';
-import CategoriesManager from '@/components/admin/CategoriesManager';
-import AdminNav from '@/components/admin/AdminNav';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Gestion des catégories - Administration',
-  description: 'Gérez les catégories de formations',
-};
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-// Disable static generation for admin page (requires auth)
-export const dynamic = 'force-dynamic';
+export default function AdminCategoriesPage() {
+  const router = useRouter();
 
-export default async function AdminCategoriesPage() {
-  // Auth will be handled client-side through middleware or auth provider
+  useEffect(() => {
+    // Rediriger vers le dashboard avec l'onglet formations/categories
+    router.replace('/dashboard?tab=formations&subtab=categories');
+  }, [router]);
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-4">Administration</h1>
-      <AdminNav />
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-2xl font-semibold mb-6">Gestion des catégories</h2>
-        <CategoriesManager />
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <p className="text-lg">Redirection vers le dashboard...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mt-4"></div>
       </div>
     </div>
   );

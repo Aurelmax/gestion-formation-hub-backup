@@ -1,0 +1,77 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { withAccelerate } from '@prisma/extension-accelerate';
+
+const prisma = new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+}).$extends(withAccelerate());
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const rendezvous = await prisma.rendezvous.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!rendezvous) {
+      return NextResponse.json(
+        { error: 'Rendez-vous non trouvé' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(rendezvous);
+  } catch (error) {
+    console.error('Erreur lors de la récupération du rendez-vous:', error);
+    return NextResponse.json(
+      { error: 'Erreur lors de la récupération du rendez-vous' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const data = await request.json();
+
+    const rendezvous = await prisma.rendezvous.update({
+      where: { id: params.id },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
+    });
+
+    return NextResponse.json(rendezvous);
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du rendez-vous:', error);
+    return NextResponse.json(
+      { error: 'Erreur lors de la mise à jour du rendez-vous' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await prisma.rendezvous.delete({
+      where: { id: params.id },
+    });
+
+    return NextResponse.json({ message: 'Rendez-vous supprimé avec succès' });
+  } catch (error) {
+    console.error('Erreur lors de la suppression du rendez-vous:', error);
+    return NextResponse.json(
+      { error: 'Erreur lors de la suppression du rendez-vous' },
+      { status: 500 }
+    );
+  }
+}

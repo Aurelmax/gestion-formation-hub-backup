@@ -18,44 +18,55 @@ type QueryParams = {
   includeInactive?: boolean;
 };
 
-// Schéma de validation avec Zod
+// Schéma de validation avec Zod - Version assouplie pour compatibilité frontend
 const programmeSchema = z.object({
+  // Champs essentiels obligatoires
   code: z.string().min(1, 'Le code est requis'),
   type: z.enum(['catalogue', 'sur-mesure']),
-  typeProgramme: z.string().optional(),
   titre: z.string().min(1, 'Le titre est requis'),
   description: z.string().min(1, 'La description est requise'),
   duree: z.string().min(1, 'La durée est requise'),
   prix: z.string().min(1, 'Le prix est requis'),
-  niveau: z.string().min(1, 'Le niveau est requis'),
-  participants: z.string().min(1, 'Le nombre de participants est requis'),
-  objectifs: z.array(z.string()).min(1, 'Au moins un objectif est requis'),
-  prerequis: z.string().min(1, 'Les prérequis sont requis'),
-  publicConcerne: z.string().min(1, 'Le public concerné est requis'),
-  contenuDetailleJours: z.string().min(1, 'Le contenu détaillé est requis'),
-  modalites: z.string().min(1, 'Les modalités sont requises'),
-  modalitesAcces: z.string().min(1, 'Les modalités d\'accès sont requises'),
-  modalitesTechniques: z.string().min(1, 'Les modalités techniques sont requises'),
-  modalitesReglement: z.string().min(1, 'Les modalités de règlement sont requises'),
-  formateur: z.string().min(1, 'Le formateur est requis'),
-  ressourcesDisposition: z.string().min(1, 'Les ressources à disposition sont requises'),
-  modalitesEvaluation: z.string().min(1, 'Les modalités d\'évaluation sont requises'),
-  sanctionFormation: z.string().min(1, 'La sanction de formation est requise'),
-  niveauCertification: z.string().min(1, 'Le niveau de certification est requis'),
-  delaiAcceptation: z.string().min(1, 'Le délai d\'acceptation est requis'),
-  accessibiliteHandicap: z.string().min(1, 'L\'accessibilité handicap est requise'),
-  cessationAbandon: z.string().min(1, 'Les conditions de cessation d\'abandon sont requises'),
-  categorieId: z.string().uuid('ID de catégorie invalide').optional(),
-  pictogramme: z.string().optional(),
+  
+  // Champs de base optionnels avec valeurs par défaut
+  typeProgramme: z.string().optional(),
+  niveau: z.string().optional().default('Non spécifié'),
+  participants: z.string().optional().default('Non spécifié'),
+  objectifs: z.array(z.string()).optional().default([]),
+  prerequis: z.string().optional().default('Aucun prérequis spécifique'),
+  publicConcerne: z.string().optional().default('Tout public'),
+  contenuDetailleJours: z.string().optional().default('Contenu détaillé à venir'),
+  
+  // Champs de modalités optionnels avec valeurs par défaut
+  modalites: z.string().optional().default('Formation présentielle ou à distance'),
+  modalitesAcces: z.string().optional().default('Inscription en ligne ou par téléphone'),
+  modalitesTechniques: z.string().optional().default('Matériel fourni sur place'),
+  modalitesReglement: z.string().optional().default('Paiement par virement bancaire'),
+  
+  // Champs pédagogiques optionnels
+  formateur: z.string().optional().default('Formateur expert'),
+  ressourcesDisposition: z.string().optional().default('Support de cours et exercices pratiques'),
+  modalitesEvaluation: z.string().optional().default('Évaluation continue et QCM final'),
+  sanctionFormation: z.string().optional().default('Attestation de fin de formation'),
+  niveauCertification: z.string().optional().default(''),
+  
+  // Champs administratifs optionnels
+  delaiAcceptation: z.string().optional().default('15 jours avant le début de formation'),
+  accessibiliteHandicap: z.string().optional().default('Locaux accessibles PMR - Nous consulter pour adaptations spécifiques'),
+  cessationAbandon: z.string().optional().default('Remboursement au prorata selon conditions générales'),
+  
+  // Champs de configuration
+  categorieId: z.string().uuid('ID de catégorie invalide').optional().nullable(),
+  pictogramme: z.string().optional().default('📚'),
   estActif: z.boolean().optional().default(true),
   estVisible: z.boolean().optional().default(true),
   version: z.number().int().positive().optional().default(1),
   objectifsSpecifiques: z.string().optional(),
-  programmeUrl: z.string().url('URL de programme invalide').optional(),
+  programmeUrl: z.string().url('URL de programme invalide').optional().nullable(),
   ressourcesAssociees: z.array(z.string()).optional().default([]),
-  beneficiaireId: z.string().uuid('ID de bénéficiaire invalide').optional(),
-  formateurId: z.string().uuid('ID de formateur invalide').optional(),
-  programmeSourId: z.string().uuid('ID de programme source invalide').optional(),
+  beneficiaireId: z.string().uuid('ID de bénéficiaire invalide').optional().nullable(),
+  formateurId: z.string().uuid('ID de formateur invalide').optional().nullable(),
+  programmeSourId: z.string().uuid('ID de programme source invalide').optional().nullable(),
 });
 
 // Schéma de validation des paramètres de requête
@@ -289,9 +300,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier si le code existe déjà
-    const existingProgramme = await prisma.programmeFormation.findUnique({
-      where: { code: data.code },
+    // Vérifier si le code existe déjà (utiliser findFirst car code n'est plus unique)
+    const existingProgramme = await prisma.programmeFormation.findFirst({
+      where: { code: validation.data.code },
     });
 
     if (existingProgramme) {

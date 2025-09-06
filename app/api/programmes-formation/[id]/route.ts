@@ -4,33 +4,36 @@ import { z } from 'zod';
 
 const prisma = new PrismaClient();
 
-// Schéma de validation partiel pour les mises à jour
+// Schéma de validation partiel pour les mises à jour - Version assouplie
 const updateProgrammeSchema = z.object({
+  // Champs essentiels
   code: z.string().min(1, 'Le code est requis').optional(),
   type: z.enum(['catalogue', 'sur-mesure']).optional(),
-  typeProgramme: z.string().optional(),
   titre: z.string().min(1, 'Le titre est requis').optional(),
   description: z.string().min(1, 'La description est requise').optional(),
   duree: z.string().min(1, 'La durée est requise').optional(),
   prix: z.string().min(1, 'Le prix est requis').optional(),
-  niveau: z.string().min(1, 'Le niveau est requis').optional(),
-  participants: z.string().min(1, 'Le nombre de participants est requis').optional(),
-  objectifs: z.array(z.string()).min(1, 'Au moins un objectif est requis').optional(),
-  prerequis: z.string().min(1, 'Les prérequis sont requis').optional(),
-  publicConcerne: z.string().min(1, 'Le public concerné est requis').optional(),
-  contenuDetailleJours: z.string().min(1, 'Le contenu détaillé est requis').optional(),
-  modalites: z.string().min(1, 'Les modalités sont requises').optional(),
-  modalitesAcces: z.string().min(1, 'Les modalités d\'accès sont requises').optional(),
-  modalitesTechniques: z.string().min(1, 'Les modalités techniques sont requises').optional(),
-  modalitesReglement: z.string().min(1, 'Les modalités de règlement sont requises').optional(),
-  formateur: z.string().min(1, 'Le formateur est requis').optional(),
-  ressourcesDisposition: z.string().min(1, 'Les ressources à disposition sont requises').optional(),
-  modalitesEvaluation: z.string().min(1, 'Les modalités d\'évaluation sont requises').optional(),
-  sanctionFormation: z.string().min(1, 'La sanction de formation est requise').optional(),
-  niveauCertification: z.string().min(1, 'Le niveau de certification est requis').optional(),
-  delaiAcceptation: z.string().min(1, 'Le délai d\'acceptation est requis').optional(),
-  accessibiliteHandicap: z.string().min(1, 'L\'accessibilité handicap est requise').optional(),
-  cessationAbandon: z.string().min(1, 'Les conditions de cessation d\'abandon sont requises').optional(),
+  
+  // Champs optionnels sans validation stricte
+  typeProgramme: z.string().optional(),
+  niveau: z.string().optional(),
+  participants: z.string().optional(),
+  objectifs: z.array(z.string()).optional(),
+  prerequis: z.string().optional(),
+  publicConcerne: z.string().optional(),
+  contenuDetailleJours: z.string().optional(),
+  modalites: z.string().optional(),
+  modalitesAcces: z.string().optional(),
+  modalitesTechniques: z.string().optional(),
+  modalitesReglement: z.string().optional(),
+  formateur: z.string().optional(),
+  ressourcesDisposition: z.string().optional(),
+  modalitesEvaluation: z.string().optional(),
+  sanctionFormation: z.string().optional(),
+  niveauCertification: z.string().optional(),
+  delaiAcceptation: z.string().optional(),
+  accessibiliteHandicap: z.string().optional(),
+  cessationAbandon: z.string().optional(),
   categorieId: z.string().uuid('ID de catégorie invalide').optional().nullable(),
   pictogramme: z.string().optional(),
   estActif: z.boolean().optional(),
@@ -47,10 +50,10 @@ const updateProgrammeSchema = z.object({
 // GET /api/programmes-formation/[id] - Récupérer un programme par son ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const programme = await prisma.programmeFormation.findUnique({
       where: { id },
@@ -95,10 +98,10 @@ export async function GET(
 // PUT /api/programmes-formation/[id] - Mettre à jour complètement un programme
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const data = await request.json();
     
     // Vérifier si le programme existe
@@ -168,10 +171,10 @@ export async function PUT(
 // PATCH /api/programmes-formation/[id] - Mettre à jour partiellement un programme
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const data = await request.json();
     
     // Vérifier si le programme existe
@@ -241,10 +244,10 @@ export async function PATCH(
 // DELETE /api/programmes-formation/[id] - Supprimer un programme
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Vérifier si le programme existe
     const existingProgramme = await prisma.programmeFormation.findUnique({
@@ -258,23 +261,21 @@ export async function DELETE(
       );
     }
 
-    // Vérifier si le programme est utilisé dans des dossiers
-    const usedInDossiers = await prisma.dossierFormation.count({
-      where: {
-        OR: [
-          { programmeId: id },
-          { programmePersonnalise: { some: { formationId: id } } },
-        ],
-      },
+    // Vérifier si le programme a des dossiers liés (via la relation prisma)
+    const programmeWithDossiers = await prisma.programmeFormation.findUnique({
+      where: { id },
+      include: {
+        dossiers: true,
+      }
     });
 
-    if (usedInDossiers > 0) {
+    if (programmeWithDossiers?.dossiers && programmeWithDossiers.dossiers.length > 0) {
       return NextResponse.json(
         { 
           error: 'Impossible de supprimer ce programme car il est utilisé dans un ou plusieurs dossiers',
-          usedInDossiers,
+          usedInDossiers: programmeWithDossiers.dossiers.length,
         },
-        { status: 400 }
+        { status: 409 }
       );
     }
 

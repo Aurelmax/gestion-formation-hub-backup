@@ -177,18 +177,77 @@ export const useRendezvous = (): UseRendezvousReturn => {
         url += '?' + params.join('&');
       }
 
-      const response = await api.get<ApiResponse<Rendezvous[]>>(url);
+      const response = await api.get<ApiResponse<any[]>>(url);
 
       // Traitement de la réponse en fonction de sa structure
+      let rawData: any[] = [];
       if (response.data && Array.isArray(response.data)) {
-        setRendezvous(response.data);
+        rawData = response.data;
       } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
-        setRendezvous(response.data.data);
+        rawData = response.data.data;
       } else {
         console.error('Structure de réponse API inattendue:', response.data);
         setRendezvous([]);
         setError('Format de réponse invalide');
+        return;
       }
+
+      // Mapper les données de l'API vers le format attendu par le hook
+      const mappedRendezvous: Rendezvous[] = rawData.map((rdv: any) => ({
+        id: rdv.id,
+        statut: rdv.status || rdv.statut, // API utilise 'status', hook attend 'statut'
+        type: rdv.type,
+        
+        // Mapping des noms de champs
+        nomBeneficiaire: rdv.nom || rdv.nomBeneficiaire,
+        prenomBeneficiaire: rdv.prenom || rdv.prenomBeneficiaire,
+        emailBeneficiaire: rdv.email || rdv.emailBeneficiaire,
+        telephoneBeneficiaire: rdv.telephone || rdv.telephoneBeneficiaire,
+        
+        // Informations pédagogiques
+        objectifs: rdv.objectifs ? (Array.isArray(rdv.objectifs) ? rdv.objectifs : [rdv.objectifs]) : undefined,
+        niveauBeneficiaire: rdv.niveau || rdv.niveauBeneficiaire,
+        situationActuelle: rdv.situationActuelle,
+        attentes: rdv.attentes,
+        pratiqueActuelle: rdv.pratiqueActuelle,
+        
+        // Informations de rendez-vous
+        canal: rdv.formatRdv || rdv.canal,
+        dateRdv: rdv.dateRdv,
+        synthese: rdv.synthese,
+        
+        // Informations de formation
+        formationSelectionnee: rdv.formationTitre || rdv.formationSelectionnee,
+        
+        // Disponibilités
+        dateDispo: rdv.disponibilites || rdv.dateDispo,
+        modaliteFormation: rdv.formatSouhaite || rdv.modaliteFormation,
+        
+        // Financement
+        isFinancement: rdv.isFinancement,
+        typeFinancement: rdv.typeFinancement,
+        
+        // Handicap
+        hasHandicap: rdv.hasHandicap,
+        detailsHandicap: rdv.detailsHandicap,
+        besoinHandicap: rdv.besoinHandicap,
+        
+        // Entreprise
+        entreprise: rdv.entreprise,
+        siret: rdv.siret,
+        adresseEntreprise: rdv.adresseEntreprise,
+        interlocuteurNom: rdv.interlocuteurNom,
+        interlocuteurFonction: rdv.interlocuteurFonction,
+        interlocuteurEmail: rdv.interlocuteurEmail,
+        interlocuteurTelephone: rdv.interlocuteurTelephone,
+        
+        // Dates
+        createdAt: rdv.createdAt,
+        updatedAt: rdv.updatedAt,
+        dateContact: rdv.dateContact
+      }));
+
+      setRendezvous(mappedRendezvous);
     } catch (err) {
       console.error('Erreur lors du chargement des rendez-vous:', err);
       setError('Impossible de charger les rendez-vous');

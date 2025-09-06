@@ -19,7 +19,7 @@ import Header from "@/components/Header";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("formations");
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -32,7 +32,7 @@ const Dashboard = () => {
             </p>
           )}
         </div>
-        <Button variant="outline" onClick={logout}>
+        <Button variant="outline" onClick={signOut}>
           Se déconnecter
         </Button>
       </div>

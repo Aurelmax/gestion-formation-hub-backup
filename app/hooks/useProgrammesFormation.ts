@@ -54,59 +54,7 @@ import api from "@/services/api";
 import { ApiError, ApiResponse } from "@/types";
 import { z } from 'zod';
 
-// Données simulées pour la démonstration quand l'API n'est pas disponible
-const MOCK_PROGRAMMES: ProgrammeFormation[] = [
-  {
-    id: "1",
-    code: "DEV-WEB-01",
-    type: "catalogue",
-    titre: "Développement Web Front-End",
-    description: "Formation complète sur les technologies front-end modernes",
-    niveau: "Débutant",
-    participants: "8 à 12 personnes",
-    duree: "35 heures",
-    prix: "1950€ HT",
-    objectifs: [
-      "Maîtriser les fondamentaux du développement web",
-      "Créer des interfaces utilisateur modernes et responsives",
-      "Comprendre et utiliser JavaScript et ses frameworks"
-    ],
-    prerequis: "Connaissances de base en informatique",
-    modalites: "Formation en présentiel ou à distance",
-    publicConcerne: "Tout public souhaitant se former au développement web",
-    contenuDetailleJours: "Jour 1: HTML5, Jour 2: CSS3, Jour 3: JavaScript, Jour 4-5: Projets",
-    modalitesAcces: "Inscription en ligne ou par téléphone",
-    modalitesTechniques: "Ordinateur avec connexion internet, environnement de développement",
-    modalitesReglement: "Paiement par virement bancaire ou CB",
-    formateur: "Experts en développement web avec +5 ans d'expérience",
-    ressourcesDisposition: "Support de cours, exercices pratiques, accès à une plateforme en ligne",
-    modalitesEvaluation: "QCM et projet pratique",
-    sanctionFormation: "Attestation de fin de formation",
-    niveauCertification: "N/A",
-    delaiAcceptation: "15 jours avant le début de la formation",
-    accessibiliteHandicap: "Locaux accessibles aux personnes à mobilité réduite",
-    cessationAbandon: "Remboursement au prorata des heures suivies",
-    beneficiaireId: null,
-    objectifsSpecifiques: null,
-    positionnementRequestId: null,
-    programmeUrl: "https://www.example.com/programmes/dev-web-01",
-    programme: "<h1>Programme détaillé</h1><p>Formation développement web complète</p>",
-    contenuDetailleHtml: "<h2>Module 1: Introduction au HTML5</h2><p>Structure, balises sémantiques, formulaires avancés</p>",
-    categorieId: "1",
-    categorie: {
-      id: "1",
-      code: "DEV",
-      titre: "Développement",
-      description: "Formations en développement logiciel"
-    },
-    pictogramme: "💻",
-    estActif: true,
-    version: "1.0",
-    typeProgramme: "standard",
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-];
+// Hook connecté aux vraies APIs - Données mockées supprimées
 
 // Interface pour les programmes de formation unifiés
 export interface ProgrammeFormation {

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -229,8 +230,21 @@ const ProgrammeDetails = ({ programme, onBack }: { programme: ProgrammeFormation
 export default function ProgrammesManager() {
   const [view, setView] = useState<'list' | 'create' | 'edit' | 'detail'>('list');
   const [selectedProgramme, setSelectedProgramme] = useState<ProgrammeFormation | null>(null);
-  const { createProgramme, updateProgramme } = useProgrammesFormation();
+  const { createProgramme, updateProgramme, programmes } = useProgrammesFormation();
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+
+  // Gérer l'affichage automatique d'un programme spécifique
+  useEffect(() => {
+    const programmeId = searchParams.get('programme');
+    if (programmeId && programmes.length > 0) {
+      const programme = programmes.find(p => p.id === programmeId);
+      if (programme) {
+        setSelectedProgramme(programme);
+        setView('detail');
+      }
+    }
+  }, [searchParams, programmes]);
 
   const handleCreateClick = () => {
     setSelectedProgramme(null);

@@ -29,8 +29,8 @@ const FormationDetailsModal = ({
 }: FormationDetailsModalProps) => {
   if (!formation) return null;
 
-  // Utiliser l'URL du programme si elle existe, sinon créer une URL par défaut
-  const programmeUrl = formation.programmeUrl || `/programmes/ml/${formation.id}-programme.html`;
+  // Utiliser l'URL du programme si elle existe, sinon rediriger vers la bibliothèque de programmes
+  const programmeUrl = formation.programmeUrl || `/dashboard?tab=formations&subtab=admin&programme=${formation.id}`;
   
   // Fonction pour gérer le clic sur le bouton de positionnement
   const handlePositionnementClick = (e: React.MouseEvent) => {
