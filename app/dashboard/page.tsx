@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import dynamic from 'next/dynamic';
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -39,9 +39,8 @@ import ReclamationsList from "@/components/reclamations/ReclamationsList";
 import ActionsCorrectivesList from "@/components/actions-correctives/ActionsCorrectivesList";
 import CategoriesManager from "@/components/admin/CategoriesManager";
 import Header from "@/components/Header";
-import { Metadata } from "next";
 
-export default function DashboardPage() {
+function DashboardContent() {
   const [activeTab, setActiveTab] = useState("formations");
   const [activeSubTab, setActiveSubTab] = useState("publiees");
   const searchParams = useSearchParams();
@@ -205,5 +204,13 @@ export default function DashboardPage() {
         </Tabs>
       </main>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<LazyLoadingSpinner />}>
+      <DashboardContent />
+    </Suspense>
   );
 }

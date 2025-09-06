@@ -11,9 +11,10 @@ const commentaireSchema = z.object({
 // POST /api/veille/[id]/commentaire - Ajouter un commentaire à une veille
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const data = await request.json();
 
     // Validation des données
@@ -32,7 +33,7 @@ export async function POST(
 
     // Vérifier que la veille existe
     const veilleExistante = await prisma.veille.findUnique({
-      where: { id: params.id }
+      where: { id: id }
     });
 
     if (!veilleExistante) {
@@ -46,14 +47,14 @@ export async function POST(
     const [commentaire] = await prisma.$transaction([
       prisma.veilleCommentaire.create({
         data: {
-          veilleId: params.id,
+          veilleId: id,
           contenu,
           utilisateur: 'Système' // À remplacer plus tard par l'utilisateur connecté
         }
       }),
       prisma.veilleHistorique.create({
         data: {
-          veilleId: params.id,
+          veilleId: id,
           action: 'Ajout de commentaire',
           details: `Commentaire ajouté: "${contenu.substring(0, 50)}${contenu.length > 50 ? '...' : ''}"`,
           utilisateur: 'Système'

@@ -17,11 +17,12 @@ const veilleUpdateSchema = z.object({
 // GET /api/veille/[id] - Récupérer une veille spécifique
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const veille = await prisma.veille.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         commentaires: {
           orderBy: { dateCreation: 'desc' }
@@ -83,9 +84,10 @@ export async function GET(
 // PATCH /api/veille/[id] - Mettre à jour une veille
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const data = await request.json();
 
     // Validation des données
@@ -104,7 +106,7 @@ export async function PATCH(
 
     // Vérifier que la veille existe
     const veilleExistante = await prisma.veille.findUnique({
-      where: { id: params.id }
+      where: { id: id }
     });
 
     if (!veilleExistante) {
@@ -133,7 +135,7 @@ export async function PATCH(
 
     // Mettre à jour la veille
     const veilleModifiee = await prisma.veille.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         ...validatedData,
         historique: changementsHistorique.length > 0 ? {
@@ -196,12 +198,13 @@ export async function PATCH(
 // DELETE /api/veille/[id] - Supprimer une veille
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Vérifier que la veille existe
     const veilleExistante = await prisma.veille.findUnique({
-      where: { id: params.id }
+      where: { id: id }
     });
 
     if (!veilleExistante) {
@@ -213,7 +216,7 @@ export async function DELETE(
 
     // Supprimer la veille (les relations seront supprimées automatiquement via onDelete: Cascade)
     await prisma.veille.delete({
-      where: { id: params.id }
+      where: { id: id }
     });
 
     return NextResponse.json(
