@@ -30,7 +30,6 @@ const CompetenceManager = dynamic(() => import("@/components/competences/Compete
 
 // Imports normaux pour les composants plus petits
 import FormationsList from "@/components/formations/FormationsList";
-import ProgrammesManager from "@/components/formations/ProgrammesManager";
 import ApprenantsList from "@/components/apprenants/ApprenantsList";
 import ConformiteQualiopi from "@/components/conformite/ConformiteQualiopi";
 import AccessibiliteManager from "@/components/accessibilite/AccessibiliteManager";
@@ -42,7 +41,7 @@ import Header from "@/components/Header";
 
 function DashboardContent() {
   const [activeTab, setActiveTab] = useState("formations");
-  const [activeSubTab, setActiveSubTab] = useState("publiees");
+  const [activeSubTab, setActiveSubTab] = useState("bibliotheque");
   const searchParams = useSearchParams();
   const { user, signOut } = useAuth();
 
@@ -62,11 +61,8 @@ function DashboardContent() {
     }
     
     // Redirection des anciennes URLs
-    if (subtab === 'admin') {
+    if (subtab === 'admin' || subtab === 'publiees' || subtab === 'catalogue') {
       setActiveSubTab('bibliotheque');
-    }
-    if (subtab === 'publiees') {
-      setActiveSubTab('catalogue');
     }
   }, [searchParams]);
 
@@ -91,7 +87,7 @@ function DashboardContent() {
           <TabsList className="flex flex-wrap gap-1 p-1 w-full">
             <TabsTrigger value="formations" className="flex items-center gap-1">
               <BookOpen className="h-4 w-4" />
-              Formations
+              Programmes
             </TabsTrigger>
             <TabsTrigger value="apprenants" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
@@ -130,15 +126,11 @@ function DashboardContent() {
           <TabsContent value="formations">
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl">Gestion des formations</CardTitle>
+                <CardTitle className="text-xl">Gestion des programmes</CardTitle>
               </CardHeader>
               <CardContent>
                 <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
-                  <TabsList className="w-full grid grid-cols-3">
-                    <TabsTrigger value="catalogue" className="flex items-center justify-center gap-1">
-                      <BookOpen className="h-4 w-4" />
-                      Catalogue Public
-                    </TabsTrigger>
+                  <TabsList className="w-full grid grid-cols-2">
                     <TabsTrigger value="bibliotheque" className="flex items-center justify-center gap-1">
                       <Database className="h-4 w-4" />
                       Bibliothèque
@@ -148,11 +140,8 @@ function DashboardContent() {
                       Catégories
                     </TabsTrigger>
                   </TabsList>
-                  <TabsContent value="catalogue" className="mt-4">
-                    <FormationsList />
-                  </TabsContent>
                   <TabsContent value="bibliotheque" className="mt-4">
-                    <ProgrammesManager />
+                    <FormationsList />
                   </TabsContent>
                   <TabsContent value="categories" className="mt-4">
                     <Card>

@@ -239,7 +239,7 @@ const FormationForm = ({ formation, onSubmit, onCancel }: FormationFormProps) =>
                       <SelectValue placeholder="Sélectionnez une catégorie" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Aucune catégorie</SelectItem>
+                      <SelectItem value="_null">Aucune catégorie</SelectItem>
                       {categories?.map((categorie) => (
                         <SelectItem key={categorie?.id} value={categorie?.id}>
                           {categorie?.titre}

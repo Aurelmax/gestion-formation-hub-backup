@@ -38,7 +38,7 @@ import { useProgrammesFormation, ProgrammeFormation } from '@/hooks/useProgramme
 const formSchema = z.object({
   code: z.string().min(3, 'Le code doit contenir au moins 3 caractères'),
   titre: z.string().min(3, 'Le titre doit contenir au moins 3 caractères'),
-  type: z.enum(['catalogue', 'sur-mesure']),
+  type: z.enum(['catalogue', 'personnalise']),
   typeProgramme: z.string().optional(),
   version: z.coerce.number().default(1),
   estActif: z.boolean().default(true),
@@ -81,7 +81,7 @@ export default function ProgrammeFormEnhanced({ programme, onSubmit, onCancel }:
     defaultValues: {
       code: programme?.code || '',
       titre: programme?.titre || '',
-      type: programme?.type as 'catalogue' | 'sur-mesure' || 'catalogue',
+      type: programme?.type as 'catalogue' | 'personnalise' || 'catalogue',
       typeProgramme: programme?.typeProgramme || '',
       version: programme?.version ? Number(programme.version) : 1,
       estActif: programme?.estActif ?? true,
@@ -184,11 +184,11 @@ export default function ProgrammeFormEnhanced({ programme, onSubmit, onCancel }:
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="catalogue">Catalogue</SelectItem>
-                      <SelectItem value="sur-mesure">Sur-mesure</SelectItem>
+                      <SelectItem value="personnalise">Personnalisé</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription>
-                    Les programmes catalogue sont visibles publiquement, les programmes sur-mesure sont personnalisés
+                    Les programmes catalogue sont visibles publiquement, les programmes personnalisés sont adaptés aux besoins spécifiques
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -210,7 +210,7 @@ export default function ProgrammeFormEnhanced({ programme, onSubmit, onCancel }:
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Aucune catégorie</SelectItem>
+                      <SelectItem value="_null">Aucune catégorie</SelectItem>
                       {categories?.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.titre}
@@ -634,7 +634,7 @@ export default function ProgrammeFormEnhanced({ programme, onSubmit, onCancel }:
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Non spécifié</SelectItem>
+                          <SelectItem value="_null">Non spécifié</SelectItem>
                           <SelectItem value="wordpress">WordPress</SelectItem>
                           <SelectItem value="ecommerce">E-commerce</SelectItem>
                           <SelectItem value="marketing">Marketing digital</SelectItem>

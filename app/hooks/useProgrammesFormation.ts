@@ -60,7 +60,7 @@ import { z } from 'zod';
 export interface ProgrammeFormation {
   id: string;
   code: string;
-  type: "catalogue" | "sur-mesure"; // Type du programme (catalogue ou sur-mesure)
+  type: "catalogue" | "personnalise"; // Type du programme (catalogue ou personnalisé)
   titre: string;
   description: string;
   
@@ -88,10 +88,12 @@ export interface ProgrammeFormation {
   accessibiliteHandicap: string;
   cessationAbandon: string;
   
-  // Champs spécifiques aux programmes sur-mesure
-  beneficiaireId: string | null;
-  objectifsSpecifiques: string | null;
-  positionnementRequestId: string | null;
+  // Champs spécifiques aux programmes personnalisés
+  beneficiaireId: string | null; // ID de l'apprenant pour programmes personnalisés
+  objectifsSpecifiques: string | null; // Objectifs adaptés pour programmes personnalisés
+  positionnementRequestId: string | null; // Lien vers demande de positionnement
+  programmeCatalogueId: string | null; // Référence vers le programme catalogue source
+  programmeCatalogue?: ProgrammeFormation; // Programme catalogue d'origine (si personnalisé)
   
   // URL vers le programme HTML
   programmeUrl: string | null;
@@ -125,7 +127,7 @@ const programmeSchema = z.object({
   code: z.string().min(1, 'Le code est requis'),
   titre: z.string().min(1, 'Le titre est requis'),
   description: z.string().optional(),
-  type: z.enum(['catalogue', 'sur-mesure']),
+  type: z.enum(['catalogue', 'personnalise']),
   duree: z.number().int().positive('La durée doit être un nombre positif').optional(),
   prix: z.number().min(0, 'Le prix ne peut pas être négatif').optional(),
   categorieId: z.string().uuid('ID de catégorie invalide').optional().nullable(),
@@ -137,7 +139,7 @@ const programmeSchema = z.object({
 
 // Schéma de validation pour les paramètres de requête
 const queryParamsSchema = z.object({
-  type: z.enum(['catalogue', 'sur-mesure']).optional(),
+  type: z.enum(['catalogue', 'personnalise']).optional(),
   version: z.string().regex(/^\d+$/).optional(),
   fields: z.string().optional().transform(fields => 
     fields ? fields.split(',').map(f => f.trim()) : []
@@ -531,16 +533,69 @@ export const useProgrammesFormation = () => {
   };
 
   /**
-   * Filtre les programmes par type (catalogue ou sur-mesure)
-   * @param {'catalogue' | 'sur-mesure' | null} type - Type de programme
+   * Filtre les programmes par type (catalogue ou personnalisé)
+   * @param {'catalogue' | 'personnalise' | null} type - Type de programme
    * @returns {ProgrammeFormation[]} Programmes filtrés
    * 
    * @example
    * // Filtrer les programmes catalogue
    * const catalogue = getProgrammesByType('catalogue');
    */
-  const getProgrammesByType = (type: 'catalogue' | 'sur-mesure' | null): ProgrammeFormation[] => {
+  const getProgrammesByType = (type: 'catalogue' | 'personnalise' | null): ProgrammeFormation[] => {
     return programmes.filter(prog => prog.type === type);
+  };
+
+  /**
+   * Crée un programme personnalisé à partir d'un programme catalogue
+   * @param {string} programmeCatalogueId - ID du programme catalogue source
+   * @param {string} beneficiaireId - ID de l'apprenant bénéficiaire
+   * @param {Partial<ProgrammeFormation>} personnalisations - Adaptations spécifiques
+   * @returns {Promise<ProgrammeFormation>} Programme personnalisé créé
+   * 
+   * @example
+   * const programmePerso = await createProgrammePersonnalise('cat-123', 'app-456', {
+   *   objectifsSpecifiques: 'Objectifs adaptés pour cet apprenant',
+   *   duree: '2 jours au lieu de 3'
+   * });
+   */
+  const createProgrammePersonnalise = async (
+    programmeCatalogueId: string, 
+    beneficiaireId: string,
+    personnalisations: Partial<ProgrammeFormation> = {}
+  ) => {
+    try {
+      const programmeCatalogue = programmes.find(p => p.id === programmeCatalogueId);
+      if (!programmeCatalogue) {
+        throw new Error('Programme catalogue introuvable');
+      }
+
+      if (programmeCatalogue.type !== 'catalogue') {
+        throw new Error('Seuls les programmes catalogue peuvent être personnalisés');
+      }
+
+      const programmePersonnalise = {
+        ...programmeCatalogue,
+        type: 'personnalise' as const,
+        programmeCatalogueId,
+        beneficiaireId,
+        code: `${programmeCatalogue.code}-PERSO-${Date.now()}`,
+        titre: `${programmeCatalogue.titre} (Personnalisé)`,
+        estVisible: false, // Les programmes personnalisés ne sont pas visibles publiquement
+        ...personnalisations,
+        id: undefined, // Le backend générera un nouvel ID
+        createdAt: undefined,
+        updatedAt: undefined
+      };
+
+      return await createProgramme(programmePersonnalise);
+      
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de créer le programme personnalisé'
+      });
+      throw error;
+    }
   };
 
   // Chargement initial des données
@@ -565,6 +620,7 @@ export const useProgrammesFormation = () => {
     duplicateProgramme,
     updateProgrammeStatus,
     getProgrammesByCategorie,
-    getProgrammesByType
+    getProgrammesByType,
+    createProgrammePersonnalise
   };
 };

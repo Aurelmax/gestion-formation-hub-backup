@@ -24,6 +24,7 @@ const RendezvousFormUnified = ({
 }: RendezvousFormProps) => {
   // État du formulaire avec valeurs par défaut ou valeurs initiales
   const [formData, setFormData] = useState<RendezvousFormData>({
+    type: initialData?.type || "positionnement",
     nomBeneficiaire: initialData?.nomBeneficiaire || "",
     prenomBeneficiaire: initialData?.prenomBeneficiaire || "",
     emailBeneficiaire: initialData?.emailBeneficiaire || "",
@@ -49,6 +50,7 @@ const RendezvousFormUnified = ({
   useEffect(() => {
     if (initialData) {
       setFormData({
+        type: initialData.type || "positionnement",
         nomBeneficiaire: initialData.nomBeneficiaire || "",
         prenomBeneficiaire: initialData.prenomBeneficiaire || "",
         emailBeneficiaire: initialData.emailBeneficiaire || "",
@@ -122,6 +124,23 @@ const RendezvousFormUnified = ({
         <TabsContent value="infos-perso">
           <Card>
             <CardContent className="pt-4 space-y-4">
+              {/* Sélecteur de type de rendez-vous */}
+              <div className="space-y-2">
+                <Label htmlFor="type">Type de rendez-vous *</Label>
+                <Select
+                  value={formData.type || "positionnement"}
+                  onValueChange={(value) => handleChange("type", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionnez le type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="positionnement">Rendez-vous de positionnement</SelectItem>
+                    <SelectItem value="impact">Rendez-vous d'impact</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="nomBeneficiaire">Nom *</Label>

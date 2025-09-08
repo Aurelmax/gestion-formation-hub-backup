@@ -17,7 +17,7 @@ import { programmeFormationToPdfFormation } from "@/utils/typeAdapters";
 type ViewMode = "list" | "form" | "detail" | "import";
 type FilteredProgrammes = {
   catalogue: ProgrammeFormation[];
-  surMesure: ProgrammeFormation[];
+  personnalise: ProgrammeFormation[];
 };
 
 // Composants internes
@@ -57,9 +57,9 @@ const FormationCard = ({
               ) : (
                 <Archive className="h-3 w-3" />
               )}
-              {programme.type === "catalogue" ? "Catalogue" : "Sur-mesure"}
+              {programme.type === "catalogue" ? "Catalogue" : "Personnalisé"}
             </Badge>
-            {programme.type === "sur-mesure" && programme.beneficiaireId && (
+            {programme.type === "personnalise" && programme.beneficiaireId && (
               <Badge variant="outline" className="flex items-center gap-1">
                 <Users className="h-3 w-3" />
                 {programme.beneficiaireId}
@@ -93,7 +93,7 @@ const FormationCard = ({
             <span>Catégorie: {programme.categorie?.titre || programme.categorieId}</span>
           </div>
         )}
-        {programme.type === "sur-mesure" && programme.objectifsSpecifiques && (
+        {programme.type === "personnalise" && programme.objectifsSpecifiques && (
           <div className="flex items-center gap-1">
             <BookOpen className="h-3 w-3" />
             <span>Objectifs spécifiques: {programme.objectifsSpecifiques}</span>
@@ -187,7 +187,7 @@ const FormationsList = () => {
   const [editingFormation, setEditingFormation] = useState<ProgrammeFormation | null>(null);
   const [programmesFiltered, setProgrammesFiltered] = useState<FilteredProgrammes>({
     catalogue: [],
-    surMesure: []
+    personnalise: []
   });
 
   // Effets
@@ -195,7 +195,7 @@ const FormationsList = () => {
     if (programmes) {
       setProgrammesFiltered({
         catalogue: programmes.filter(p => p.type === "catalogue"),
-        surMesure: programmes.filter(p => p.type === "sur-mesure")
+        personnalise: programmes.filter(p => p.type === "personnalise")
       });
     }
   }, [programmes]);
@@ -210,49 +210,22 @@ const FormationsList = () => {
     });
   }, [toast]);
 
-  // Approche radicalement simplifiée pour isoler le problème
   const handleEdit = useCallback((formation: ProgrammeFormation) => {
-    console.log('=== NOUVELLE FONCTION HANDLEEDIT APPELÉE ===');
-    console.log('handleEdit appelé avec formation:', formation);
-
-    // Force directement les variables d'état pour éviter tout problème de timing
-    window.localStorage.setItem('temp_editing_formation', JSON.stringify(formation));
-    
-    // Utilise directement les variables d'état plutôt que d'attendre une mise à jour async
     setEditingFormation(formation);
-    
-    // Utiliser une valeur valide pour le type ViewMode
     setView("form");
-    
-    console.log('handleEdit terminé, view changée à "form"');
-    
-    // Force un test direct de l'affichage du formulaire après un court délai
-    setTimeout(() => {
-      if (editingFormation) {
-        console.log('TEST: editingFormation après timeout:', editingFormation);
-      } else {
-        // Si editingFormation n'est pas défini, essayer de le récupérer du localStorage
-        console.log('TEST: editingFormation non défini après timeout, essai de récupération depuis localStorage');
-      }
-    }, 200);
-  }, [editingFormation]);
+  }, []);
 
   const handleDelete = useCallback(async (id: string) => {
-    console.log('handleDelete appelé avec id:', id);
     try {
-      console.log('Avant appel à deleteProgramme');
       await deleteProgramme(id);
-      console.log('Après appel à deleteProgramme réussi');
       toast({
         title: "Programme supprimé",
         description: "Le programme a été supprimé avec succès.",
       });
     } catch (error) {
-      console.error('Erreur dans deleteProgramme:', error);
       toast({
         title: "Erreur",
         description: "Impossible de supprimer le programme.",
-        variant: "destructive",
       });
     }
   }, [deleteProgramme, toast]);
@@ -284,7 +257,6 @@ const FormationsList = () => {
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder le programme.",
-        variant: "destructive",
       });
     }
   }, [createProgramme, editingFormation, toast, updateProgramme]);
@@ -318,7 +290,6 @@ const FormationsList = () => {
       toast({
         title: "Erreur",
         description: "Impossible de générer le PDF.",
-        variant: "destructive",
       });
     }
   }, [generateFormationPDF, toast]);
@@ -337,23 +308,18 @@ const FormationsList = () => {
   }, [refreshProgrammes, toast]);
 
   const handleToggleActive = useCallback(async (id: string, newState: boolean) => {
-    console.log('handleToggleActive appelé avec id:', id, 'newState:', newState);
     try {
       // Utiliser la fonction dédiée du hook pour modifier le statut
-      console.log('Avant appel à updateProgrammeStatus');
-      await updateProgrammeStatus(id, { estActif: newState });
-      console.log('Après appel à updateProgrammeStatus réussi');
+      await updateProgrammeStatus(id, newState);
       toast({
         title: newState ? "Programme activé" : "Programme désactivé",
         description: `Le programme a été ${newState ? "activé" : "désactivé"} avec succès.`
       });
       // Le statut est déjà mis à jour dans le hook, pas besoin de rafraîchir
     } catch (error) {
-      console.error("Erreur lors du changement d'état:", error);
       toast({
         title: "Erreur",
         description: "Impossible de modifier l'état du programme.",
-        variant: "destructive"
       });
     }
   }, [toast, updateProgrammeStatus]);
@@ -368,12 +334,7 @@ const FormationsList = () => {
         throw new Error('Programme introuvable');
       }
 
-      // Déterminer le type de duplication : catalogue vers sur-mesure ou vice-versa
-      const targetType = programme.type === 'catalogue' ? 'sur-mesure' : 'catalogue';
-      console.log('Type cible pour duplication:', targetType);
-      
-      // Utiliser la fonction du hook pour dupliquer
-      console.log('Avant appel à duplicateProgramme');
+      const targetType = programme.type === 'catalogue' ? 'personnalise' : 'catalogue';
       await duplicateProgramme(id, { 
         type: targetType,
         titre: `${programme.titre} (copie)`,
@@ -393,7 +354,6 @@ const FormationsList = () => {
       toast({
         title: "Erreur",
         description: "Impossible de dupliquer le programme.",
-        variant: "destructive"
       });
     }
   }, [programmes, duplicateProgramme, refreshProgrammes, toast]);
@@ -430,9 +390,9 @@ const FormationsList = () => {
             <FileText className="h-4 w-4" />
             Catalogue
           </TabsTrigger>
-          <TabsTrigger value="sur-mesure" className="flex items-center gap-2">
+          <TabsTrigger value="personnalise" className="flex items-center gap-2">
             <Archive className="h-4 w-4" />
-            Sur-mesure
+            Personnalisés
           </TabsTrigger>
           <TabsTrigger value="mentions" className="flex items-center gap-2">
             <Info className="h-4 w-4" />
@@ -490,16 +450,16 @@ const FormationsList = () => {
           )}
         </TabsContent>
         
-        <TabsContent value="sur-mesure">
+        <TabsContent value="personnalise">
           {isLoading ? (
             <div className="flex justify-center p-10">
               <span className="loading loading-spinner loading-lg"></span>
             </div>
-          ) : programmesFiltered.surMesure.length === 0 ? (
-            <EmptyState type="sur-mesure" onCreate={handleCreate} />
+          ) : programmesFiltered.personnalise.length === 0 ? (
+            <EmptyState type="personnalisé" onCreate={handleCreate} />
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {programmesFiltered.surMesure.map((programme) => (
+              {programmesFiltered.personnalise.map((programme) => (
                 <FormationCard
                   key={programme.id}
                   programme={programme}
@@ -523,8 +483,8 @@ const FormationsList = () => {
   );
 
   // Rendu principal avec approche directe sans switch
-  if (view === "form" && editingFormation) {
-    console.log('RENDU: Affichage du formulaire d\'édition avec:', editingFormation);
+  if (view === "form") {
+    console.log('RENDU: Affichage du formulaire avec:', editingFormation ? 'édition' : 'création');
     return (
       <ProgrammeForm
         onSubmit={handleSubmit}

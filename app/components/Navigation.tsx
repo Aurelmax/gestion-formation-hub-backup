@@ -54,12 +54,12 @@ const Navigation = () => {
               Espace Apprenant
             </Button>
           </Link>
-          <Link href="/admin">
+          <Link href="/dashboard">
             <Button 
-              variant={isActive("/admin") ? "default" : "ghost"}
+              variant={isActive("/dashboard") ? "default" : "ghost"}
               className="text-base bg-primary/10 hover:bg-primary/20"
             >
-              Administration
+              Tableau de bord
             </Button>
           </Link>
         </>

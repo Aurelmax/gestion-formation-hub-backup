@@ -183,7 +183,7 @@ const ProgrammeForm = ({ programme, onSubmit, onCancel }: ProgrammeFormProps) =>
                         <SelectValue placeholder="Sélectionner une catégorie" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Aucune catégorie</SelectItem>
+                        <SelectItem value="_null">Aucune catégorie</SelectItem>
                         {categories?.map(cat => (
                           <SelectItem key={cat.id} value={cat.id}>{cat.titre}</SelectItem>
                         ))}

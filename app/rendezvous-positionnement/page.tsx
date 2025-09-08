@@ -10,22 +10,10 @@ function PositionnementContent() {
   const formationTitre = searchParams.get('formation') || '';
 
   const handleSubmit = (data: any) => {
-    // Envoyer les données du formulaire à l'API
-    fetch('/api/rendezvous', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Success:', data);
+    // Le formulaire gère déjà l'appel API, on redirige juste vers la confirmation
+    setTimeout(() => {
       router.push('/confirmation-rendezvous');
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
+    }, 2000); // Délai pour permettre à l'animation confetti de se terminer
   };
 
   return (

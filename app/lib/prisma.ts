@@ -3,7 +3,7 @@ import { withAccelerate } from '@prisma/extension-accelerate';
 
 declare global {
   // PrismaClient est attaché à `global` pour réutilisation
-  // eslint-disable-next-line no-var
+   
   var __prisma: any;
 }
 

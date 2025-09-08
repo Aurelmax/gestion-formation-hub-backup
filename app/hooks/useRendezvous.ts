@@ -76,6 +76,9 @@ export interface Rendezvous {
 }
 
 export interface RendezvousFormData {
+  // Type de rendez-vous
+  type?: string; // 'positionnement' | 'impact'
+  
   // Informations personnelles
   nomBeneficiaire: string;
   prenomBeneficiaire: string;
@@ -177,7 +180,9 @@ export const useRendezvous = (): UseRendezvousReturn => {
         url += '?' + params.join('&');
       }
 
+      console.log('🚀 Fetching rendez-vous from:', url);
       const response = await api.get<ApiResponse<any[]>>(url);
+      console.log('✅ Response received:', response);
 
       // Traitement de la réponse en fonction de sa structure
       let rawData: any[] = [];
@@ -259,7 +264,19 @@ export const useRendezvous = (): UseRendezvousReturn => {
 
   const createRendezvous = async (data: RendezvousFormData): Promise<Rendezvous> => {
     try {
-      const response = await api.post<ApiResponse<Rendezvous>>('/api/rendezvous', data);
+      // Mapper les champs du formulaire vers l'API
+      const apiData = {
+        type: data.type || 'positionnement',
+        prenom: data.prenomBeneficiaire,
+        nom: data.nomBeneficiaire,
+        email: data.emailBeneficiaire,
+        telephone: data.telephoneBeneficiaire,
+        objectifs: Array.isArray(data.objectifs) ? data.objectifs.join(', ') : data.objectifs,
+        formationSelectionnee: data.formationSelectionnee,
+        commentaires: data.commentaires,
+      };
+
+      const response = await api.post<ApiResponse<Rendezvous>>('/api/rendezvous', apiData);
       const newRendezvous = Array.isArray(response.data) ? response.data[0] : response.data;
       
       // Mettre à jour la liste locale
@@ -572,7 +589,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
   // Charger les rendez-vous au montage du composant
   useEffect(() => {
     fetchRendezvous();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   /**

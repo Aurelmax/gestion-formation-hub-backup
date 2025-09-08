@@ -1,11 +1,19 @@
-import { auth } from "@/auth"
 import NextAuth from "next-auth"
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
+import { withAccelerate } from '@prisma/extension-accelerate';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { compare } from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+// Instance Prisma avec gestion d'erreur améliorée
+const prisma = new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+    },
+  },
+}).$extends(withAccelerate());
 
 const handler = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -18,47 +26,69 @@ const handler = NextAuth({
         password: { label: 'Mot de passe', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email et mot de passe requis');
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error('Email et mot de passe requis');
+          }
+
+          // Vérification de la connexion Prisma
+          try {
+            await prisma.$connect();
+          } catch (connectError) {
+            console.warn('Reconnexion Prisma nécessaire dans NextAuth:', connectError);
+          }
+
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email as string },
+          });
+
+          if (!user || !user.password) {
+            throw new Error('Identifiants invalides');
+          }
+
+          const isValid = await bcrypt.compare(credentials.password as string, user.password);
+
+          if (!isValid) {
+            throw new Error('Mot de passe incorrect');
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error('Erreur lors de l\'autorisation:', error);
+          throw error;
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        });
-
-        if (!user || !user.password) {
-          throw new Error('Identifiants invalides');
-        }
-
-        const isValid = await compare(credentials.password as string, user.password);
-
-        if (!isValid) {
-          throw new Error('Mot de passe incorrect');
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
       },
     }),
   ],
   callbacks: {
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
+      try {
+        if (token) {
+          (session.user as any).id = token.id as string;
+          (session.user as any).role = token.role as string;
+        }
+        return session;
+      } catch (error) {
+        console.error('Erreur lors de la session callback:', error);
+        return session;
       }
-      return session;
     },
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = user.role;
+      try {
+        if (user) {
+          token.id = user.id;
+          (token as any).role = (user as any).role;
+        }
+        return token;
+      } catch (error) {
+        console.error('Erreur lors du JWT callback:', error);
+        return token;
       }
-      return token;
     },
   },
   pages: {

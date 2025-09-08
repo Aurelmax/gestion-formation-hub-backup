@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
@@ -11,13 +12,12 @@ datasource db {
 model ProgrammeFormation {
   id                      String                 @id @default(uuid())
   code                    String
-  type                    String
-  typeProgramme           String?                @map("type_programme")
+  type                    String                 // "catalogue" | "personnalise"
   version                 Int                    @default(1)
   estActif                Boolean                @default(true) @map("est_actif")
   estVisible              Boolean                @default(true) @map("est_visible")
   categorieId             String?                @map("categorie_id")
-  programmeSourId         String?                @map("programme_source_id")
+  programmeCatalogueId    String?                @map("programme_catalogue_id") // Référence vers le programme catalogue d'origine
   pictogramme             String?
   titre                   String
   description             String
@@ -32,7 +32,7 @@ model ProgrammeFormation {
   contenuDetailleJours    String                 @map("contenu_detaille_jours")
   evaluationSur           String?                @map("evaluation_sur")
   horaires                String                 @default("9h-12h30 et 14h-17h30")
-  modalites               String
+  modalites               String?
   modalitesAcces          String                 @map("modalites_acces")
   modalitesTechniques     String                 @map("modalites_techniques")
   delaiAcces              String?                @map("delai_acces")
@@ -52,22 +52,25 @@ model ProgrammeFormation {
   ressourcesAssociees     String[]               @map("ressources_associees")
   dateCreation            DateTime               @default(now()) @map("date_creation")
   dateModification        DateTime               @default(now()) @updatedAt @map("date_modification")
-  beneficiaireId          String?                @map("beneficiaire_id")
+  beneficiaireId          String?                @map("beneficiaire_id") // Seulement pour programmes personnalisés
   formateurId             String?                @map("formateur_id")
-  positionnementRequestId String?                @unique @map("positionnement_request_id")
+  positionnementRequestId String?                @unique @map("positionnement_request_id") // Seulement pour programmes personnalisés
   dossiers                DossierFormation[]
+  programmesPersonnalises ProgrammePersonnalise[]
   categorie               CategorieProgramme?    @relation("ProgrammesCategorie", fields: [categorieId], references: [id])
-  positionnementRequest   PositionnementRequest? @relation(fields: [positionnementRequestId], references: [id])
-  programmeSource         ProgrammeFormation?    @relation("VersionsProgramme", fields: [programmeSourId], references: [id])
-  versionsDerivees        ProgrammeFormation[]   @relation("VersionsProgramme")
+  programmeCatalogue      ProgrammeFormation?    @relation("ProgrammeCataloguePersonnalise", fields: [programmeCatalogueId], references: [id])
+  programmesDerivés       ProgrammeFormation[]   @relation("ProgrammeCataloguePersonnalise")
   rendezvous              Rendezvous[]
+  positionnements         PositionnementRequest[] @relation("PositionnementProgramme")
 
   @@index([categorieId])
   @@index([estActif])
   @@index([estVisible])
   @@index([type])
   @@index([dateCreation])
+  @@index([programmeCatalogueId])
   @@index([categorieId, estActif, estVisible])
+  @@index([type, estActif, estVisible])
   @@map("programmes_formation")
 }
 
@@ -141,39 +144,6 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-model Formation {
-  id                      String                  @id @default(uuid())
-  duree                   String
-  prerequis               String
-  tarif                   String
-  dateCreation            DateTime                @default(now()) @map("date_creation")
-  dateModification        DateTime                @default(now()) @updatedAt @map("date_modification")
-  createdAt               DateTime                @default(now()) @map("created_at")
-  accessibiliteHandicapee String                  @default("Formation accessible aux personnes en situation de handicap. Contactez notre référent handicap pour adapter le parcours.") @map("accessibilite_handicapee")
-  delaiAcceptation        String                  @default("7 jours ouvrables") @map("delai_acceptation")
-  formateur               String                  @default("Formateur spécialisé WordPress avec 5+ ans d'expérience") @map("formateur")
-  horaires                String                  @default("9h-12h30 et 14h-17h30, adaptables selon les besoins du bénéficiaire") @map("horaires")
-  modalitesAcces          String                  @default("Formation accessible à distance ou en présentiel selon le contexte") @map("modalites_acces")
-  niveauCertification     String                  @default("Formation non certifiante") @map("niveau_certification")
-  objectifsPedagogiques   String                  @map("objectifs_pedagogiques")
-  referentPedagogique     String                  @default("Aurélien Lien - aurelien@gestionmax.fr") @map("referent_pedagogique")
-  referentQualite         String                  @default("Aurélien Lien - aurelien@gestionmax.fr") @map("referent_qualite")
-  ressourcesDisposition   String                  @default("Support de cours, tutoriels vidéo, accès à une plateforme d'exercices") @map("ressources_disposition")
-  code                    String
-  libelle                 String
-  contenuDetailleJours    String?                 @map("contenu_detaille_jours")
-  cessationAbandon        String                  @map("cessation_abandon")
-  contactOrganisme        String                  @default("GestionMax - aurelien@gestionmax.fr - 01.23.45.67.89") @map("contact_organisme")
-  modalitesEvaluation     String                  @map("modalites_evaluation")
-  modalitesReglement      String                  @map("modalites_reglement")
-  publicConcerne          String                  @map("public_concerne")
-  sanctionFormation       String                  @map("sanction_formation")
-  modalitesTechniques     String                  @default("Formation en présentiel individuel")
-  dossiers                DossierFormation[]
-  programmesPersonnalises ProgrammePersonnalise[]
-
-  @@map("formations")
-}
 
 model Apprenant {
   id        String             @id @default(uuid())
@@ -241,10 +211,17 @@ model PositionnementRequest {
   objectifs              String[]
   pratiqueActuelle       String                 @map("pratique_actuelle")
   situationActuelle      String                 @map("situation_actuelle")
-  telephoneBeneficiaire  String?                @map("telephone_beneficiaire")
-  dossierFormation       DossierFormation?
-  programmeFormation     ProgrammeFormation?
-  programmePersonnalise  ProgrammePersonnalise?
+  telephoneBeneficiaire    String?                @map("telephone_beneficiaire")
+  
+  // Relations avec clés étrangères
+  programmeFormationId     String?                @map("programme_formation_id")
+  programmePersonnaliseId  String?                @map("programme_personnalise_id")
+  dossierFormationId       String?                @map("dossier_formation_id")
+  
+  // Relations définies
+  programmeFormation       ProgrammeFormation?    @relation("PositionnementProgramme", fields: [programmeFormationId], references: [id])
+  programmePersonnalise    ProgrammePersonnalise? @relation("PositionnementProgrammePersonnalise", fields: [programmePersonnaliseId], references: [id])  
+  dossierFormation         DossierFormation?      @relation("PositionnementDossier", fields: [dossierFormationId], references: [id])
 
   @@map("positionnement_requests")
 }
@@ -334,7 +311,7 @@ model DemandeAccessibilite {
 
 model DossierFormation {
   id                   String                 @id @default(uuid())
-  formationId          String                 @map("formation_id")
+  programmeFormationId String                 @map("programme_formation_id")
   apprenantId          String                 @map("apprenant_id")
   positionnementId     String?                @unique @map("positionnement_id")
   dateInscription      DateTime               @default(now()) @map("date_inscription")
@@ -342,13 +319,11 @@ model DossierFormation {
   dateFin              DateTime?              @map("date_fin")
   createdAt            DateTime               @default(now()) @map("created_at")
   updatedAt            DateTime               @default(now()) @updatedAt @map("updated_at")
-  programmeFormationId String?                @map("programme_formation_id")
   statut               String                 @default("inscrit")
   documents            DocumentFormation[]
-  apprenant            Apprenant              @relation(fields: [apprenantId], references: [id])
-  formation            Formation              @relation(fields: [formationId], references: [id])
-  positionnement       PositionnementRequest? @relation(fields: [positionnementId], references: [id])
-  programmeFormation   ProgrammeFormation?    @relation(fields: [programmeFormationId], references: [id])
+  apprenant            Apprenant               @relation(fields: [apprenantId], references: [id])
+  programmeFormation   ProgrammeFormation      @relation(fields: [programmeFormationId], references: [id])
+  positionnements      PositionnementRequest[] @relation("PositionnementDossier")
   rendezvous           Rendezvous[]
 
   @@map("dossiers_formation")
@@ -368,7 +343,7 @@ model DocumentFormation {
 
 model ProgrammePersonnalise {
   id                      String                 @id @default(uuid())
-  formationId             String                 @map("formation_id")
+  programmeFormationId    String                 @map("programme_formation_id")
   titre                   String
   description             String
   contenu                 String
@@ -396,8 +371,8 @@ model ProgrammePersonnalise {
   sanctionFormation       String?                @map("sanction_formation")
   tarif                   String?                @map("tarif")
   positionnementRequestId String?                @unique @map("positionnement_request_id")
-  formation               Formation              @relation(fields: [formationId], references: [id])
-  positionnementRequest   PositionnementRequest? @relation(fields: [positionnementRequestId], references: [id])
+  programmeFormation      ProgrammeFormation      @relation(fields: [programmeFormationId], references: [id])
+  positionnements         PositionnementRequest[] @relation("PositionnementProgrammePersonnalise")
   rendezvous              Rendezvous[]
 
   @@map("programmes_personnalises")

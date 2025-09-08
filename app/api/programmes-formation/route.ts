@@ -5,24 +5,11 @@ import { createHash } from 'crypto';
 
 const prisma = new PrismaClient();
 
-// Interface pour les paramètres de requête
-type QueryParams = {
-  type?: 'catalogue' | 'sur-mesure';
-  version?: string;
-  fields?: string[];
-  categorieId?: string;
-  estActif?: boolean;
-  search?: string;
-  page: number;
-  limit: number;
-  includeInactive?: boolean;
-};
-
 // Schéma de validation avec Zod - Version assouplie pour compatibilité frontend
 const programmeSchema = z.object({
   // Champs essentiels obligatoires
   code: z.string().min(1, 'Le code est requis'),
-  type: z.enum(['catalogue', 'sur-mesure']),
+  type: z.enum(['catalogue', 'personnalise']),
   titre: z.string().min(1, 'Le titre est requis'),
   description: z.string().min(1, 'La description est requise'),
   duree: z.string().min(1, 'La durée est requise'),
@@ -38,7 +25,7 @@ const programmeSchema = z.object({
   contenuDetailleJours: z.string().optional().default('Contenu détaillé à venir'),
   
   // Champs de modalités optionnels avec valeurs par défaut
-  modalites: z.string().optional().default('Formation présentielle ou à distance'),
+  modalites: z.string().optional().default('En présentiel individuel'),
   modalitesAcces: z.string().optional().default('Inscription en ligne ou par téléphone'),
   modalitesTechniques: z.string().optional().default('Matériel fourni sur place'),
   modalitesReglement: z.string().optional().default('Paiement par virement bancaire'),
@@ -66,12 +53,12 @@ const programmeSchema = z.object({
   ressourcesAssociees: z.array(z.string()).optional().default([]),
   beneficiaireId: z.string().uuid('ID de bénéficiaire invalide').optional().nullable(),
   formateurId: z.string().uuid('ID de formateur invalide').optional().nullable(),
-  programmeSourId: z.string().uuid('ID de programme source invalide').optional().nullable(),
+  programmeCatalogueId: z.string().uuid('ID de programme catalogue invalide').optional().nullable(),
 });
 
 // Schéma de validation des paramètres de requête
 const queryParamsSchema = z.object({
-  type: z.enum(['catalogue', 'sur-mesure']).optional(),
+  type: z.enum(['catalogue', 'personnalise']).optional(),
   version: z.string().regex(/^\d+$/).optional(),
   fields: z.string().optional().transform(fields => 
     fields ? fields.split(',').map(f => f.trim()) : []
@@ -88,7 +75,7 @@ const queryParamsSchema = z.object({
     z.number().int().min(1).max(100)
   ).default(20),
   includeInactive: z.string().transform(val => val === 'true').optional(),
-}) satisfies z.ZodType<QueryParams>;
+});
 
 /**
  * @swagger
@@ -100,8 +87,8 @@ const queryParamsSchema = z.object({
  *         name: type
  *         schema:
  *           type: string
- *           enum: [catalogue, sur-mesure]
- *         description: Type de programme (catalogue ou sur-mesure)
+ *           enum: [catalogue, personnalise]
+ *         description: Type de programme (catalogue ou personnalise)
  *       - in: query
  *         name: version
  *         schema:
@@ -197,6 +184,7 @@ export async function GET(request: NextRequest) {
       type: true,
       version: true,
       estActif: true,
+      modalites: true,  // Ajouté pour afficher les modalités
       dateCreation: true,  // Ajouté pour le tri
       categorie: {
         select: { id: true, titre: true }
@@ -205,7 +193,7 @@ export async function GET(request: NextRequest) {
 
     // Ajouter les champs optionnels si demandés
     if (Array.isArray(params.fields) && params.fields.includes('details')) {
-      select.contenuDetailleHtml = true;
+      select.contenuDetailleJours = true;
       select.objectifs = true;
       select.prerequis = true;
       select.modalites = true;
@@ -314,11 +302,7 @@ export async function POST(request: NextRequest) {
 
     // Création du programme
     const programme = await prisma.programmeFormation.create({
-      data: {
-        ...validation.data,
-        dateCreation: new Date(),
-        dateModification: new Date(),
-      },
+      data: validation.data as any, // Type cast temporaire pour éviter les conflits de types
       include: {
         categorie: true,
       },

@@ -2,7 +2,9 @@
 import axios from 'axios';
 
 // URL de base de l'API - utilisation de la variable d'environnement
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (
+  typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+);
 
 // Configuration d'axios avec le token JWT s'il existe
 const api = axios.create({
@@ -26,7 +28,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('Erreur API:', error.response?.data || error.message);
+    // Gestion d'erreur plus robuste pour éviter les erreurs d'évaluation
+    const errorMessage = error?.response?.data || error?.message || 'Erreur API inconnue';
+    const statusCode = error?.response?.status || 'N/A';
+    const url = error?.config?.url || 'N/A';
+    
+    console.error(`Erreur API [${statusCode}] sur ${url}:`, errorMessage);
     return Promise.reject(error);
   }
 );

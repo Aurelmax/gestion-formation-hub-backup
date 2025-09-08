@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  redirect('/catalogue');
+  redirect('/dashboard');
   
   // Ce code ne sera jamais exécuté
   return null;
