@@ -68,7 +68,7 @@ const ActionsCorrectivesList = () => {
   const filteredActions = actionsCorrectives.filter(action => {
     const matchesSearch = action.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          action.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (action.responsable_nom?.toLowerCase().includes(searchTerm.toLowerCase()));
+                         (action.responsableNom?.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesStatut = statutFilter === "tous" || action.statut === statutFilter;
     const matchesPriorite = prioriteFilter === "tous" || action.priorite === prioriteFilter;
@@ -181,10 +181,10 @@ const ActionsCorrectivesList = () => {
                       <p className="text-gray-600 line-clamp-2">{action.description}</p>
                       
                       <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                        <span>Origine: {action.origine_type}</span>
-                        {action.responsable_nom && <span>Responsable: {action.responsable_nom}</span>}
-                        {action.date_echeance && (
-                          <span>Échéance: {new Date(action.date_echeance).toLocaleDateString('fr-FR')}</span>
+                        <span>Origine: {action.origineType}</span>
+                        {action.responsableNom && <span>Responsable: {action.responsableNom}</span>}
+                        {action.dateEcheance && (
+                          <span>Échéance: {new Date(action.dateEcheance).toLocaleDateString('fr-FR')}</span>
                         )}
                         <span>Créé le: {new Date(action.created_at).toLocaleDateString('fr-FR')}</span>
                       </div>

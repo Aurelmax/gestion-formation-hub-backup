@@ -22,7 +22,11 @@ const VeilleManager = () => {
     updateStatut, 
     updateAvancement, 
     addCommentaire,
-    deleteVeille 
+    updateCommentaire,
+    deleteCommentaire,
+    deleteVeille,
+    uploadDocument,
+    deleteDocument
   } = useVeille();
 
   const [selectedVeille, setSelectedVeille] = useState<Veille | null>(null);
@@ -123,6 +127,10 @@ const VeilleManager = () => {
         onUpdateStatut={handleUpdateStatut}
         onUpdateAvancement={handleUpdateAvancement}
         onAddCommentaire={handleAddCommentaire}
+        onUpdateCommentaire={updateCommentaire}
+        onDeleteCommentaire={deleteCommentaire}
+        onUploadDocument={uploadDocument}
+        onDeleteDocument={deleteDocument}
       />
     );
   }

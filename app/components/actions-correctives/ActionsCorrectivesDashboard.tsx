@@ -50,10 +50,10 @@ const ActionsCorrectivesDashboard = () => {
 
   // Actions par origine
   const origineStats = [
-    { name: 'Réclamations', value: actionsCorrectives.filter(a => a.origine_type === 'reclamation').length },
-    { name: 'Incidents', value: actionsCorrectives.filter(a => a.origine_type === 'incident').length },
-    { name: 'Audits', value: actionsCorrectives.filter(a => a.origine_type === 'audit').length },
-    { name: 'Veille', value: actionsCorrectives.filter(a => a.origine_type === 'veille').length },
+    { name: 'Réclamations', value: actionsCorrectives.filter(a => a.origineType === 'reclamation').length },
+    { name: 'Incidents', value: actionsCorrectives.filter(a => a.origineType === 'incident').length },
+    { name: 'Audits', value: actionsCorrectives.filter(a => a.origineType === 'audit').length },
+    { name: 'Veille', value: actionsCorrectives.filter(a => a.origineType === 'veille').length },
   ];
 
   const handleExport = () => {
@@ -218,9 +218,9 @@ const ActionsCorrectivesDashboard = () => {
                   <div key={action.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
                       <div className="font-medium">{action.titre}</div>
-                      <div className="text-sm text-gray-600">{action.responsable_nom || 'Non assigné'}</div>
+                      <div className="text-sm text-gray-600">{action.responsableNom || 'Non assigné'}</div>
                       <div className="text-xs text-gray-500">
-                        Origine: {action.origine_type} • {new Date(action.created_at).toLocaleDateString('fr-FR')}
+                        Origine: {action.origineType} • {new Date(action.created_at).toLocaleDateString('fr-FR')}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

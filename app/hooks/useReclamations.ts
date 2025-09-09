@@ -36,15 +36,16 @@ export const useReclamations = () => {
   const fetchReclamations = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/reclamations');
+      const response = await api.get('/api/reclamations');
       
-      setReclamations(response.data);
+      // L'API retourne {data: [...], pagination: {...}}
+      const reclamationsData = response.data?.data || response.data || [];
+      setReclamations(reclamationsData);
     } catch (error) {
       console.error('Erreur lors du chargement des réclamations:', error);
       toast({
         title: "Erreur",
         description: "Impossible de charger les réclamations",
-        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -53,14 +54,14 @@ export const useReclamations = () => {
 
   const createReclamation = async (data: CreateReclamationData) => {
     try {
-      await api.post('/reclamations', {
+      await api.post('/api/reclamations', {
         nom: data.nom,
         email: data.email,
         telephone: data.telephone,
         sujet: data.sujet,
         message: data.message,
         priorite: data.priorite || 'normale',
-        statut: 'nouvelle' // Valeur par défaut
+        statut: 'nouvelle' as const // Valeur par défaut
       });
 
       toast({
@@ -75,7 +76,6 @@ export const useReclamations = () => {
       toast({
         title: "Erreur",
         description: "Impossible d'envoyer la réclamation",
-        variant: "destructive",
       });
       return false;
     }
@@ -84,7 +84,7 @@ export const useReclamations = () => {
   const updateReclamation = async (id: string, updates: Partial<Reclamation>) => {
     try {
       // Utiliser directement l'API pour mettre à jour
-      await api.put(`/reclamations/${id}`, updates);
+      await api.put(`/api/reclamations/${id}`, updates);
 
       toast({
         title: "Réclamation mise à jour",
@@ -98,7 +98,6 @@ export const useReclamations = () => {
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour la réclamation",
-        variant: "destructive",
       });
       return false;
     }
@@ -108,11 +107,33 @@ export const useReclamations = () => {
     fetchReclamations();
   }, []);
 
+  const deleteReclamation = async (id: string) => {
+    try {
+      await api.delete(`/api/reclamations/${id}`);
+
+      toast({
+        title: "Réclamation supprimée",
+        description: "La réclamation a été supprimée avec succès",
+      });
+
+      await fetchReclamations();
+      return true;
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la réclamation",
+      });
+      return false;
+    }
+  };
+
   return {
     reclamations,
     loading,
     createReclamation,
     updateReclamation,
+    deleteReclamation,
     fetchReclamations,
   };
 };

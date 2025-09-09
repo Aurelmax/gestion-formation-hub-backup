@@ -47,7 +47,7 @@ const CompetenceManager = () => {
   }, [deleteCompetence, currentView]);
 
   const handleExportCSV = useCallback(() => {
-    exportCompetencesToCSV(competences);
+    exportCompetencesToCSV(competences || []);
   }, [competences]);
 
   const getCategorieColor = (categorie: CategorieCompetence) => {
@@ -64,13 +64,17 @@ const CompetenceManager = () => {
     const colors = {
       'planifie': 'bg-gray-100 text-gray-800',
       'en-cours': 'bg-yellow-100 text-yellow-800',
-      'realise': 'bg-green-100 text-green-800',
-      'reporte': 'bg-red-100 text-red-800'
+      'acquis': 'bg-green-100 text-green-800',
+      'valide': 'bg-blue-100 text-blue-800'
     };
     return colors[statut];
   };
 
   const filteredCompetences = useMemo(() => {
+    if (!Array.isArray(competences)) {
+      return [];
+    }
+    
     return competences.filter(competence => {
       const matchesSearch = competence.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            competence.description.toLowerCase().includes(searchTerm.toLowerCase());

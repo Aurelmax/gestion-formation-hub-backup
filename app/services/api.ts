@@ -33,7 +33,13 @@ api.interceptors.response.use(
     const statusCode = error?.response?.status || 'N/A';
     const url = error?.config?.url || 'N/A';
     
-    console.error(`Erreur API [${statusCode}] sur ${url}:`, errorMessage);
+    // Éviter les logs côté serveur pour prévenir les problèmes d'hydratation
+    if (typeof window !== 'undefined') {
+      // Utiliser setTimeout pour éviter les problèmes d'hydratation
+      setTimeout(() => {
+        console.error(`Erreur API [${statusCode}] sur ${url}:`, errorMessage);
+      }, 0);
+    }
     return Promise.reject(error);
   }
 );

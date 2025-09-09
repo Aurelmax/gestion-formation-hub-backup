@@ -207,6 +207,103 @@ export function useVeille() {
     }
   }, []);
 
+  // Ajouter un document à une veille
+  const uploadDocument = useCallback(async (veilleId: string, file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`/api/veille/${veilleId}/documents`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de l\'upload du document');
+      }
+
+      const document = await response.json();
+
+      // Mettre à jour la veille avec le nouveau document
+      setVeilles(prev => prev.map(v => 
+        v.id === veilleId 
+          ? { ...v, documents: [...v.documents, document] }
+          : v
+      ));
+
+      return document;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      throw err;
+    }
+  }, []);
+
+  // Supprimer un document d'une veille
+  const deleteDocument = useCallback(async (veilleId: string, documentId: string) => {
+    try {
+      const response = await fetch(`/api/veille/${veilleId}/documents?documentId=${documentId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la suppression du document');
+      }
+
+      // Mettre à jour la veille en retirant le document
+      setVeilles(prev => prev.map(v => 
+        v.id === veilleId 
+          ? { ...v, documents: v.documents.filter(d => d.id !== documentId) }
+          : v
+      ));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      throw err;
+    }
+  }, []);
+
+  // Modifier un commentaire
+  const updateCommentaire = useCallback(async (veilleId: string, commentaireId: string, contenu: string) => {
+    try {
+      const response = await fetch(`/api/veille/${veilleId}/commentaires/${commentaireId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ contenu }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la modification du commentaire');
+      }
+
+      // Recharger les données pour avoir la version à jour
+      await fetchVeilles();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      throw err;
+    }
+  }, [fetchVeilles]);
+
+  // Supprimer un commentaire
+  const deleteCommentaire = useCallback(async (veilleId: string, commentaireId: string) => {
+    try {
+      const response = await fetch(`/api/veille/${veilleId}/commentaires/${commentaireId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la suppression du commentaire');
+      }
+
+      // Recharger les données pour avoir la version à jour
+      await fetchVeilles();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      throw err;
+    }
+  }, [fetchVeilles]);
+
   // Charger les veilles au montage du composant
   useEffect(() => {
     fetchVeilles();
@@ -222,6 +319,10 @@ export function useVeille() {
     updateStatut,
     updateAvancement,
     addCommentaire,
-    deleteVeille
+    updateCommentaire,
+    deleteCommentaire,
+    deleteVeille,
+    uploadDocument,
+    deleteDocument
   };
 }

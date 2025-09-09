@@ -37,8 +37,8 @@ export const exportCompetencesToCSV = (competences: Competence[]) => {
       `"${competence.lienFormation || ''}"`,
       `"${competence.typePreuve}"`,
       `"${competence.contenuPreuve}"`,
-      `"${competence.dateCreation.toLocaleDateString('fr-FR')}"`,
-      `"${competence.dateModification.toLocaleDateString('fr-FR')}"`
+      `"${competence.dateCreation ? new Date(competence.dateCreation).toLocaleDateString('fr-FR') : ''}"`,
+      `"${competence.dateModification ? new Date(competence.dateModification).toLocaleDateString('fr-FR') : ''}"`
     ].join(','))
   ].join('\n');
 

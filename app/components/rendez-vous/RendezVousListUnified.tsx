@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Edit, Eye, CheckCircle, Calendar, FileText, BookOpen, X, Check, Video, Clock, AlertCircle, BarChart4, FileBarChart, Star, Award, LineChart, FileEdit } from "lucide-react";
+import { Plus, Edit, Eye, CheckCircle, Calendar, FileText, BookOpen, X, Check, Video, Clock, AlertCircle, BarChart4, FileBarChart, Star, Award, LineChart, FileEdit, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
@@ -58,6 +58,7 @@ const RendezVousListUnified = () => {
     updateRendezvous,
     updateRendezvousStatut,
     validerRendezvous,
+    deleteRendezvous,
     // Fonctions pour les rendez-vous d'impact
     planifierImpact,
     completerEvaluationImpact,
@@ -90,8 +91,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de l'enregistrement.",
-        variant: "destructive",
-      });
+              });
     }
   };
 
@@ -122,13 +122,17 @@ const RendezVousListUnified = () => {
   // Fonction pour créer une formation à partir d'un rendez-vous
   const creerFormation = (rdv: Rendezvous) => {
     // Stocker les données temporairement dans localStorage pour les récupérer sur la page de création
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('formation_data', JSON.stringify({
-        apprenantNom: `${rdv.prenomBeneficiaire} ${rdv.nomBeneficiaire}`,
-        apprenantEmail: rdv.emailBeneficiaire,
-        formationTitre: rdv.formationSelectionnee,
-        rdvId: rdv.id
-      }));
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('formation_data', JSON.stringify({
+          apprenantNom: `${rdv.prenomBeneficiaire} ${rdv.nomBeneficiaire}`,
+          apprenantEmail: rdv.emailBeneficiaire,
+          formationTitre: rdv.formationSelectionnee,
+          rdvId: rdv.id
+        }));
+      }
+    } catch (error) {
+      console.warn('Impossible d\'accéder au localStorage:', error);
     }
     // Rediriger vers la création de formation
     router.push('/dashboard/formations/create');
@@ -141,7 +145,7 @@ const RendezVousListUnified = () => {
       const dateRdv = rdv.dateRdv ? new Date(rdv.dateRdv) : new Date();
       const dateImpact = format(addMonths(dateRdv, 6), 'yyyy-MM-dd');
       
-      const result = await planifierImpact(rdv.id, dateImpact);
+      await planifierImpact(rdv.id, dateImpact);
       
       toast({
         title: "Rendez-vous d'impact planifié",
@@ -154,8 +158,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la planification du rendez-vous d'impact.",
-        variant: "destructive",
-      });
+              });
     }
   };
   
@@ -184,8 +187,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de l'enregistrement de l'évaluation d'impact.",
-        variant: "destructive",
-      });
+              });
     }
   };
   
@@ -204,8 +206,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la clôture du rendez-vous d'impact.",
-        variant: "destructive",
-      });
+              });
     }
   };
   
@@ -222,8 +223,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la génération du rapport d'impact.",
-        variant: "destructive",
-      });
+              });
       setLoadingReport(false);
     }
   };
@@ -260,8 +260,7 @@ const RendezVousListUnified = () => {
         toast({
           title: "Erreur",
           description: "Veuillez sélectionner une date et une heure",
-          variant: "destructive",
-        });
+                  });
         return;
       }
       
@@ -292,8 +291,7 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Impossible de reprogrammer le rendez-vous.",
-        variant: "destructive",
-      });
+              });
     } finally {
       setLoadingActions(prev => ({ ...prev, [`reschedule-${rdvToReschedule?.id}`]: false }));
     }
@@ -318,10 +316,41 @@ const RendezVousListUnified = () => {
       toast({
         title: "Erreur",
         description: "Impossible d'annuler le rendez-vous.",
-        variant: "destructive",
-      });
+              });
     } finally {
       setLoadingActions(prev => ({ ...prev, [`cancel-${rdv.id}`]: false }));
+    }
+  };
+
+  // Fonction pour supprimer définitivement un rendez-vous
+  const handleDeleteRendezvous = async (rdv: Rendezvous) => {
+    // Demander confirmation avant suppression
+    const confirmed = window.confirm(
+      `Êtes-vous sûr de vouloir supprimer définitivement le rendez-vous avec ${rdv.prenomBeneficiaire} ${rdv.nomBeneficiaire} ? Cette action est irréversible.`
+    );
+    
+    if (!confirmed) return;
+
+    try {
+      // Indiquer le chargement
+      setLoadingActions(prev => ({ ...prev, [`delete-${rdv.id}`]: true }));
+      
+      await deleteRendezvous(rdv.id);
+      toast({
+        title: "Rendez-vous supprimé",
+        description: "Le rendez-vous a été supprimé définitivement.",
+      });
+      
+      // Rafraîchir la liste pour montrer les changements
+      await fetchRendezvous();
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer le rendez-vous.",
+              });
+    } finally {
+      setLoadingActions(prev => ({ ...prev, [`delete-${rdv.id}`]: false }));
     }
   };
 
@@ -651,11 +680,10 @@ const RendezVousListUnified = () => {
                                               description: `Un rendez-vous de suivi d'impact a été créé pour le ${new Date(dateStr).toLocaleDateString('fr-FR')}`
                                             });
                                           })
-                                          .catch(err => {
+                                          .catch(() => {
                                             toast({
                                               title: "Erreur",
                                               description: "Impossible de planifier le suivi d'impact.",
-                                              variant: "destructive"
                                             });
                                           });
                                       }
@@ -726,6 +754,19 @@ const RendezVousListUnified = () => {
                                   }
                                 </Button>
                               )}
+
+                              <Button 
+                                variant="destructive" 
+                                size="sm"
+                                onClick={() => handleDeleteRendezvous(rdv)}
+                                disabled={loadingActions[`delete-${rdv.id}`]}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                {loadingActions[`delete-${rdv.id}`] ? 
+                                  "Suppression..." : 
+                                  <><Trash2 className="h-4 w-4 mr-1" />Supprimer</>
+                                }
+                              </Button>
                             </div>
                           </div>
                         </CardContent>
@@ -816,6 +857,19 @@ const RendezVousListUnified = () => {
                             >
                               <Edit className="h-4 w-4 mr-1" />
                               Modifier
+                            </Button>
+                            
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={() => handleDeleteRendezvous(rdv)}
+                              disabled={loadingActions[`delete-${rdv.id}`]}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              {loadingActions[`delete-${rdv.id}`] ? 
+                                "Suppression..." : 
+                                <><Trash2 className="h-4 w-4 mr-1" />Supprimer</>
+                              }
                             </Button>
                           </div>
                         </div>

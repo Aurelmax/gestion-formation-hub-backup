@@ -6,26 +6,22 @@ interface PlanAccessibilite {
   id: string;
   titre: string;
   description: string;
-  typeHandicap: string;
-  adaptationsPedagogiques: string;
-  adaptationsMaterielles: string;
-  adaptationsEvaluation: string;
-  responsable: string;
-  statut: "En cours" | "Validé" | "À réviser";
   dateCreation: Date;
-  dateMiseAJour: Date;
+  dateModification: Date;
+  actionsRequises: string[];
+  statut: string;
 }
 
 interface DemandeAccessibilite {
   id: string;
-  apprenantNom: string;
-  apprenantEmail: string;
-  typeHandicap: string;
-  besoinsSpecifiques: string;
-  documentsMedicaux: boolean;
-  statut: "En attente" | "En cours d'analyse" | "Validée" | "Refusée";
+  nom: string;
+  email: string;
+  telephone?: string;
+  description: string;
   dateCreation: Date;
-  commentaires?: string;
+  statut: string;
+  reponse?: string;
+  dateResolution?: Date;
 }
 
 export const useAccessibilite = () => {
@@ -42,8 +38,21 @@ export const useAccessibilite = () => {
       // Récupérer les demandes d'accessibilité via l'API
       const demandesResponse = await api.get('/accessibilite/demandes');
 
-      setPlansAccessibilite(plansResponse.data);
-      setDemandesAccessibilite(demandesResponse.data);
+      // Convertir les dates string en objets Date
+      const plansFormates = plansResponse.data.map((plan: any) => ({
+        ...plan,
+        dateCreation: new Date(plan.dateCreation),
+        dateModification: new Date(plan.dateModification)
+      }));
+
+      const demandesFormatees = demandesResponse.data.map((demande: any) => ({
+        ...demande,
+        dateCreation: new Date(demande.dateCreation),
+        dateResolution: demande.dateResolution ? new Date(demande.dateResolution) : undefined
+      }));
+
+      setPlansAccessibilite(plansFormates);
+      setDemandesAccessibilite(demandesFormatees);
     } catch (error) {
       console.error("Erreur lors du chargement des données d'accessibilité:", error);
     } finally {
@@ -56,22 +65,22 @@ export const useAccessibilite = () => {
   }, []);
 
   const creerPlanAccessibilite = async (
-    planData: Omit<PlanAccessibilite, 'id' | 'dateCreation' | 'dateMiseAJour'>
+    planData: Omit<PlanAccessibilite, 'id' | 'dateCreation' | 'dateModification'>
   ) => {
     try {
       // Créer un plan d'accessibilité via l'API
       const response = await api.post('/accessibilite/plans', {
         titre: planData.titre,
         description: planData.description,
-        typeHandicap: planData.typeHandicap,
-        adaptationsPedagogiques: planData.adaptationsPedagogiques,
-        adaptationsMaterielles: planData.adaptationsMaterielles,
-        adaptationsEvaluation: planData.adaptationsEvaluation,
-        responsable: planData.responsable,
+        actionsRequises: planData.actionsRequises,
         statut: planData.statut
       });
 
-      const nouveauPlan = response.data;
+      const nouveauPlan = {
+        ...response.data,
+        dateCreation: new Date(response.data.dateCreation),
+        dateModification: new Date(response.data.dateModification)
+      };
       setPlansAccessibilite(prev => [nouveauPlan, ...prev]);
       return nouveauPlan;
     } catch (error) {
@@ -82,17 +91,21 @@ export const useAccessibilite = () => {
 
   const traiterDemande = async (
     id: string,
-    statut: DemandeAccessibilite['statut'],
-    commentaires?: string
+    statut: string,
+    reponse?: string
   ) => {
     try {
       // Mettre à jour une demande d'accessibilité via l'API
       const response = await api.put(`/accessibilite/demandes/${id}`, {
         statut,
-        commentaires
+        reponse
       });
 
-      const updated = response.data;
+      const updated = {
+        ...response.data,
+        dateCreation: new Date(response.data.dateCreation),
+        dateResolution: response.data.dateResolution ? new Date(response.data.dateResolution) : undefined
+      };
       setDemandesAccessibilite(prev =>
         prev.map(d => d.id === id ? updated : d)
       );
@@ -103,11 +116,53 @@ export const useAccessibilite = () => {
     }
   };
 
+  const creerDemandeAccessibilite = async (
+    demandeData: Omit<DemandeAccessibilite, 'id' | 'dateCreation' | 'dateResolution'>
+  ) => {
+    try {
+      const response = await api.post('/accessibilite/demandes', demandeData);
+      const nouvelleDemande = {
+        ...response.data,
+        dateCreation: new Date(response.data.dateCreation),
+        dateResolution: response.data.dateResolution ? new Date(response.data.dateResolution) : undefined
+      };
+      setDemandesAccessibilite(prev => [nouvelleDemande, ...prev]);
+      return nouvelleDemande;
+    } catch (error) {
+      console.error('Erreur lors de la création de la demande:', error);
+      throw error;
+    }
+  };
+
+  const supprimerPlanAccessibilite = async (id: string) => {
+    try {
+      await api.delete(`/accessibilite/plans/${id}`);
+      setPlansAccessibilite(prev => prev.filter(p => p.id !== id));
+    } catch (error) {
+      console.error('Erreur lors de la suppression du plan:', error);
+      throw error;
+    }
+  };
+
+  const supprimerDemandeAccessibilite = async (id: string) => {
+    try {
+      await api.delete(`/accessibilite/demandes/${id}`);
+      setDemandesAccessibilite(prev => prev.filter(d => d.id !== id));
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la demande:', error);
+      throw error;
+    }
+  };
+
   return {
     plansAccessibilite,
     demandesAccessibilite,
     loading,
     creerPlanAccessibilite,
+    creerDemandeAccessibilite,
     traiterDemande,
+    supprimerPlanAccessibilite,
+    supprimerDemandeAccessibilite,
+    fetchData
   };
 };

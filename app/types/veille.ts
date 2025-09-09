@@ -2,6 +2,13 @@
 export type TypeVeille = 'reglementaire' | 'metier' | 'innovation';
 export type StatutVeille = 'nouvelle' | 'en-cours' | 'terminee';
 
+export interface VeilleCommentaire {
+  id: string;
+  contenu: string;
+  dateCreation: Date;
+  utilisateur?: string;
+}
+
 export interface Veille {
   id: string;
   titre: string;
@@ -11,7 +18,7 @@ export interface Veille {
   avancement: number; // pourcentage 0-100
   dateCreation: Date;
   dateEcheance?: Date;
-  commentaires: string[];
+  commentaires: VeilleCommentaire[];
   documents: Document[];
   historique: HistoriqueAction[];
 }

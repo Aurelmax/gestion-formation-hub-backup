@@ -11,16 +11,16 @@ const reclamationSchema = z.object({
   telephone: z.string().optional(),
   sujet: z.string().min(1, 'Le sujet est requis'),
   message: z.string().min(1, 'Le message est requis'),
-  statut: z.enum(['nouvelle', 'en-cours', 'resolue', 'fermee']).optional().default('nouvelle'),
-  priorite: z.enum(['basse', 'normale', 'haute', 'critique']).optional().default('normale'),
+  statut: z.enum(['nouvelle', 'en_cours', 'resolue', 'fermee']).optional().default('nouvelle'),
+  priorite: z.enum(['basse', 'normale', 'haute', 'urgente']).optional().default('normale'),
   assigneeId: z.string().uuid().optional(),
   notesInternes: z.string().optional(),
 });
 
 // Schéma pour les paramètres de requête
 const queryParamsSchema = z.object({
-  statut: z.enum(['nouvelle', 'en-cours', 'resolue', 'fermee']).optional(),
-  priorite: z.enum(['basse', 'normale', 'haute', 'critique']).optional(),
+  statut: z.enum(['nouvelle', 'en_cours', 'resolue', 'fermee']).optional(),
+  priorite: z.enum(['basse', 'normale', 'haute', 'urgente']).optional(),
   assigneeId: z.string().uuid().optional(),
   page: z.preprocess(
     val => parseInt(String(val || '1'), 10),

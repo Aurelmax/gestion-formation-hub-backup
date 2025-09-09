@@ -1,6 +1,6 @@
 
 export type CategorieCompetence = 'technique' | 'pedagogique' | 'relationnelle' | 'organisationnelle';
-export type StatutCompetence = 'planifie' | 'en-cours' | 'realise' | 'reporte';
+export type StatutCompetence = 'planifie' | 'en-cours' | 'acquis' | 'valide';
 export type TypePreuve = 'fichier' | 'url';
 
 export interface Competence {

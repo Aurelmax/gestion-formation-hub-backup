@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, BookOpen, Calendar, FileCheck, Accessibility, Search, MessageSquareWarning, ClipboardCheck, Database, Folder } from "lucide-react";
+import { Users, BookOpen, Calendar, FileCheck, Accessibility, Search, MessageSquareWarning, ClipboardCheck, Database, Folder, Award } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 // Composant de chargement réutilisable
@@ -98,7 +98,7 @@ function DashboardContent() {
               Rendez-vous
             </TabsTrigger>
             <TabsTrigger value="competences" className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
+              <Award className="h-4 w-4" />
               Compétences
             </TabsTrigger>
             <TabsTrigger value="reclamations" className="flex items-center gap-2">

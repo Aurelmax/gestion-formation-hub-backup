@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, ReactNode, useEffect, useState } from 'react';
+import { createContext, useContext, ReactNode, useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn as nextAuthSignIn, signOut as nextAuthSignOut, useSession } from 'next-auth/react';
 
@@ -31,7 +31,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [cachedUser, setCachedUser] = useState<User | null>(null);
   const loading = status === 'loading';
+
+  // Éviter les problèmes d'hydratation
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!loading) {
@@ -77,14 +84,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  // Ensure user object always has required fields
-  const user = session?.user ? {
-    id: session.user.id || '',
-    email: session.user.email || null,
-    name: session.user.name || null,
-    role: (session.user as any).role, // Cast to any to avoid TypeScript errors for custom properties
-    image: session.user.image || null
-  } : null;
+  // Ensure user object always has required fields avec cache optimisé
+  const user = useMemo(() => {
+    if (!session?.user) return null;
+    
+    const newUser = {
+      id: (session.user as any).id || session.user.email || '',
+      email: session.user.email || null,
+      name: session.user.name || null,
+      role: (session.user as any).role,
+      image: session.user.image || null
+    };
+
+    // Mettre à jour le cache si l'utilisateur a changé
+    if (!cachedUser || cachedUser.id !== newUser.id) {
+      setCachedUser(newUser);
+    }
+    
+    return newUser;
+  }, [session?.user, cachedUser]);
 
   const value: AuthContextType = {
     user,
@@ -93,6 +111,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     loading,
     error,
   };
+
+  // Attendre que le composant soit monté côté client pour éviter l'hydratation
+  if (!mounted) {
+    return (
+      <AuthContext.Provider value={{ user: null, signIn, signOut, loading: true, error: null }}>
+        {children}
+      </AuthContext.Provider>
+    );
+  }
 
   return (
     <AuthContext.Provider value={value}>
@@ -110,4 +137,4 @@ export function useAuth() {
 }
 
 // Export types
-export type { AuthContextType, User };
+export type { AuthContextType };

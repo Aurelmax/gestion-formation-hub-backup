@@ -8,15 +8,15 @@ export interface ActionCorrective {
   titre: string;
   description: string;
   statut: 'planifiee' | 'en_cours' | 'terminee' | 'annulee';
-  origine_type: 'reclamation' | 'incident' | 'audit' | 'veille';
-  origine_ref?: string;
-  origine_date?: Date;
-  origine_resume?: string;
+  origineType: 'reclamation' | 'incident' | 'audit' | 'veille';
+  origineRef?: string;
+  origineDate?: Date;
+  origineResume?: string;
   priorite: 'faible' | 'moyenne' | 'haute' | 'critique';
   avancement: number;
-  responsable_nom?: string;
-  responsable_email?: string;
-  date_echeance?: Date;
+  responsableNom?: string;
+  responsableEmail?: string;
+  dateEcheance?: Date;
   indicateur_efficacite?: string;
   created_at: Date;
   updated_at: Date;
@@ -46,14 +46,14 @@ export interface HistoriqueActionCorrective {
 export interface CreateActionCorrectiveData {
   titre: string;
   description: string;
-  origine_type: 'reclamation' | 'incident' | 'audit' | 'veille';
-  origine_ref?: string;
-  origine_date?: string;
-  origine_resume?: string;
+  origineType: 'reclamation' | 'incident' | 'audit' | 'veille';
+  origineRef?: string;
+  origineDate?: string;
+  origineResume?: string;
   priorite?: 'faible' | 'moyenne' | 'haute' | 'critique';
-  responsable_nom?: string;
-  responsable_email?: string;
-  date_echeance?: string;
+  responsableNom?: string;
+  responsableEmail?: string;
+  dateEcheance?: string;
   indicateur_efficacite?: string;
 }
 
@@ -65,7 +65,7 @@ export const useActionsCorrectives = () => {
   const fetchActionsCorrectives = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/actions-correctives');
+      const response = await api.get('/api/actions-correctives');
 
       setActionsCorrectives(response.data);
     } catch (error) {
@@ -73,7 +73,6 @@ export const useActionsCorrectives = () => {
       toast({
         title: "Erreur",
         description: "Impossible de charger les actions correctives",
-        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -83,17 +82,17 @@ export const useActionsCorrectives = () => {
   const createActionCorrective = async (data: CreateActionCorrectiveData) => {
     try {
       // Créer l'action corrective via l'API
-      await api.post('/actions-correctives', {
+      await api.post('/api/actions-correctives', {
         titre: data.titre,
         description: data.description,
-        origine_type: data.origine_type,
-        origine_ref: data.origine_ref,
-        origine_date: data.origine_date,
-        origine_resume: data.origine_resume,
+        origineType: data.origineType,
+        origineRef: data.origineRef,
+        origineDate: data.origineDate,
+        origineResume: data.origineResume,
         priorite: data.priorite || 'moyenne',
-        responsable_nom: data.responsable_nom,
-        responsable_email: data.responsable_email,
-        date_echeance: data.date_echeance,
+        responsableNom: data.responsableNom,
+        responsableEmail: data.responsableEmail,
+        dateEcheance: data.dateEcheance,
         indicateur_efficacite: data.indicateur_efficacite
       });
 
@@ -109,7 +108,6 @@ export const useActionsCorrectives = () => {
       toast({
         title: "Erreur",
         description: "Impossible de créer l'action corrective",
-        variant: "destructive",
       });
       return false;
     }
@@ -118,7 +116,7 @@ export const useActionsCorrectives = () => {
   const updateActionCorrective = async (id: string, updates: Partial<ActionCorrective>) => {
     try {
       // Mettre à jour l'action corrective via l'API
-      await api.put(`/actions-correctives/${id}`, updates);
+      await api.put(`/api/actions-correctives/${id}`, updates);
 
       toast({
         title: "Action corrective mise à jour",
@@ -132,7 +130,6 @@ export const useActionsCorrectives = () => {
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour l'action corrective",
-        variant: "destructive",
       });
       return false;
     }
@@ -140,7 +137,7 @@ export const useActionsCorrectives = () => {
 
   const deleteActionCorrective = async (id: string) => {
     try {
-      await api.delete(`/actions-correctives/${id}`);
+      await api.delete(`/api/actions-correctives/${id}`);
 
       toast({
         title: "Action corrective supprimée",
@@ -154,7 +151,6 @@ export const useActionsCorrectives = () => {
       toast({
         title: "Erreur",
         description: "Impossible de supprimer l'action corrective",
-        variant: "destructive",
       });
       return false;
     }

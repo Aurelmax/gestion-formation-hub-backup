@@ -8,11 +8,12 @@ const prisma = new PrismaClient({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const rendezvous = await prisma.rendezvous.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!rendezvous) {
@@ -34,13 +35,14 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const data = await request.json();
 
     const rendezvous = await prisma.rendezvous.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...data,
         updatedAt: new Date(),
@@ -59,11 +61,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await prisma.rendezvous.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Rendez-vous supprimé avec succès' });
