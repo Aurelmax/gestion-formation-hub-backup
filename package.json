@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3000",
     "dev:auth": "concurrently \"cd backend && npm run dev\" \"next dev\"",
     "build": "next build",
     "build:prod": "npm run db:generate:prod && next build",

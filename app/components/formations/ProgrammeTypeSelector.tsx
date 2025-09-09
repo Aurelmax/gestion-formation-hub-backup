@@ -21,7 +21,7 @@ interface ProgrammeTypeSelectorProps {
   value: string | null;
   placeholder?: string;
   showAll?: boolean;
-  filterType?: 'catalogue' | 'sur-mesure' | null;
+  filterType?: 'catalogue' | 'personnalise' | null;
 }
 
 export function ProgrammeTypeSelector({

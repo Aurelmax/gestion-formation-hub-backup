@@ -79,8 +79,7 @@ export async function POST(request: NextRequest) {
   const origin = request.headers.get('origin');
   const allowedOrigins = [
     'https://gestion-formation-hub-backup.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:3001'
+    'http://localhost:3000'
   ];
   
   try {
@@ -245,8 +244,7 @@ export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin');
   const allowedOrigins = [
     'https://gestion-formation-hub-backup.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:3001'
+    'http://localhost:3000'
   ];
 
   const response = new NextResponse(null, { status: 200 });

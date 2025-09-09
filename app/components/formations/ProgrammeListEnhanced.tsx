@@ -56,7 +56,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { useProgrammesFormation, ProgrammeFormation } from "@/hooks/useProgrammesFormation";
+import { useProgrammesFormation } from "@/hooks/useProgrammesFormation";
+import { ProgrammeFormation } from "@/types/programmes";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { generateFormationPDF } from "@/utils/pdfGenerator";
@@ -82,7 +83,7 @@ export default function ProgrammeListEnhanced({
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const [programmeToModify, setProgrammeToModify] = useState<ProgrammeFormation | null>(null);
-  const [duplicationType, setDuplicationType] = useState<"catalogue" | "sur-mesure">("sur-mesure");
+  const [duplicationType, setDuplicationType] = useState<"catalogue" | "personnalise">("personnalise");
 
   // Filtrer les programmes en fonction des critères
   const filteredProgrammes = useMemo(() => {
@@ -163,7 +164,7 @@ export default function ProgrammeListEnhanced({
         title: "Programme dupliqué",
         description: duplicationType === "catalogue" 
           ? "Le programme a été dupliqué dans le catalogue." 
-          : "Le programme a été converti en version sur-mesure.",
+          : "Le programme a été converti en version personnalise.",
       });
       
       setDuplicateDialogOpen(false);
@@ -234,7 +235,7 @@ export default function ProgrammeListEnhanced({
     }
   };
 
-  const openDuplicateDialog = (programme: ProgrammeFormation, type: "catalogue" | "sur-mesure") => {
+  const openDuplicateDialog = (programme: ProgrammeFormation, type: "catalogue" | "personnalise") => {
     setProgrammeToModify(programme);
     setDuplicationType(type);
     setDuplicateDialogOpen(true);
@@ -246,7 +247,7 @@ export default function ProgrammeListEnhanced({
         <div>
           <h2 className="text-2xl font-bold">Gestion des programmes</h2>
           <p className="text-gray-600">
-            Bibliothèque unifiée des programmes de formation catalogue et sur-mesure
+            Bibliothèque unifiée des programmes de formation catalogue et personnalise
           </p>
         </div>
         <Button onClick={onCreateClick}>
@@ -278,7 +279,7 @@ export default function ProgrammeListEnhanced({
               <SelectContent>
                 <SelectItem value="all">Tous les types</SelectItem>
                 <SelectItem value="catalogue">Catalogue</SelectItem>
-                <SelectItem value="sur-mesure">Sur-mesure</SelectItem>
+                <SelectItem value="personnalise">Personnalisé</SelectItem>
               </SelectContent>
             </Select>
             
@@ -383,12 +384,12 @@ export default function ProgrammeListEnhanced({
                       
                       <DropdownMenuLabel>Conversion</DropdownMenuLabel>
                       {programme.type === 'catalogue' && (
-                        <DropdownMenuItem onClick={() => openDuplicateDialog(programme, 'sur-mesure')}>
+                        <DropdownMenuItem onClick={() => openDuplicateDialog(programme, 'personnalise')}>
                           <Copy className="h-4 w-4 mr-2" />
-                          Convertir en sur-mesure
+                          Convertir en personnalise
                         </DropdownMenuItem>
                       )}
-                      {programme.type === 'sur-mesure' && (
+                      {programme.type === 'personnalise' && (
                         <DropdownMenuItem onClick={() => openDuplicateDialog(programme, 'catalogue')}>
                           <Copy className="h-4 w-4 mr-2" />
                           Publier dans le catalogue
@@ -429,7 +430,7 @@ export default function ProgrammeListEnhanced({
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Badge variant={programme.type === 'catalogue' ? 'default' : 'secondary'}>
-                    {programme.type === 'catalogue' ? 'Catalogue' : 'Sur-mesure'}
+                    {programme.type === 'catalogue' ? 'Catalogue' : 'Personnalisé'}
                   </Badge>
                   {programme.categorie && (
                     <Badge variant="outline">{programme.categorie.titre}</Badge>
@@ -484,7 +485,7 @@ export default function ProgrammeListEnhanced({
                     </TableCell>
                     <TableCell>
                       <Badge variant={programme.type === 'catalogue' ? 'default' : 'secondary'}>
-                        {programme.type === 'catalogue' ? 'Catalogue' : 'Sur-mesure'}
+                        {programme.type === 'catalogue' ? 'Catalogue' : 'Personnalisé'}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -531,12 +532,12 @@ export default function ProgrammeListEnhanced({
                               Télécharger PDF
                             </DropdownMenuItem>
                             {programme.type === 'catalogue' && (
-                              <DropdownMenuItem onClick={() => openDuplicateDialog(programme, 'sur-mesure')}>
+                              <DropdownMenuItem onClick={() => openDuplicateDialog(programme, 'personnalise')}>
                                 <Copy className="h-4 w-4 mr-2" />
-                                Convertir en sur-mesure
+                                Convertir en personnalise
                               </DropdownMenuItem>
                             )}
-                            {programme.type === 'sur-mesure' && (
+                            {programme.type === 'personnalise' && (
                               <DropdownMenuItem onClick={() => openDuplicateDialog(programme, 'catalogue')}>
                                 <Copy className="h-4 w-4 mr-2" />
                                 Publier dans catalogue
@@ -606,14 +607,14 @@ export default function ProgrammeListEnhanced({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {duplicationType === "sur-mesure"
-                ? "Convertir en programme sur-mesure"
+              {duplicationType === "personnalise"
+                ? "Convertir en programme personnalise"
                 : "Publier dans le catalogue"}
             </DialogTitle>
             <DialogDescription>
-              {duplicationType === "sur-mesure"
-                ? "Vous êtes sur le point de créer une version sur-mesure de ce programme catalogue qui pourra être personnalisée sans modifier l'original."
-                : "Vous êtes sur le point de publier ce programme sur-mesure dans le catalogue public."}
+              {duplicationType === "personnalise"
+                ? "Vous êtes sur le point de créer une version personnalise de ce programme catalogue qui pourra être personnalisée sans modifier l'original."
+                : "Vous êtes sur le point de publier ce programme personnalise dans le catalogue public."}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -623,7 +624,7 @@ export default function ProgrammeListEnhanced({
             </p>
             <p className="text-sm text-gray-500 mt-2">
               <strong>Nouveau type:</strong>{" "}
-              {duplicationType === "sur-mesure" ? "Sur-mesure" : "Catalogue"}
+              {duplicationType === "personnalise" ? "Personnalisé" : "Catalogue"}
             </p>
             <p className="text-sm text-gray-500 mt-4">
               Un nouveau programme sera créé avec un code et un titre légèrement modifiés.
@@ -636,7 +637,7 @@ export default function ProgrammeListEnhanced({
             </Button>
             <Button onClick={handleDuplicate}>
               <Copy className="h-4 w-4 mr-2" />
-              {duplicationType === "sur-mesure" ? "Créer version sur-mesure" : "Publier dans le catalogue"}
+              {duplicationType === "personnalise" ? "Créer version personnalise" : "Publier dans le catalogue"}
             </Button>
           </DialogFooter>
         </DialogContent>

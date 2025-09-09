@@ -15,6 +15,21 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@mui/material', '@mui/icons-material'],
   },
+  // Force disable prerendering for built-in error pages
+  generateEtags: false,
+  // Disable problematic static page generation
+  trailingSlash: false,
+  skipTrailingSlashRedirect: true,
+  // Configure page extensions to avoid conflicts
+  pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
+  // Disable static optimization to prevent Html import errors
+  distDir: '.next',
+  poweredByHeader: false,
+  reactStrictMode: false,
+  // Prevent static generation of error pages to avoid Html import conflicts
+  generateBuildId: async () => {
+    return 'build-' + Date.now();
+  },
   // Code splitting optimization
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {

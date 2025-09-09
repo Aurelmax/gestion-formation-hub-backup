@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Plus, Minus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useProgrammesFormation, ProgrammeFormation } from "@/hooks/useProgrammesFormation";
+import { ProgrammeFormation } from "@/types/programmes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ProgrammeFormProps {
@@ -21,8 +21,7 @@ interface ProgrammeFormProps {
   }>;
 }
 
-const ProgrammeForm = ({ programme, onSubmit, onCancel }: ProgrammeFormProps) => {
-  const { categories } = useProgrammesFormation();
+const ProgrammeForm = ({ programme, onSubmit, onCancel, categories }: ProgrammeFormProps) => {
   
   // État du formulaire avec le modèle unifié
   const [formData, setFormData] = useState<Partial<ProgrammeFormation>>({
@@ -56,7 +55,7 @@ const ProgrammeForm = ({ programme, onSubmit, onCancel }: ProgrammeFormProps) =>
     accessibiliteHandicap: programme?.accessibiliteHandicap || "Formation accessible aux personnes en situation de handicap. Contactez notre référent handicap pour adapter le parcours.",
     cessationAbandon: programme?.cessationAbandon || "En cas d'abandon, la facturation sera établie au prorata des heures réalisées.",
     
-    // Champs spécifiques aux programmes sur-mesure
+    // Champs spécifiques aux programmes personnalise
     beneficiaireId: programme?.beneficiaireId || null,
     objectifsSpecifiques: programme?.objectifsSpecifiques || null,
     positionnementRequestId: programme?.positionnementRequestId || null,
@@ -119,7 +118,7 @@ const ProgrammeForm = ({ programme, onSubmit, onCancel }: ProgrammeFormProps) =>
 
       <Card>
         <CardHeader>
-          <CardTitle>Programme de formation {formData.type === "catalogue" ? "catalogue" : "sur-mesure"}</CardTitle>
+          <CardTitle>Programme de formation {formData.type === "catalogue" ? "catalogue" : "personnalise"}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -128,8 +127,8 @@ const ProgrammeForm = ({ programme, onSubmit, onCancel }: ProgrammeFormProps) =>
                 <TabsTrigger value="infos">Informations générales</TabsTrigger>
                 <TabsTrigger value="contenu">Contenu pédagogique</TabsTrigger>
                 <TabsTrigger value="reglementaire">Informations réglementaires</TabsTrigger>
-                {formData.type === "sur-mesure" && (
-                  <TabsTrigger value="surmesure">Spécificités sur-mesure</TabsTrigger>
+                {formData.type === "personnalise" && (
+                  <TabsTrigger value="surmesure">Spécificités personnalise</TabsTrigger>
                 )}
               </TabsList>
               
@@ -146,7 +145,7 @@ const ProgrammeForm = ({ programme, onSubmit, onCancel }: ProgrammeFormProps) =>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="catalogue">Catalogue</SelectItem>
-                        <SelectItem value="sur-mesure">Sur-mesure</SelectItem>
+                        <SelectItem value="personnalise">Personnalisé</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -475,7 +474,7 @@ const ProgrammeForm = ({ programme, onSubmit, onCancel }: ProgrammeFormProps) =>
                 </div>
               </TabsContent>
               
-              {formData.type === "sur-mesure" && (
+              {formData.type === "personnalise" && (
                 <TabsContent value="surmesure" className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">

@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { useProgrammesCatalogue, ProgrammeFormation, CategorieFormation } from '../../hooks/useProgrammesCatalogue';
+import { useProgrammesFormation } from '../../hooks/useProgrammesFormation';
+import { useCatalogueAdapter, CategorieFormation } from '../../adapters/catalogueAdapter';
+import { ProgrammeFormation } from '@/types';
 import { Box, Typography, Grid, Card, CardContent, CardActions, Button, Chip, CircularProgress, Alert, Container, Tabs, Tab } from '@mui/material';
 import Link from 'next/link';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -14,7 +16,12 @@ const formatDate = (dateString?: string | Date) => {
 };
 
 const CataloguePage: React.FC = () => {
-  const { categories, loading, error } = useProgrammesCatalogue();
+  // Utilisation du hook unifié avec adaptateur
+  const unifiedHook = useProgrammesFormation({ 
+    autoFetch: true, 
+    enableCache: true 
+  });
+  const { categories, loading, error } = useCatalogueAdapter(unifiedHook);
   const [activeTab, setActiveTab] = useState<number>(0);
   
   // Gérer le changement d'onglet

@@ -1,5 +1,5 @@
 // Adaptateurs pour convertir entre les différentes interfaces de l'application
-import { ProgrammeFormation } from '@/hooks/useProgrammesFormation';
+import { ProgrammeFormation } from '@/types/programmes';
 import { Formation as PdfFormation } from './pdfGenerator';
 
 /**
@@ -12,7 +12,7 @@ export const programmeFormationToPdfFormation = (programme: ProgrammeFormation):
     libelle: programme.titre,
     duree: programme.duree?.toString() || '',
     objectifsPedagogiques: programme.objectifs?.toString() || '',
-    contenuDetailleJours: programme.contenuDetailleJours || programme.contenuDetailleHtml || '',
+    contenuDetailleJours: programme.contenuDetailleJours || '',
     prerequis: programme.prerequis || '',
     publicConcerne: programme.publicConcerne || '',
     horaires: programme.modalites?.split('\n')?.[0] || '',

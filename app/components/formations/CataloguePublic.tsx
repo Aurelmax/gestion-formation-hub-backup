@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Users, BookOpen, Calendar, Archive } from "lucide-react";
-import { useProgrammesFormation, ProgrammeFormation } from "@/hooks/useProgrammesFormation";
+import { useProgrammesFormation } from "@/hooks/useProgrammesFormation";
+import { ProgrammeFormation } from "@/types/programmes";
 
 const CataloguePublic = () => {
   const { programmes, loading, error } = useProgrammesFormation();

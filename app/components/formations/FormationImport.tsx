@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useProgrammesFormation, ProgrammeFormation } from "@/hooks/useProgrammesFormation";
+import { useProgrammesFormation } from "@/hooks/useProgrammesFormation";
+import { ProgrammeFormation } from "@/types/programmes";
 import { Upload, FileText, Check, AlertCircle, ArrowLeft } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -21,7 +22,7 @@ const FormationImport = ({ onBack, onSuccess }: FormationImportProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<any[]>([]);
-  const [importType, setImportType] = useState<"catalogue" | "sur-mesure">("catalogue");
+  const [importType, setImportType] = useState<"catalogue" | "personnalise">("catalogue");
   const [importMode, setImportMode] = useState<"file" | "paste">("file");
   
   // Gérer l'upload de fichier JSON
@@ -214,14 +215,14 @@ const FormationImport = ({ onBack, onSuccess }: FormationImportProps) => {
         <CardContent>
           <Select 
             value={importType} 
-            onValueChange={(value) => setImportType(value as "catalogue" | "sur-mesure")}
+            onValueChange={(value) => setImportType(value as "catalogue" | "personnalise")}
           >
             <SelectTrigger className="w-full mb-4">
               <SelectValue placeholder="Sélectionnez le type de formation" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="catalogue">Formations catalogue</SelectItem>
-              <SelectItem value="sur-mesure">Formations sur-mesure</SelectItem>
+              <SelectItem value="personnalise">Formations personnalise</SelectItem>
             </SelectContent>
           </Select>
           

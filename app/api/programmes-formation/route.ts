@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient, Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { createHash } from 'crypto';
+import { PROGRAMME_TYPE_ENUM } from '@/types/programmes';
 
 const prisma = new PrismaClient();
 
@@ -9,7 +10,7 @@ const prisma = new PrismaClient();
 const programmeSchema = z.object({
   // Champs essentiels obligatoires
   code: z.string().min(1, 'Le code est requis'),
-  type: z.enum(['catalogue', 'personnalise']),
+  type: z.enum(PROGRAMME_TYPE_ENUM),
   titre: z.string().min(1, 'Le titre est requis'),
   description: z.string().min(1, 'La description est requise'),
   duree: z.string().min(1, 'La durée est requise'),
@@ -58,7 +59,7 @@ const programmeSchema = z.object({
 
 // Schéma de validation des paramètres de requête
 const queryParamsSchema = z.object({
-  type: z.enum(['catalogue', 'personnalise']).optional(),
+  type: z.enum(PROGRAMME_TYPE_ENUM).optional(),
   version: z.string().regex(/^\d+$/).optional(),
   fields: z.string().optional().transform(fields => 
     fields ? fields.split(',').map(f => f.trim()) : []

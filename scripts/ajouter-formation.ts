@@ -25,8 +25,7 @@ async function main() {
     data: {
       id: uuidv4(),
       code: 'A001-WP-DD',
-      type: 'Catalogue',
-      typeProgramme: 'Développement Web',
+      type: 'catalogue',
       titre: 'Création site internet (WordPress) & Stratégie de développement Digital',
       description: 'Formation complète sur la création de sites WordPress et la stratégie digitale associée.',
       duree: '5 jours',
@@ -44,13 +43,15 @@ async function main() {
       modalites: 'Présentiel ou distanciel',
       modalitesAcces: 'Accessible aux personnes en situation de handicap',
       modalitesTechniques: 'Ordinateur avec connexion internet',
-      modalitesReglement: 'Paiement à l\\'inscription',
+      modalitesReglement: 'Paiement à l\'inscription',
       formateur: 'Expert WordPress certifié',
       ressourcesDisposition: 'Support de cours, accès à un espace de formation en ligne',
       modalitesEvaluation: 'Exercices pratiques et projet final',
       sanctionFormation: 'Attestation de formation',
       niveauCertification: 'Non certifiante',
+      delaiAcceptation: '48h',
       accessibiliteHandicap: 'Accessible',
+      cessationAbandon: 'Remboursement selon conditions générales',
       categorie: {
         connect: { id: categorie.id }
       }

@@ -32,7 +32,8 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react';
-import { useProgrammesFormation, ProgrammeFormation } from '@/hooks/useProgrammesFormation';
+import { useProgrammesFormation } from '@/hooks/useProgrammesFormation';
+import { ProgrammeFormation } from '@/types/programmes';
 
 // Définition du schéma de validation
 const formSchema = z.object({

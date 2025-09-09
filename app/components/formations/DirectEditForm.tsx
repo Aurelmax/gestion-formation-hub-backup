@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useProgrammesFormation, ProgrammeFormation } from "@/hooks/useProgrammesFormation";
+import { useProgrammesFormation } from "@/hooks/useProgrammesFormation";
+import { ProgrammeFormation } from "@/types/programmes";
 import { useToast } from "@/hooks/use-toast";
 
 interface DirectEditFormProps {
@@ -127,7 +128,7 @@ const DirectEditForm = ({ programmeId, onBack }: DirectEditFormProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="catalogue">Catalogue</SelectItem>
-                    <SelectItem value="sur-mesure">Sur-mesure</SelectItem>
+                    <SelectItem value="personnalise">Personnalisé</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Edit, Trash2, Eye, Clock, Users, BookOpen, Info, GitBranch, Calendar, Download, Archive, FileText, Upload } from "lucide-react";
 import { useProgrammesFormation, ProgrammeFormation } from "@/hooks/useProgrammesFormation";
+import api from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 import ProgrammeForm from "./ProgrammeForm";
 import FormationDetail from "./FormationDetail";
@@ -173,15 +174,18 @@ const FormationsList = () => {
   const { 
     programmes, 
     loading: isLoading, 
-    createProgramme,
-    updateProgramme, 
-    deleteProgramme,
     refreshProgrammes,
-    categories,
-    updateProgrammeStatus,
+    createProgramme,
+    updateProgramme,
     duplicateProgramme
   } = useProgrammesFormation();
+  
+  console.log('🏷️ FormationsList render - État actuel:', {
+    programmes: programmes?.length || 0,
+    isLoading
+  });
   const { toast } = useToast();
+  const [categories, setCategories] = useState<any[]>([]);
   const [view, setView] = useState<ViewMode>("list");
   const [selectedFormation, setSelectedFormation] = useState<ProgrammeFormation | null>(null);
   const [editingFormation, setEditingFormation] = useState<ProgrammeFormation | null>(null);
@@ -192,13 +196,59 @@ const FormationsList = () => {
 
   // Effets
   useEffect(() => {
+    console.log('🔄 FormationsList - useEffect programmes changé:', programmes?.length || 0, 'programmes');
     if (programmes) {
-      setProgrammesFiltered({
+      const filteredData = {
         catalogue: programmes.filter(p => p.type === "catalogue"),
         personnalise: programmes.filter(p => p.type === "personnalise")
+      };
+      console.log('📊 Filtrage programmes:', {
+        total: programmes.length,
+        catalogue: filteredData.catalogue.length,
+        personnalise: filteredData.personnalise.length
       });
+      setProgrammesFiltered(filteredData);
     }
   }, [programmes]);
+
+  // Charger les catégories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories');
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des catégories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Rafraîchissement périodique pour éviter les décalages
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    
+    // Rafraîchir les données toutes les 30 secondes si la page est visible
+    const startPeriodicRefresh = () => {
+      intervalId = setInterval(() => {
+        if (document.visibilityState === 'visible' && view === 'list') {
+          console.log('🔄 Rafraîchissement périodique des programmes');
+          refreshProgrammes();
+        }
+      }, 30000);
+    };
+
+    startPeriodicRefresh();
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [view, refreshProgrammes]);
 
   // Handlers
   const handleCreate = useCallback(() => {
@@ -217,18 +267,37 @@ const FormationsList = () => {
 
   const handleDelete = useCallback(async (id: string) => {
     try {
-      await deleteProgramme(id);
+      await api.delete(`/api/programmes-formation/${id}`);
+      
       toast({
-        title: "Programme supprimé",
-        description: "Le programme a été supprimé avec succès.",
+        title: "Succès",
+        description: "Programme supprimé avec succès.",
       });
-    } catch (error) {
+      // Refresh the list
+      await refreshProgrammes();
+    } catch (error: any) {
+      console.error('Erreur lors de la suppression:', error);
+      
+      let errorMessage = "Erreur lors de la suppression du programme.";
+      
+      if (error?.response?.status === 404) {
+        errorMessage = "Ce programme n'existe plus ou a déjà été supprimé. La liste va être actualisée.";
+        // Refresh the list to sync with database
+        await refreshProgrammes();
+      } else if (error?.response?.status === 409) {
+        errorMessage = error?.response?.data?.error || "Impossible de supprimer ce programme car il est utilisé ailleurs.";
+      } else if (error?.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Erreur",
-        description: "Impossible de supprimer le programme.",
+        description: errorMessage,
       });
     }
-  }, [deleteProgramme, toast]);
+  }, [toast, refreshProgrammes]);
 
   const handleSubmit = useCallback(async (formData: Omit<ProgrammeFormation, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
@@ -245,7 +314,7 @@ const FormationsList = () => {
           description: "Le programme a été modifié avec succès.",
         });
       } else {
-        await createProgramme(formData);
+        await createProgramme(formData as any);
         toast({
           title: "Programme créé",
           description: "Le nouveau programme a été créé avec succès.",
@@ -254,12 +323,13 @@ const FormationsList = () => {
       setView("list");
       setEditingFormation(null);
     } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder le programme.",
       });
     }
-  }, [createProgramme, editingFormation, toast, updateProgramme]);
+  }, [editingFormation, createProgramme, updateProgramme, toast]);
 
   const handleGeneratePDF = useCallback((formation: ProgrammeFormation) => {
     const pdfFormation = programmeFormationToPdfFormation(formation);
@@ -292,7 +362,7 @@ const FormationsList = () => {
         description: "Impossible de générer le PDF.",
       });
     }
-  }, [generateFormationPDF, toast]);
+  }, [toast]);
 
   const handleImport = useCallback(() => {
     setView("import");
@@ -309,46 +379,35 @@ const FormationsList = () => {
 
   const handleToggleActive = useCallback(async (id: string, newState: boolean) => {
     try {
-      // Utiliser la fonction dédiée du hook pour modifier le statut
-      await updateProgrammeStatus(id, newState);
+      await updateProgramme(id, { estActif: newState });
       toast({
         title: newState ? "Programme activé" : "Programme désactivé",
-        description: `Le programme a été ${newState ? "activé" : "désactivé"} avec succès.`
+        description: "Le statut a été mis à jour avec succès.",
       });
-      // Le statut est déjà mis à jour dans le hook, pas besoin de rafraîchir
     } catch (error) {
+      console.error('Erreur lors du changement de statut:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de modifier l'état du programme.",
+        description: "Impossible de modifier le statut du programme.",
       });
     }
-  }, [toast, updateProgrammeStatus]);
+  }, [updateProgramme, toast]);
 
   const handleDuplicate = useCallback(async (id: string) => {
-    console.log('handleDuplicate appelé avec id:', id);
     try {
       // Récupérer le programme à dupliquer
       const programme = programmes.find(p => p.id === id);
-      console.log('Programme trouvé:', programme);
       if (!programme) {
         throw new Error('Programme introuvable');
       }
 
-      const targetType = programme.type === 'catalogue' ? 'personnalise' : 'catalogue';
-      await duplicateProgramme(id, { 
-        type: targetType,
-        titre: `${programme.titre} (copie)`,
-        estActif: true
-      });
-      console.log('Après appel à duplicateProgramme réussi');
-      
+      // Dupliquer le programme
+      await duplicateProgramme(id);
+
       toast({
-        title: "Duplication réussie",
-        description: `Le programme a été dupliqué en version ${targetType}.`
+        title: "Programme dupliqué",
+        description: "Le programme a été dupliqué avec succès.",
       });
-      
-      await refreshProgrammes();
-      console.log('Programmes rafraîchis après duplication');
     } catch (error) {
       console.error("Erreur lors de la duplication:", error);
       toast({
@@ -356,7 +415,7 @@ const FormationsList = () => {
         description: "Impossible de dupliquer le programme.",
       });
     }
-  }, [programmes, duplicateProgramme, refreshProgrammes, toast]);
+  }, [programmes, duplicateProgramme, toast]);
 
   // Rendu des différentes vues
   const renderListView = () => (
@@ -416,7 +475,7 @@ const FormationsList = () => {
                   onViewDetail={handleViewDetail}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
-                  onGeneratePDF={handleGeneratePDF}
+                  onGeneratePDF={handleExportPDF}
                   onToggleActive={handleToggleActive}
                   onDuplicate={handleDuplicate}
                 />
@@ -441,7 +500,7 @@ const FormationsList = () => {
                   onViewDetail={handleViewDetail}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
-                  onGeneratePDF={handleGeneratePDF}
+                  onGeneratePDF={handleExportPDF}
                   onToggleActive={handleToggleActive}
                   onDuplicate={handleDuplicate}
                 />
@@ -466,7 +525,7 @@ const FormationsList = () => {
                   onViewDetail={handleViewDetail}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
-                  onGeneratePDF={handleGeneratePDF}
+                  onGeneratePDF={handleExportPDF}
                   onToggleActive={handleToggleActive}
                   onDuplicate={handleDuplicate}
                 />

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import { PROGRAMME_TYPE_ENUM } from '@/types/programmes';
 
 const prisma = new PrismaClient();
 
@@ -8,7 +9,7 @@ const prisma = new PrismaClient();
 const updateProgrammeSchema = z.object({
   // Champs essentiels
   code: z.string().min(1, 'Le code est requis').optional(),
-  type: z.enum(['catalogue', 'sur-mesure']).optional(),
+  type: z.enum(PROGRAMME_TYPE_ENUM).optional(),
   titre: z.string().min(1, 'Le titre est requis').optional(),
   description: z.string().min(1, 'La description est requise').optional(),
   duree: z.string().min(1, 'La durée est requise').optional(),
@@ -59,7 +60,7 @@ export async function GET(
       where: { id },
       include: {
         categorie: true,
-        programmeSource: {
+        programmeCatalogue: {
           select: {
             id: true,
             code: true,
@@ -67,7 +68,7 @@ export async function GET(
             version: true,
           },
         },
-        versionsDerivees: {
+        programmesDerivés: {
           select: {
             id: true,
             code: true,

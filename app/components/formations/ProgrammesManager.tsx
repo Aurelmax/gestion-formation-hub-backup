@@ -15,7 +15,7 @@ const ProgrammeFormEnhanced = dynamic(() => import('./ProgrammeFormEnhanced'), {
   ),
   ssr: false
 });
-import { ProgrammeFormation } from '@/hooks/useProgrammesFormation';
+import { ProgrammeFormation } from '@/types';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, BookOpen, FileSpreadsheet, FileUp } from 'lucide-react';
 import ImportProgrammesHtml from '../admin/ImportProgrammesHtml';
@@ -49,7 +49,7 @@ const ProgrammeDetails = ({ programme, onBack }: { programme: ProgrammeFormation
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-500">Type</h3>
-              <p>{programme.type === 'catalogue' ? 'Catalogue' : 'Sur-mesure'}</p>
+              <p>{programme.type === 'catalogue' ? 'Catalogue' : 'Personnalisé'}</p>
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-500">Catégorie</h3>
@@ -316,7 +316,7 @@ export default function ProgrammesManager() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Bibliothèque de programmes</h2>
-          <p className="text-gray-600">Gestion centralisée des programmes catalogue et sur-mesure</p>
+          <p className="text-gray-600">Gestion centralisée des programmes catalogue et personnalise</p>
         </div>
       </div>
 
@@ -364,7 +364,7 @@ export default function ProgrammesManager() {
               <p>Fonctionnalité à venir: gestion du workflow complet de formation depuis le positionnement jusqu'au dossier.</p>
               <p className="text-gray-600 mt-4">Cette interface permettra de:</p>
               <ul className="list-disc pl-6 mt-2 space-y-1 text-gray-600">
-                <li>Créer un programme sur-mesure à partir d'une demande de positionnement</li>
+                <li>Créer un programme personnalise à partir d'une demande de positionnement</li>
                 <li>Suivre le workflow complet de création des dossiers</li>
                 <li>Générer les documents administratifs associés</li>
                 <li>Suivre les étapes du parcours de formation</li>

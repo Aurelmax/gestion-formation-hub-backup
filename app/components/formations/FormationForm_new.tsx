@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Plus, Minus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useProgrammesFormation, ProgrammeFormation } from "@/hooks/useProgrammesFormation";
+import { useProgrammesFormation } from "@/hooks/useProgrammesFormation";
+import { ProgrammeFormation } from "@/types/programmes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
@@ -51,7 +52,7 @@ const FormationForm = ({ formation, onSubmit, onCancel }: FormationFormProps) =>
     accessibiliteHandicap: formation?.accessibiliteHandicap || "Formation accessible aux personnes en situation de handicap. Contactez notre référent handicap pour adapter le parcours.",
     cessationAbandon: formation?.cessationAbandon || "En cas d'abandon, la facturation sera établie au prorata des heures réalisées.",
     
-    // Champs spécifiques aux programmes sur-mesure
+    // Champs spécifiques aux programmes personnalise
     beneficiaireId: formation?.beneficiaireId || null,
     objectifsSpecifiques: formation?.objectifsSpecifiques || null,
     positionnementRequestId: formation?.positionnementRequestId || null,
@@ -114,7 +115,7 @@ const FormationForm = ({ formation, onSubmit, onCancel }: FormationFormProps) =>
 
       <Card>
         <CardHeader>
-          <CardTitle>Programme de formation {formData.type === "catalogue" ? "catalogue" : "sur-mesure"}</CardTitle>
+          <CardTitle>Programme de formation {formData.type === "catalogue" ? "catalogue" : "personnalise"}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -123,8 +124,8 @@ const FormationForm = ({ formation, onSubmit, onCancel }: FormationFormProps) =>
                 <TabsTrigger value="infos">Informations générales</TabsTrigger>
                 <TabsTrigger value="contenu">Contenu pédagogique</TabsTrigger>
                 <TabsTrigger value="reglementaire">Informations réglementaires</TabsTrigger>
-                {formData.type === "sur-mesure" && (
-                  <TabsTrigger value="surmesure">Spécificités sur-mesure</TabsTrigger>
+                {formData.type === "personnalise" && (
+                  <TabsTrigger value="surmesure">Spécificités personnalise</TabsTrigger>
                 )}
               </TabsList>
               
@@ -152,7 +153,7 @@ const FormationForm = ({ formation, onSubmit, onCancel }: FormationFormProps) =>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="catalogue">Catalogue</SelectItem>
-                        <SelectItem value="sur-mesure">Sur-mesure</SelectItem>
+                        <SelectItem value="personnalise">Personnalisé</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -478,7 +479,7 @@ const FormationForm = ({ formation, onSubmit, onCancel }: FormationFormProps) =>
                 </div>
               </TabsContent>
               
-              {formData.type === "sur-mesure" && (
+              {formData.type === "personnalise" && (
                 <TabsContent value="surmesure" className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="beneficiaireId">ID du bénéficiaire</Label>
@@ -496,7 +497,7 @@ const FormationForm = ({ formation, onSubmit, onCancel }: FormationFormProps) =>
                       id="objectifsSpecifiques"
                       value={formData.objectifsSpecifiques || ""}
                       onChange={(e) => handleChange("objectifsSpecifiques", e.target.value)}
-                      placeholder="Objectifs spécifiques pour ce programme sur-mesure"
+                      placeholder="Objectifs spécifiques pour ce programme personnalise"
                       rows={5}
                     />
                   </div>
