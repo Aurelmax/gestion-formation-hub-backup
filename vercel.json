@@ -1,38 +1,27 @@
 {
+  "env": {
+    "DATABASE_URL": "prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqd3RfaWQiOjEsInNlY3VyZV9rZXkiOiJza19vaTJUWHB0SHFtaTRsY3VYS3Y2a0ciLCJhcGlfa2V5IjoiMDFLNEQwRTFGUUFCOUQxSkNOOTY3QktQWFEiLCJ0ZW5hbnRfaWQiOiI3NTUyM2I1NjU2MWMwNzNlODRmNmY4ZDg0ZmMwODhlYzY5MGYwMjBjMjdmMGFkNTBlZTNhZWI4OGQwOTEzMDQ2IiwiaW50ZXJuYWxfc2VjcmV0IjoiNTQ0OWE5ZWEtNGNhOC00ODdhLWI1NGMtZDFkYWU5NjI5YmVjIn0.AKhhRt_4ow6gezVjZIlc5lLGNntKrc21B7ku0QR28PM",
+    "DIRECT_URL": "postgres://75523b56561c073e84f6f8d84fc088ec690f020c27f0ad50ee3aeb88d0913046:sk_oi2TXptHqmi4lcuXKv6kG@db.prisma.io:5432/postgres?sslmode=require",
+    "NEXTAUTH_SECRET": "IaQdE9fU8hP7mC2vX6yT3zJ5nB4rW1oL",
+    "JWT_SECRET": "IaQdE9fU8hP7mC2vX6yT3zJ5nB4rW1oL",
+    "PRISMA_GENERATE_DATAPROXY": "true",
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "NEXTAUTH_URL": "$VERCEL_URL",
+      "NEXT_PUBLIC_API_URL": "$VERCEL_URL"
+    }
+  },
   "functions": {
     "app/api/**/*.ts": {
-      "runtime": "@vercel/node@3.2.14"
+      "maxDuration": 30
     }
   },
-  "buildCommand": "npm run build",
-  "installCommand": "npm install && npx prisma generate",
-  "env": {
-    "PRISMA_GENERATE_DATAPROXY": "true"
-  },
-  "headers": [
+  "rewrites": [
     {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/catalogue",
-      "permanent": false
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
     }
   ]
 }
