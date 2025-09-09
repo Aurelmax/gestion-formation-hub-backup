@@ -186,7 +186,7 @@ const ActionsCorrectivesList = () => {
                         {action.dateEcheance && (
                           <span>Échéance: {new Date(action.dateEcheance).toLocaleDateString('fr-FR')}</span>
                         )}
-                        <span>Créé le: {new Date(action.created_at).toLocaleDateString('fr-FR')}</span>
+                        <span>Créé le: {new Date(action.createdAt).toLocaleDateString('fr-FR')}</span>
                       </div>
 
                       <div className="space-y-1">

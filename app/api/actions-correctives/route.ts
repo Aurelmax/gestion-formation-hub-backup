@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client/edge';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // Schéma de validation pour la création d'une action corrective
 const actionCorrectiveSchema = z.object({
@@ -64,12 +62,12 @@ export async function GET(request: NextRequest) {
 
     const actions = await prisma.actionCorrective.findMany({
       where,
-      orderBy: { created_at: 'desc' },
+      orderBy: { createdAt: 'desc' },
       include: {
         reclamation: {
           select: {
             id: true,
-            titre: true,
+            sujet: true,
             statut: true,
           },
         },

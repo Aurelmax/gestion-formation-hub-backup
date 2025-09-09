@@ -220,7 +220,7 @@ const ActionsCorrectivesDashboard = () => {
                       <div className="font-medium">{action.titre}</div>
                       <div className="text-sm text-gray-600">{action.responsableNom || 'Non assigné'}</div>
                       <div className="text-xs text-gray-500">
-                        Origine: {action.origineType} • {new Date(action.created_at).toLocaleDateString('fr-FR')}
+                        Origine: {action.origineType} • {new Date(action.createdAt).toLocaleDateString('fr-FR')}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

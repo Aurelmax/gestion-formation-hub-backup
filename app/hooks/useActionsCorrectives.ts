@@ -18,8 +18,8 @@ export interface ActionCorrective {
   responsableEmail?: string;
   dateEcheance?: Date;
   indicateur_efficacite?: string;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface DocumentActionCorrective {
