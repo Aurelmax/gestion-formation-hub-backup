@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "dev:auth": "concurrently \"cd backend && npm run dev\" \"next dev\"",
-    "build": "next build",
+    "build": "prisma generate --no-engine && next build",
     "build:prod": "npm run db:generate:prod && next build",
     "build:no-lint": "NEXT_LINT_IGNORE_ESLING=true next build",
     "analyze": "ANALYZE=true npm run build",
