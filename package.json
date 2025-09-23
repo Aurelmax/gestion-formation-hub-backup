@@ -84,7 +84,7 @@
     "next-themes": "^0.3.0",
     "node-fetch": "^2.7.0",
     "node-html-parser": "^7.0.1",
-    "puppeteer": "^24.16.1",
+    "puppeteer": "^24.18.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
