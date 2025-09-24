@@ -40,7 +40,7 @@ const Footer = () => {
             <h5 className="text-xl font-bold mb-4 text-accent">Navigation</h5>
             <nav className="flex flex-col space-y-2" aria-label="Liens de pied de page">
               <Link href="/" className="text-gray-300 hover:text-white transition-colors">Accueil</Link>
-              <Link href="/catalogue" className="text-gray-300 hover:text-white transition-colors">Catalogue</Link>
+              <Link href="/#catalogue" className="text-gray-300 hover:text-white transition-colors">Formations</Link>
               <Link href="/blog" className="text-gray-300 hover:text-white transition-colors">Blog</Link>
               <Link href="/a-propos" className="text-gray-300 hover:text-white transition-colors">À propos</Link>
               <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact</Link>

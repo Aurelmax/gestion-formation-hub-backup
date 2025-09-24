@@ -13,12 +13,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${baseUrl}/catalogue`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.9,
-    },
-    {
       url: `${baseUrl}/contact`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
@@ -65,7 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
     })
 
-    formationsPages = formations.map((formation) => ({
+    formationsPages = formations.map((formation: { id: string; dateModification: Date }) => ({
       url: `${baseUrl}/formations/${formation.id}`,
       lastModified: formation.dateModification,
       changeFrequency: 'weekly' as const,
