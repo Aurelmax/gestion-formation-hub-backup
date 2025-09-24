@@ -46,10 +46,6 @@ function determinerCategorie(code: string): string {
   return 'WEB_CONCEPTION';
 }
 
-function extractTextContent($: cheerio.CheerioAPI, selector: string): string {
-  const element = $(selector);
-  return element.text().trim();
-}
 
 function extractObjectifs($: cheerio.CheerioAPI): string[] {
   const objectifs: string[] = [];
@@ -261,7 +257,7 @@ async function main() {
     console.log('🚀 Import automatique des programmes HTML vers Prisma Cloud');
     console.log('===========================================================');
     
-    const programmesDir = '/home/gestionmax-aur-lien/CascadeProjects/lovable/gestion-formation-hub-backup/public/programmes/ml';
+    const programmesDir = path.join(process.cwd(), 'public/programmes/ml');
     const files = fs.readdirSync(programmesDir);
     
     // Filtrer les fichiers HTML (exclure templates)

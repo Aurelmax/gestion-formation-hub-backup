@@ -28,7 +28,7 @@ async function updateTitresProgrammes() {
     console.log('🔄 Mise à jour des titres des programmes...');
     console.log('============================================');
     
-    const programmesDir = '/home/gestionmax-aur-lien/CascadeProjects/lovable/gestion-formation-hub-backup/public/programmes/ml';
+    const programmesDir = path.join(process.cwd(), 'public/programmes/ml');
     const files = fs.readdirSync(programmesDir);
     
     // Filtrer les fichiers HTML
