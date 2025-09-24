@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
-import { withAccelerate } from '@prisma/extension-accelerate';
-
-  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-}).$extends(withAccelerate());
 
 export async function GET(
   request: NextRequest,

@@ -1,23 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
-import { withAccelerate } from '@prisma/extension-accelerate';
 import { z } from 'zod';
-
-// Instance Prisma avec Accelerate et gestion de reconnexion
-  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
-  },
-  // Configuration pour gérer les déconnexions
-  __internal: {
-    engine: {
-      connectTimeout: 60000,
-      queryTimeout: 60000,
-    },
-  },
-}).$extends(withAccelerate());
 
 // Schéma de validation pour la création d'un rendez-vous
 const rendezvousSchema = z.object({

@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
-import { withAccelerate } from '@prisma/extension-accelerate';
-
-  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-}).$extends(withAccelerate());
 
 // Schéma de validation pour les compétences
 const competenceUpdateSchema = z.object({
