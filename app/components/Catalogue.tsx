@@ -17,7 +17,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 // 4. Autres composants
 import ProcessusPedagogique from './ProcessusPedagogique';
-import HeroSection from './HeroSection';
 
 // 5. Types et interfaces
 interface ProgrammeFormation {
@@ -225,9 +224,6 @@ export default function Catalogue() {
 
   return (
     <div className="bg-white">
-      {/* Section Hero */}
-      <HeroSection />
-      
       {/* Contenu principal */}
       <div className="container mx-auto px-4 py-8">
         {/* Filtres */}

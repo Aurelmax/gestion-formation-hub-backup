@@ -5,12 +5,14 @@ import Footer from '@/components/Footer';
 import CatalogueClient from '@/components/client/CatalogueClient';
 import WordPressFAQ from '@/components/wordpress/WordPressFAQ';
 import FormationsAdaptabilite from '@/components/catalogue/FormationsAdaptabilite';
+import ArticlesCarousel from '@/components/blog/ArticlesCarousel';
+import GSAPCatalogueSection from '@/components/animations/GSAPCatalogueSection';
 import { generateMetadata as generateSeoMetadata } from '@/lib/seo';
 import { SEO_CONFIG } from '@/lib/constants';
 
 export const metadata = generateSeoMetadata({
   title: 'Centre de Formation Professionnelle Certifié Qualiopi',
-  description: 'Organisme de formation professionnelle certifié Qualiopi. Catalogue complet de formations WordPress, développement web, bureautique et management. Formations éligibles CPF pour entreprises et particuliers.',
+  description: 'Organisme de formation professionnelle certifié Qualiopi. Catalogue complet de formations WordPress, développement web, bureautique et management. Blog expertise et conseils. Formations éligibles CPF pour entreprises et particuliers.',
   keywords: [
     'formation professionnelle',
     'catalogue formations',
@@ -23,7 +25,11 @@ export const metadata = generateSeoMetadata({
     'particuliers',
     'certification',
     'bureautique',
-    'management'
+    'management',
+    'blog WordPress',
+    'conseils experts',
+    'tutoriels',
+    'actualités formation'
   ],
   image: SEO_CONFIG.images.ogCatalogue,
 });
@@ -40,20 +46,8 @@ export default function HomePage() {
         {/* About Section - Pourquoi nous choisir */}
         <AboutSection />
 
-        {/* Section principale : Catalogue complet */}
-        <section id="catalogue" className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900">
-                Notre Catalogue de Formations
-              </h2>
-              <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-                Découvrez notre catalogue complet de formations professionnelles certifiées Qualiopi.
-                Formations éligibles CPF, adaptées aux entreprises et particuliers.
-              </p>
-            </div>
-          </div>
-        </section>
+        {/* Section principale : Catalogue complet avec GSAP */}
+        <GSAPCatalogueSection />
 
         {/* Catalogue complet intégré */}
         <section className="bg-gray-50">
@@ -63,6 +57,9 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* Section Articles Récents */}
+        <ArticlesCarousel />
 
         {/* Section Adaptabilité des formations */}
         <FormationsAdaptabilite />

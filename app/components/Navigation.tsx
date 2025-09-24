@@ -20,14 +20,6 @@ const Navigation = () => {
           Accueil
         </Button>
       </Link>
-      <Link href="/#catalogue">
-        <Button
-          variant="ghost"
-          className="text-base"
-        >
-          Formations
-        </Button>
-      </Link>
       <Link href="/blog">
         <Button 
           variant={isActive("/blog") ? "default" : "ghost"}

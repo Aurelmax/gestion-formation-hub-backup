@@ -89,8 +89,8 @@ export default async function FormationDetailPage({ params }: { params: { id: st
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6">
-          <Link 
-            href="/catalogue" 
+          <Link
+            href="/"
             className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
