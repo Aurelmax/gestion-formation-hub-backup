@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
 import { FileDown, Calendar, CheckCircle, BookOpen, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { generateFormationMetadata } from '@/lib/seo';
 
 interface ProgrammeFormation {
   id: string;
@@ -27,23 +28,20 @@ interface ProgrammeFormation {
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const formation = await getFormation(params.id);
-  
+
   if (!formation) {
     return {
       title: 'Formation non trouvée',
-      description: 'La formation demandée est introuvable.'
+      description: 'La formation demandée est introuvable.',
+      robots: { index: false, follow: false }
     };
   }
 
-  return {
-    title: `${formation.titre} | GestionMax`,
-    description: formation.description.substring(0, 160),
-    openGraph: {
-      title: formation.titre,
-      description: formation.description.substring(0, 160),
-      type: 'website',
-    },
-  };
+  return generateFormationMetadata({
+    titre: formation.titre,
+    description: formation.description,
+    id: formation.id,
+  });
 }
 
 async function getFormation(id: string): Promise<ProgrammeFormation | null> {

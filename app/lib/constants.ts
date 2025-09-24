@@ -6,6 +6,17 @@ export const SEO_CONFIG = {
   defaultDescription: 'Organisme de formation professionnelle certifié Qualiopi. Formations WordPress, développement web, bureautique et management.',
   locale: 'fr_FR' as const,
   type: 'website' as const,
+  images: {
+    ogDefault: '/images/og/og-default.jpg',
+    ogCatalogue: '/images/og/og-catalogue.jpg',
+    ogFormation: '/images/og/og-formation.jpg',
+    logo: '/logo-gestionmax-antibes.png',
+    qualiopiBadge: '/logo-qualiopi-gestionmax.webp',
+  },
+  twitter: {
+    site: '@gestionmax',
+    creator: '@aurelien_gmax',
+  },
 }
 
 export const SOCIAL_LINKS = {

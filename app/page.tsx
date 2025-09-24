@@ -1,27 +1,25 @@
-import { Metadata } from 'next';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import AboutSection from '@/components/AboutSection';
 import FormationsPreview from '@/components/FormationsPreview';
 import Footer from '@/components/Footer';
+import { generateMetadata as generateSeoMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'GestionMax Formation Hub - Centre de Formation Professionnelle',
+export const metadata = generateSeoMetadata({
+  title: 'Centre de Formation Professionnelle',
   description: 'Organisme de formation professionnelle certifié Qualiopi. Formations WordPress, développement web, bureautique et management pour entreprises et particuliers.',
-  keywords: ['formation professionnelle', 'WordPress', 'développement web', 'Qualiopi', 'organisme formation', 'entreprise', 'particuliers'],
-  openGraph: {
-    title: 'GestionMax Formation Hub - Centre de Formation Professionnelle',
-    description: 'Organisme de formation professionnelle certifié Qualiopi. Formations WordPress, développement web, bureautique et management.',
-    url: process.env.NEXT_PUBLIC_API_URL || 'https://gestionmax-formation-hub.vercel.app',
-    siteName: 'GestionMax Formation Hub',
-    locale: 'fr_FR',
-    type: 'website',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+  keywords: [
+    'formation professionnelle',
+    'WordPress',
+    'développement web',
+    'Qualiopi',
+    'organisme formation',
+    'entreprise',
+    'particuliers',
+    'CPF',
+    'certification'
+  ],
+});
 
 export default function HomePage() {
   return (

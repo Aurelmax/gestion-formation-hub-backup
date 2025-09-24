@@ -1,23 +1,27 @@
-import { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CatalogueClient from '@/components/client/CatalogueClient';
 import WordPressFAQ from '@/components/wordpress/WordPressFAQ';
 import FormationsAdaptabilite from '@/components/catalogue/FormationsAdaptabilite';
+import { generateMetadata as generateSeoMetadata } from '@/lib/seo';
+import { SEO_CONFIG } from '@/lib/constants';
 
-export const metadata: Metadata = {
-  title: 'Catalogue des Formations | GestionMax',
-  description: 'Découvrez notre catalogue complet de formations professionnelles. Filtrez par catégorie et trouvez la formation qui vous correspond.',
-  keywords: ['formations', 'catalogue', 'formations professionnelles', 'développement', 'bureautique', 'management'],
-  openGraph: {
-    title: 'Catalogue des Formations | GestionMax',
-    description: 'Découvrez notre catalogue complet de formations professionnelles.',
-    url: `${process.env.NEXT_PUBLIC_API_URL || 'https://gestionmax-formation-hub.vercel.app'}/catalogue`,
-    siteName: 'GestionMax Formation Hub',
-    locale: 'fr_FR',
-    type: 'website',
-  },
-};
+export const metadata = generateSeoMetadata({
+  title: 'Catalogue des Formations',
+  description: 'Découvrez notre catalogue complet de formations professionnelles certifiées Qualiopi. Formations WordPress, développement web, bureautique et management. Filtrez par catégorie et trouvez la formation qui vous correspond.',
+  url: '/catalogue',
+  image: SEO_CONFIG.images.ogCatalogue,
+  keywords: [
+    'catalogue formations',
+    'formations professionnelles',
+    'WordPress',
+    'développement web',
+    'bureautique',
+    'management',
+    'Qualiopi',
+    'CPF'
+  ],
+});
 
 export default function CataloguePage() {
   return (
