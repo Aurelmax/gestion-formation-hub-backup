@@ -16,7 +16,7 @@ export function useVeille() {
       if (type) params.append('type', type);
       if (statut) params.append('statut', statut);
 
-      const response = await fetch(`/api/veille?${params.toString()}`);
+      const response = await fetch(`/veille?${params.toString()}`);
       if (!response.ok) {
         throw new Error('Erreur lors du chargement des veilles');
       }
@@ -42,7 +42,7 @@ export function useVeille() {
   // Créer une nouvelle veille
   const createVeille = useCallback(async (nouvelleVeille: Omit<Veille, "id" | "dateCreation" | "commentaires" | "documents" | "historique">) => {
     try {
-      const response = await fetch('/api/veille', {
+      const response = await fetch('/veille', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export function useVeille() {
   // Mettre à jour le statut d'une veille
   const updateStatut = useCallback(async (id: string, statut: StatutVeille) => {
     try {
-      const response = await fetch(`/api/veille/${id}`, {
+      const response = await fetch(`/veille/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export function useVeille() {
   // Mettre à jour l'avancement d'une veille
   const updateAvancement = useCallback(async (id: string, avancement: number) => {
     try {
-      const response = await fetch(`/api/veille/${id}`, {
+      const response = await fetch(`/veille/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ export function useVeille() {
   // Ajouter un commentaire à une veille
   const addCommentaire = useCallback(async (id: string, contenu: string) => {
     try {
-      const response = await fetch(`/api/veille/${id}/commentaire`, {
+      const response = await fetch(`/veille/${id}/commentaire`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,7 +159,7 @@ export function useVeille() {
   // Mettre à jour une veille complètement
   const updateVeille = useCallback(async (id: string, veilleData: Partial<Omit<Veille, "id" | "dateCreation" | "commentaires" | "documents" | "historique">>) => {
     try {
-      const response = await fetch(`/api/veille/${id}`, {
+      const response = await fetch(`/veille/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +192,7 @@ export function useVeille() {
   // Supprimer une veille
   const deleteVeille = useCallback(async (id: string) => {
     try {
-      const response = await fetch(`/api/veille/${id}`, {
+      const response = await fetch(`/veille/${id}`, {
         method: 'DELETE',
       });
 
@@ -213,7 +213,7 @@ export function useVeille() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch(`/api/veille/${veilleId}/documents`, {
+      const response = await fetch(`/veille/${veilleId}/documents`, {
         method: 'POST',
         body: formData,
       });
@@ -242,7 +242,7 @@ export function useVeille() {
   // Supprimer un document d'une veille
   const deleteDocument = useCallback(async (veilleId: string, documentId: string) => {
     try {
-      const response = await fetch(`/api/veille/${veilleId}/documents?documentId=${documentId}`, {
+      const response = await fetch(`/veille/${veilleId}/documents?documentId=${documentId}`, {
         method: 'DELETE',
       });
 
@@ -265,7 +265,7 @@ export function useVeille() {
   // Modifier un commentaire
   const updateCommentaire = useCallback(async (veilleId: string, commentaireId: string, contenu: string) => {
     try {
-      const response = await fetch(`/api/veille/${veilleId}/commentaires/${commentaireId}`, {
+      const response = await fetch(`/veille/${veilleId}/commentaires/${commentaireId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -288,7 +288,7 @@ export function useVeille() {
   // Supprimer un commentaire
   const deleteCommentaire = useCallback(async (veilleId: string, commentaireId: string) => {
     try {
-      const response = await fetch(`/api/veille/${veilleId}/commentaires/${commentaireId}`, {
+      const response = await fetch(`/veille/${veilleId}/commentaires/${commentaireId}`, {
         method: 'DELETE',
       });
 

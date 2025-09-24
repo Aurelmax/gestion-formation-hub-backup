@@ -32,8 +32,8 @@ export default function CategoriesManager() {
     try {
       const method = editingId ? 'PATCH' : 'POST';
       const url = editingId 
-        ? `/api/categories/${editingId}`
-        : '/api/categories';
+        ? `/categories/${editingId}`
+        : '/categories';
       
       const response = await fetch(url, {
         method,

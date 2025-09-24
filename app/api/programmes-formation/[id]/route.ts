@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import { PROGRAMME_TYPE_ENUM } from '@/types/programmes';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // Schéma de validation partiel pour les mises à jour - Version assouplie
 const updateProgrammeSchema = z.object({
@@ -11,7 +9,7 @@ const updateProgrammeSchema = z.object({
   code: z.string().min(1, 'Le code est requis').optional(),
   type: z.enum(PROGRAMME_TYPE_ENUM).optional(),
   titre: z.string().min(1, 'Le titre est requis').optional(),
-  description: z.string().min(1, 'La description est requise').optional(),
+  description: z.string().optional(),
   duree: z.string().min(1, 'La durée est requise').optional(),
   prix: z.string().min(1, 'Le prix est requis').optional(),
   
@@ -40,12 +38,13 @@ const updateProgrammeSchema = z.object({
   estActif: z.boolean().optional(),
   estVisible: z.boolean().optional(),
   version: z.number().int().positive().optional(),
-  objectifsSpecifiques: z.string().optional(),
+  objectifsSpecifiques: z.string().optional().nullable(),
   programmeUrl: z.string().url('URL de programme invalide').optional().nullable(),
   ressourcesAssociees: z.array(z.string()).optional(),
   beneficiaireId: z.string().uuid('ID de bénéficiaire invalide').optional().nullable(),
   formateurId: z.string().uuid('ID de formateur invalide').optional().nullable(),
   programmeSourId: z.string().uuid('ID de programme source invalide').optional().nullable(),
+  positionnementRequestId: z.string().uuid('ID de demande de positionnement invalide').optional().nullable(),
 });
 
 // GET /api/programmes-formation/[id] - Récupérer un programme par son ID
@@ -103,8 +102,17 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
+
+    // Debug: Log des headers reçus
+    const contentType = request.headers.get('content-type');
+    console.log('📄 PUT Content-Type reçu:', contentType);
+
     const data = await request.json();
-    
+
+    // Debug: Log des données reçues et leur type
+    console.log('📋 PUT Données reçues pour mise à jour programme:', JSON.stringify(data, null, 2));
+    console.log('🔍 PUT Type des données:', typeof data);
+
     // Vérifier si le programme existe
     const existingProgramme = await prisma.programmeFormation.findUnique({
       where: { id },
@@ -121,10 +129,11 @@ export async function PUT(
     const validation = updateProgrammeSchema.safeParse(data);
     
     if (!validation.success) {
+      console.error('❌ PUT Validation échouée:', validation.error.errors);
       return NextResponse.json(
-        { 
+        {
           error: 'Données invalides',
-          details: validation.error.errors 
+          details: validation.error.errors
         },
         { status: 400 }
       );
@@ -194,10 +203,11 @@ export async function PATCH(
     const validation = updateProgrammeSchema.safeParse(data);
     
     if (!validation.success) {
+      console.error('❌ PUT Validation échouée:', validation.error.errors);
       return NextResponse.json(
-        { 
+        {
           error: 'Données invalides',
-          details: validation.error.errors 
+          details: validation.error.errors
         },
         { status: 400 }
       );

@@ -35,7 +35,7 @@ const FormationDetailsPage: React.FC = () => {
     const fetchFormationDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/programmes-formation/${id}`);
+        const response = await axios.get(`/programmes-formation/${id}`);
         setFormation(response.data);
       } catch (err) {
         console.error("Erreur lors de la récupération des détails de la formation:", err);

@@ -65,7 +65,7 @@ const ContactForm = ({
     setIsSubmitting(true);
     
     try {
-      const response = await fetch('/api/rendezvous', {
+      const response = await fetch('/rendezvous', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

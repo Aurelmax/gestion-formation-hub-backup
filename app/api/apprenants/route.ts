@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
 import { withAccelerate } from '@prisma/extension-accelerate';
 import { z } from 'zod';
 
-const prisma = new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
 }).$extends(withAccelerate());
 

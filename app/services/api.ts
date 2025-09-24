@@ -8,8 +8,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || (
 
 // Configuration d'axios avec le token JWT s'il existe
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: `${API_URL}/api`,
   withCredentials: true, // Important pour les cookies de session
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
 });
 
 // Interception des requêtes pour ajouter le token d'authentification

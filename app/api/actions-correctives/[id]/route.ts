@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
 
-const prisma = new PrismaClient();
+
 
 // Schéma pour les mises à jour
 const updateActionCorrectiveSchema = z.object({

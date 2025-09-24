@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
-const prisma = new PrismaClient();
+
 
 // Taille maximale des fichiers: 10MB
 const MAX_FILE_SIZE = 10 * 1024 * 1024;

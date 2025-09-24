@@ -170,7 +170,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
     setError(null);
     try {
       // Construction de l'URL avec filtrage optionnel par statut et/ou type
-      let url = '/api/rendezvous';
+      let url = '/rendezvous';
       const params = [];
       
       if (statut) params.push(`statut=${encodeURIComponent(statut)}`);
@@ -276,7 +276,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
         commentaires: data.commentaires,
       };
 
-      const response = await api.post<ApiResponse<Rendezvous>>('/api/rendezvous', apiData);
+      const response = await api.post<ApiResponse<Rendezvous>>('/rendezvous', apiData);
       const newRendezvous = Array.isArray(response.data) ? response.data[0] : response.data;
       
       // Mettre à jour la liste locale
@@ -290,7 +290,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
 
   const updateRendezvous = async (id: string, data: Partial<Rendezvous>): Promise<Rendezvous> => {
     try {
-      const response = await api.put<ApiResponse<Rendezvous>>(`/api/rendezvous/${id}`, data);
+      const response = await api.put<ApiResponse<Rendezvous>>(`/rendezvous/${id}`, data);
       const updatedRendezvous = Array.isArray(response.data) ? response.data[0] : response.data;
       
       // Mettre à jour la liste locale
@@ -304,7 +304,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
 
   const updateRendezvousStatut = async (id: string, statut: string): Promise<Rendezvous> => {
     try {
-      const response = await api.put<ApiResponse<Rendezvous>>(`/api/rendezvous/${id}/statut`, { statut });
+      const response = await api.put<ApiResponse<Rendezvous>>(`/rendezvous/${id}/statut`, { statut });
       const updatedRendezvous = Array.isArray(response.data) ? response.data[0] : response.data;
       
       // Mettre à jour la liste locale
@@ -318,7 +318,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
 
   const deleteRendezvous = async (id: string): Promise<void> => {
     try {
-      await api.delete(`/api/rendezvous/${id}`);
+      await api.delete(`/rendezvous/${id}`);
       // Mettre à jour la liste locale
       await fetchRendezvous();
     } catch (err) {
@@ -339,7 +339,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
   const validerRendezvous = async (id: string, formatRdv?: string, dateRdv?: string): Promise<Rendezvous> => {
     try {
       const response = await api.put<ApiResponse<Rendezvous>>(
-        `/api/rendezvous/${id}/valider`, 
+        `/rendezvous/${id}/valider`, 
         { formatRdv, dateRdv }
       );
       
@@ -373,7 +373,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
   const planifierImpact = async (id: string, dateImpact?: string): Promise<Rendezvous> => {
     try {
       const response = await api.post<ApiResponse<{rendezvous: Rendezvous}>>(
-        `/api/rendezvous/${id}/impact/planifier`, 
+        `/rendezvous/${id}/impact/planifier`, 
         { dateImpact }
       );
       
@@ -405,7 +405,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
   const completerEvaluationImpact = async (id: string, evaluationData: ImpactEvaluationData): Promise<Rendezvous> => {
     try {
       const response = await api.put<ApiResponse<{rendezvous: Rendezvous}>>(
-        `/api/rendezvous/${id}/impact/evaluation`, 
+        `/rendezvous/${id}/impact/evaluation`, 
         evaluationData
       );
       
@@ -436,7 +436,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
   const terminerImpact = async (id: string): Promise<Rendezvous> => {
     try {
       const response = await api.put<ApiResponse<{rendezvous: Rendezvous}>>(
-        `/api/rendezvous/${id}/impact/terminer`
+        `/rendezvous/${id}/impact/terminer`
       );
       
       let updatedRendezvous: Rendezvous;
@@ -466,7 +466,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
   const genererRapportImpact = async (id: string): Promise<{rapportUrl: string}> => {
     try {
       const response = await api.get<ApiResponse<{rapportUrl: string}>>(
-        `/api/rendezvous/${id}/impact/rapport`
+        `/rendezvous/${id}/impact/rapport`
       );
       
       let result: {rapportUrl: string};
@@ -479,7 +479,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
         result = { rapportUrl: String(((response.data.message as {rapportUrl: unknown}).rapportUrl)) };
       } else {
         // Fallback si le format de réponse est différent
-        result = { rapportUrl: '/api/rapports/default.pdf' };
+        result = { rapportUrl: '/rapports/default.pdf' };
       }
       
       return result;
@@ -498,7 +498,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
   const annulerRendezvous = async (id: string, raison?: string): Promise<Rendezvous> => {
     try {
       const response = await api.post<ApiResponse<Rendezvous>>(
-        `/api/rendezvous/${id}/annuler`, 
+        `/rendezvous/${id}/annuler`, 
         { raison }
       );
       
@@ -532,7 +532,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
   ): Promise<Rendezvous> => {
     try {
       const response = await api.post<ApiResponse<Rendezvous>>(
-        `/api/rendezvous/${id}/reprogrammer`, 
+        `/rendezvous/${id}/reprogrammer`, 
         { dateRdv: nouvelleDateRdv, formatRdv }
       );
       
@@ -566,7 +566,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
   }): Promise<Rendezvous> => {
     try {
       const response = await api.post<ApiResponse<Rendezvous>>(
-        `/api/rendezvous/${id}/impact/evaluation`, 
+        `/rendezvous/${id}/impact/evaluation`, 
         evaluationData
       );
       
@@ -602,7 +602,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
   const editerCompteRendu = async (id: string, synthese: string, notes?: string): Promise<Rendezvous> => {
     try {
       const response = await api.put<ApiResponse<Rendezvous>>(
-        `/api/rendezvous/${id}/compte-rendu`, 
+        `/rendezvous/${id}/compte-rendu`, 
         { synthese, notes }
       );
       
@@ -630,7 +630,7 @@ export const useRendezvous = (): UseRendezvousReturn => {
   const genererProgrammeEtDossier = async (id: string): Promise<{programmeId: string; dossierId: string}> => {
     try {
       const response = await api.post<{programmeId: string; dossierId: string}>(
-        `/api/rendezvous/${id}/generer-programme`
+        `/rendezvous/${id}/generer-programme`
       );
       
       if (response.data && 'programmeId' in response.data && 'dossierId' in response.data) {

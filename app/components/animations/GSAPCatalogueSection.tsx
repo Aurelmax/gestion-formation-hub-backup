@@ -220,6 +220,7 @@ export default function GSAPCatalogueSection({ children }: GSAPCatalogueSectionP
       ref={sectionRef}
       id="catalogue"
       className="relative bg-gradient-to-br from-slate-200 via-purple-100/40 to-cyan-100/50 shadow-sm overflow-hidden"
+      suppressHydrationWarning={true}
     >
       {/* Pattern géométrique moderne - hexagones */}
       <div className="background-pattern absolute inset-0 opacity-[0.08]" style={{

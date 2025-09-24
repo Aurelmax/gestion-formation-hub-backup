@@ -17,7 +17,7 @@ export const useApprenants = () => {
   const fetchApprenants = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/apprenants');
+      const response = await api.get('/apprenants');
       setApprenants(response.data);
     } catch (error) {
       console.error('Erreur lors du chargement des apprenants:', error);
@@ -34,7 +34,7 @@ export const useApprenants = () => {
     apprenantData: Omit<Apprenant, 'id' | 'createdAt'>
   ) => {
     try {
-      const response = await api.post('/api/apprenants', apprenantData);
+      const response = await api.post('/apprenants', apprenantData);
       const newApprenant = response.data;
       setApprenants(prev => [newApprenant, ...prev]);
       return newApprenant;
@@ -46,7 +46,7 @@ export const useApprenants = () => {
 
   const updateApprenant = async (id: string, apprenantData: Partial<Apprenant>) => {
     try {
-      const response = await api.put(`/api/apprenants/${id}`, apprenantData);
+      const response = await api.put(`/apprenants/${id}`, apprenantData);
       const updated = response.data;
       setApprenants(prev => prev.map(a => (a.id === id ? updated : a)));
     } catch (error) {

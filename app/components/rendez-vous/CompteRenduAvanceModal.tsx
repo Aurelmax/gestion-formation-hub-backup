@@ -43,7 +43,7 @@ export default function CompteRenduAvanceModal({
 
     try {
       setLoading(true);
-      await api.put(`/api/rendezvous/${rendezvous.id}/compte-rendu`, {
+      await api.put(`/rendezvous/${rendezvous.id}/compte-rendu`, {
         ...data,
         rendezvousId: rendezvous.id,
       });
@@ -82,7 +82,7 @@ export default function CompteRenduAvanceModal({
 
     try {
       setGenerationLoading(true);
-      const response = await api.post(`/api/rendezvous/${rendezvous.id}/generer-programme-dossier`);
+      const response = await api.post(`/rendezvous/${rendezvous.id}/generer-programme-dossier`);
       
       toast({
         title: "Programme et dossier générés",

@@ -28,15 +28,48 @@ const CompetenceManager = dynamic(() => import("@/components/competences/Compete
   ssr: false
 });
 
-// Imports normaux pour les composants plus petits
-import FormationsList from "@/components/formations/FormationsList";
-import ApprenantsList from "@/components/apprenants/ApprenantsList";
-import ConformiteQualiopi from "@/components/conformite/ConformiteQualiopi";
-import AccessibiliteManager from "@/components/accessibilite/AccessibiliteManager";
-import VeilleManager from "@/components/veille/VeilleManager";
-import ReclamationsList from "@/components/reclamations/ReclamationsList";
-import ActionsCorrectivesList from "@/components/actions-correctives/ActionsCorrectivesList";
-import CategoriesManager from "@/components/admin/CategoriesManager";
+// Lazy loading pour tous les gros composants d'onglets
+const FormationsList = dynamic(() => import("@/components/formations/FormationsList"), {
+  loading: () => <LazyLoadingSpinner />,
+  ssr: false
+});
+
+const ApprenantsList = dynamic(() => import("@/components/apprenants/ApprenantsList"), {
+  loading: () => <LazyLoadingSpinner />,
+  ssr: false
+});
+
+const ConformiteQualiopi = dynamic(() => import("@/components/conformite/ConformiteQualiopi"), {
+  loading: () => <LazyLoadingSpinner />,
+  ssr: false
+});
+
+const AccessibiliteManager = dynamic(() => import("@/components/accessibilite/AccessibiliteManager"), {
+  loading: () => <LazyLoadingSpinner />,
+  ssr: false
+});
+
+const VeilleManager = dynamic(() => import("@/components/veille/VeilleManager"), {
+  loading: () => <LazyLoadingSpinner />,
+  ssr: false
+});
+
+const ReclamationsList = dynamic(() => import("@/components/reclamations/ReclamationsList"), {
+  loading: () => <LazyLoadingSpinner />,
+  ssr: false
+});
+
+const ActionsCorrectivesList = dynamic(() => import("@/components/actions-correctives/ActionsCorrectivesList"), {
+  loading: () => <LazyLoadingSpinner />,
+  ssr: false
+});
+
+const CategoriesManager = dynamic(() => import("@/components/admin/CategoriesManager"), {
+  loading: () => <LazyLoadingSpinner />,
+  ssr: false
+});
+
+// Imports normaux pour les composants légers
 import Header from "@/components/Header";
 
 function DashboardContent() {
@@ -53,18 +86,52 @@ function DashboardContent() {
 
     if (tab) setActiveTab(tab);
     if (subtab) setActiveSubTab(subtab);
-    
+
     // Si un programme spécifique est demandé, s'assurer qu'on est dans le bon onglet
     if (programme && tab === 'formations' && subtab === 'bibliotheque') {
       setActiveTab('formations');
       setActiveSubTab('bibliotheque');
     }
-    
+
     // Redirection des anciennes URLs
     if (subtab === 'admin' || subtab === 'publiees' || subtab === 'catalogue') {
       setActiveSubTab('bibliotheque');
     }
   }, [searchParams]);
+
+  // Preloading intelligent des données critiques
+  useEffect(() => {
+    const preloadCriticalData = async () => {
+      try {
+        // Précharger les catégories (utilisées par plusieurs onglets)
+        const preloadPromises = [
+          fetch('/api/categories').then(r => r.json()).catch(() => null)
+        ];
+
+        // Précharger conditionnellement selon l'onglet actif
+        if (activeTab === 'formations') {
+          preloadPromises.push(
+            fetch('/api/programmes-formation?limit=10').then(r => r.json()).catch(() => null)
+          );
+        } else if (activeTab === 'apprenants') {
+          preloadPromises.push(
+            fetch('/api/apprenants?limit=5').then(r => r.json()).catch(() => null)
+          );
+        } else if (activeTab === 'rendez-vous') {
+          preloadPromises.push(
+            fetch('/api/rendezvous?limit=5').then(r => r.json()).catch(() => null)
+          );
+        }
+
+        await Promise.allSettled(preloadPromises);
+        console.log('✅ Critical data preloaded for tab:', activeTab);
+      } catch (error) {
+        console.warn('⚠️ Preloading failed:', error);
+      }
+    };
+
+    preloadCriticalData();
+  }, [activeTab]);
 
   return (
     <div className="min-h-screen bg-gray-50">

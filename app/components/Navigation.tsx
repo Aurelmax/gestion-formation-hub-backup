@@ -54,8 +54,11 @@ const Navigation = () => {
               Espace Apprenant
             </Button>
           </Link>
-          <Link href="/dashboard">
-            <Button 
+          <Link
+            href="/dashboard"
+            prefetch={true}
+          >
+            <Button
               variant={isActive("/dashboard") ? "default" : "ghost"}
               className="text-base bg-primary/10 hover:bg-primary/20"
             >

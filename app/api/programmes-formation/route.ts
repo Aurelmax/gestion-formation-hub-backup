@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { createHash } from 'crypto';
 import { PROGRAMME_TYPE_ENUM } from '@/types/programmes';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // Schéma de validation avec Zod - Version assouplie pour compatibilité frontend
 const programmeSchema = z.object({
@@ -12,7 +11,7 @@ const programmeSchema = z.object({
   code: z.string().min(1, 'Le code est requis'),
   type: z.enum(PROGRAMME_TYPE_ENUM),
   titre: z.string().min(1, 'Le titre est requis'),
-  description: z.string().min(1, 'La description est requise'),
+  description: z.string().default(''),
   duree: z.string().min(1, 'La durée est requise'),
   prix: z.string().min(1, 'Le prix est requis'),
   
@@ -23,7 +22,7 @@ const programmeSchema = z.object({
   objectifs: z.array(z.string()).optional().default([]),
   prerequis: z.string().optional().default('Aucun prérequis spécifique'),
   publicConcerne: z.string().optional().default('Tout public'),
-  contenuDetailleJours: z.string().optional().default('Contenu détaillé à venir'),
+  contenuDetailleJours: z.string().default(''),
   
   // Champs de modalités optionnels avec valeurs par défaut
   modalites: z.string().optional().default('En présentiel individuel'),
@@ -49,12 +48,13 @@ const programmeSchema = z.object({
   estActif: z.boolean().optional().default(true),
   estVisible: z.boolean().optional().default(true),
   version: z.number().int().positive().optional().default(1),
-  objectifsSpecifiques: z.string().optional(),
+  objectifsSpecifiques: z.string().optional().nullable(),
   programmeUrl: z.string().url('URL de programme invalide').optional().nullable(),
   ressourcesAssociees: z.array(z.string()).optional().default([]),
   beneficiaireId: z.string().uuid('ID de bénéficiaire invalide').optional().nullable(),
   formateurId: z.string().uuid('ID de formateur invalide').optional().nullable(),
   programmeCatalogueId: z.string().uuid('ID de programme catalogue invalide').optional().nullable(),
+  positionnementRequestId: z.string().uuid('ID de demande de positionnement invalide').optional().nullable(),
 });
 
 // Schéma de validation des paramètres de requête
@@ -274,16 +274,25 @@ export async function GET(request: NextRequest) {
 // POST /api/programmes-formation - Créer un nouveau programme
 export async function POST(request: NextRequest) {
   try {
+    // Debug: Log des headers reçus
+    const contentType = request.headers.get('content-type');
+    console.log('📄 Content-Type reçu:', contentType);
+
     const data = await request.json();
-    
+
+    // Debug: Log des données reçues et leur type
+    console.log('📋 Données reçues pour création programme:', JSON.stringify(data, null, 2));
+    console.log('🔍 Type des données:', typeof data);
+
     // Validation des données
     const validation = programmeSchema.safeParse(data);
-    
+
     if (!validation.success) {
+      console.error('❌ Validation échouée:', validation.error.errors);
       return NextResponse.json(
-        { 
+        {
           error: 'Données invalides',
-          details: validation.error.errors 
+          details: validation.error.errors
         },
         { status: 400 }
       );

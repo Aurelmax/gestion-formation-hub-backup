@@ -32,29 +32,47 @@ export const useAccessibilite = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      // Récupérer les plans d'accessibilité via l'API
-      const plansResponse = await api.get('/accessibilite/plans');
 
-      // Récupérer les demandes d'accessibilité via l'API
-      const demandesResponse = await api.get('/accessibilite/demandes');
+      // Récupérer les plans d'accessibilité via l'API (avec gestion d'erreur 404)
+      try {
+        const plansResponse = await api.get('/accessibilite/plans');
+        const plansFormates = plansResponse.data.map((plan: any) => ({
+          ...plan,
+          dateCreation: new Date(plan.dateCreation),
+          dateModification: new Date(plan.dateModification)
+        }));
+        setPlansAccessibilite(plansFormates);
+      } catch (plansError: any) {
+        if (plansError.response?.status === 404) {
+          console.warn("API plans d'accessibilité non disponible (404)");
+          setPlansAccessibilite([]);
+        } else {
+          throw plansError;
+        }
+      }
 
-      // Convertir les dates string en objets Date
-      const plansFormates = plansResponse.data.map((plan: any) => ({
-        ...plan,
-        dateCreation: new Date(plan.dateCreation),
-        dateModification: new Date(plan.dateModification)
-      }));
+      // Récupérer les demandes d'accessibilité via l'API (avec gestion d'erreur 404)
+      try {
+        const demandesResponse = await api.get('/accessibilite/demandes');
+        const demandesFormatees = demandesResponse.data.map((demande: any) => ({
+          ...demande,
+          dateCreation: new Date(demande.dateCreation),
+          dateResolution: demande.dateResolution ? new Date(demande.dateResolution) : undefined
+        }));
+        setDemandesAccessibilite(demandesFormatees);
+      } catch (demandesError: any) {
+        if (demandesError.response?.status === 404) {
+          console.warn("API demandes d'accessibilité non disponible (404)");
+          setDemandesAccessibilite([]);
+        } else {
+          throw demandesError;
+        }
+      }
 
-      const demandesFormatees = demandesResponse.data.map((demande: any) => ({
-        ...demande,
-        dateCreation: new Date(demande.dateCreation),
-        dateResolution: demande.dateResolution ? new Date(demande.dateResolution) : undefined
-      }));
-
-      setPlansAccessibilite(plansFormates);
-      setDemandesAccessibilite(demandesFormatees);
     } catch (error) {
       console.error("Erreur lors du chargement des données d'accessibilité:", error);
+      setPlansAccessibilite([]);
+      setDemandesAccessibilite([]);
     } finally {
       setLoading(false);
     }

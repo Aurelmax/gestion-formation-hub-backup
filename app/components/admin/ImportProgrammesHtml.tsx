@@ -50,7 +50,7 @@ const ImportProgrammesHtml = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axios.get('/api/programmes-html');
+      const response = await axios.get('/programmes-html');
       
       if (response.data && Array.isArray(response.data)) {
         setHtmlTemplates(response.data);
@@ -74,7 +74,7 @@ const ImportProgrammesHtml = () => {
       setSuccess(null);
       setImportResults(null);
       
-      const response = await axios.post('/api/programmes-html/import-to-db');
+      const response = await axios.post('/programmes-html/import-to-db');
       
       if (response.data && response.data.results) {
         setImportResults(response.data);

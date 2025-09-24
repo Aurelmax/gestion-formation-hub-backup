@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
 import { withAccelerate } from '@prisma/extension-accelerate';
 import { z } from 'zod';
 
 // Instance Prisma avec Accelerate et gestion de reconnexion
-const prisma = new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
   datasources: {
     db: {

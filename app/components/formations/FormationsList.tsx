@@ -267,7 +267,7 @@ const FormationsList = () => {
 
   const handleDelete = useCallback(async (id: string) => {
     try {
-      await api.delete(`/api/programmes-formation/${id}`);
+      await api.delete(`/programmes-formation/${id}`);
       
       toast({
         title: "Succès",

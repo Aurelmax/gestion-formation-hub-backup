@@ -52,8 +52,8 @@ export default function ProgrammesPersonnalises() {
     try {
       setLoading(true);
       const endpoint = statut && statut !== 'tous' 
-        ? `/api/programmes-personnalises?statut=${statut}` 
-        : '/api/programmes-personnalises';
+        ? `/programmes-personnalises?statut=${statut}` 
+        : '/programmes-personnalises';
       
       const response = await api.get<ApiResponse<ProgrammePersonnalise[]>>(endpoint);
       
@@ -152,7 +152,7 @@ export default function ProgrammesPersonnalises() {
 
   const handleValidateProgramme = async (programmeId: string) => {
     try {
-      await api.put<ApiResponse<ProgrammePersonnalise>>(`/api/programmes-personnalises/${programmeId}/valider`);
+      await api.put<ApiResponse<ProgrammePersonnalise>>(`/programmes-personnalises/${programmeId}/valider`);
       toast({
         title: 'Programme validé',
         description: 'Le programme a été validé avec succès.',
@@ -174,7 +174,7 @@ export default function ProgrammesPersonnalises() {
     }
 
     try {
-      await api.delete<ApiResponse<void>>(`/api/programmes-personnalises/${programmeId}`);
+      await api.delete<ApiResponse<void>>(`/programmes-personnalises/${programmeId}`);
       toast({
         title: 'Programme supprimé',
         description: 'Le programme a été supprimé avec succès.',
@@ -192,7 +192,7 @@ export default function ProgrammesPersonnalises() {
 
   const handleGenerateDocument = async (programmeId: string) => {
     try {
-      const response = await api.post<{url: string}>(`/api/programmes-personnalises/${programmeId}/generer-document`);
+      const response = await api.post<{url: string}>(`/programmes-personnalises/${programmeId}/generer-document`);
       if (response.data && response.data.url) {
         window.open(response.data.url, '_blank');
         toast({

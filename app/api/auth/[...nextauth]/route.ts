@@ -1,19 +1,8 @@
 import NextAuth from "next-auth"
 import { PrismaAdapter } from '@auth/prisma-adapter';
-import { PrismaClient } from '@prisma/client';
-import { withAccelerate } from '@prisma/extension-accelerate';
+import { prisma } from "@/lib/prisma";
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-
-// Instance Prisma avec gestion d'erreur améliorée
-const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
-  },
-}).$extends(withAccelerate());
 
 const handler = NextAuth({
   adapter: PrismaAdapter(prisma),

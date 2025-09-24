@@ -65,7 +65,7 @@ export const useActionsCorrectives = () => {
   const fetchActionsCorrectives = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/actions-correctives');
+      const response = await api.get('/actions-correctives');
 
       setActionsCorrectives(response.data);
     } catch (error) {
@@ -82,7 +82,7 @@ export const useActionsCorrectives = () => {
   const createActionCorrective = async (data: CreateActionCorrectiveData) => {
     try {
       // Créer l'action corrective via l'API
-      await api.post('/api/actions-correctives', {
+      await api.post('/actions-correctives', {
         titre: data.titre,
         description: data.description,
         origineType: data.origineType,
@@ -116,7 +116,7 @@ export const useActionsCorrectives = () => {
   const updateActionCorrective = async (id: string, updates: Partial<ActionCorrective>) => {
     try {
       // Mettre à jour l'action corrective via l'API
-      await api.put(`/api/actions-correctives/${id}`, updates);
+      await api.put(`/actions-correctives/${id}`, updates);
 
       toast({
         title: "Action corrective mise à jour",
@@ -137,7 +137,7 @@ export const useActionsCorrectives = () => {
 
   const deleteActionCorrective = async (id: string) => {
     try {
-      await api.delete(`/api/actions-correctives/${id}`);
+      await api.delete(`/actions-correctives/${id}`);
 
       toast({
         title: "Action corrective supprimée",

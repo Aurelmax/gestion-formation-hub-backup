@@ -150,7 +150,7 @@ const WorkflowPositionnement = ({ positionnementRequest, onCancel, onComplete }:
       }
 
       // Marquer la demande de positionnement comme traitée via l'API
-      await api.put(`/api/positionnement-requests/${positionnementRequest.id}/status`, {
+      await api.put(`/positionnement-requests/${positionnementRequest.id}/status`, {
         status: 'traite'
       });
 

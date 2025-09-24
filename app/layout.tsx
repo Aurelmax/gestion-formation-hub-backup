@@ -42,7 +42,7 @@ export const metadata = {
 export default function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="fr" className={inter.variable}>
-      <body className="font-sans antialiased">
+      <body className={`${inter.className} antialiased`}>
         <Providers>
           {children}
         </Providers>

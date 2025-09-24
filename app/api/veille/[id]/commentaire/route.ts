@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
 
-const prisma = new PrismaClient();
+
 
 const commentaireSchema = z.object({
   contenu: z.string().min(1, 'Le commentaire ne peut pas être vide'),

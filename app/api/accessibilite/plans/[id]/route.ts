@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+
 
 // GET - Récupérer un plan d'accessibilité spécifique
 export async function GET(

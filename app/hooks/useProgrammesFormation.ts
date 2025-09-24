@@ -41,7 +41,7 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
   // Charger les catégories
   const fetchCategories = useCallback(async () => {
     try {
-      const response = await api.get('/api/categories');
+      const response = await api.get('/categories');
       const categoriesData = response.data || [];
       setCategories(categoriesData);
       return categoriesData;
@@ -58,7 +58,7 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
       setLoading(true);
       setError(null);
 
-      let url = '/api/programmes-formation';
+      let url = '/programmes-formation';
       const params = new URLSearchParams();
       
       if (filters?.type) params.append('type', filters.type);
@@ -93,7 +93,11 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
   const createProgramme = useCallback(async (programmeData: Partial<ProgrammeFormation>) => {
     try {
       setLoading(true);
-      const response = await api.post('/api/programmes-formation', programmeData);
+
+      // Debug: Log des données envoyées côté client
+      console.log('🚀 Client - Données à envoyer:', JSON.stringify(programmeData, null, 2));
+
+      const response = await api.post('/programmes-formation', programmeData);
       await fetchProgrammes();
       toast({
         title: 'Succès',
@@ -115,7 +119,7 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
   const updateProgramme = useCallback(async (id: string, programmeData: Partial<ProgrammeFormation>) => {
     try {
       setLoading(true);
-      const response = await api.put(`/api/programmes-formation/${id}`, programmeData);
+      const response = await api.put(`/programmes-formation/${id}`, programmeData);
       await fetchProgrammes();
       toast({
         title: 'Succès',
@@ -137,7 +141,7 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
   const deleteProgramme = useCallback(async (id: string) => {
     try {
       setLoading(true);
-      await api.delete(`/api/programmes-formation/${id}`);
+      await api.delete(`/programmes-formation/${id}`);
       await fetchProgrammes();
       toast({
         title: 'Succès',
@@ -158,7 +162,7 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
   const duplicateProgramme = useCallback(async (id: string) => {
     try {
       setLoading(true);
-      const response = await api.post(`/api/programmes-formation/duplicate/${id}`);
+      const response = await api.post(`/programmes-formation/duplicate/${id}`);
       await fetchProgrammes();
       toast({
         title: 'Succès',
