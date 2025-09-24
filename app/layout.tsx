@@ -19,8 +19,24 @@ type LayoutProps = {
 };
 
 export const metadata = {
-  title: 'GestionMax Formation Hub',
-  description: 'Plateforme de gestion des formations',
+  title: {
+    default: 'GestionMax Formation Hub',
+    template: '%s | GestionMax Formation Hub'
+  },
+  description: 'Organisme de formation professionnelle certifié Qualiopi. Spécialisé dans les formations WordPress, développement web, bureautique et management.',
+  keywords: ['formation professionnelle', 'Qualiopi', 'WordPress', 'développement web', 'organisme formation'],
+  authors: [{ name: 'GestionMax' }],
+  creator: 'GestionMax',
+  publisher: 'GestionMax',
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    siteName: 'GestionMax Formation Hub',
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps) {

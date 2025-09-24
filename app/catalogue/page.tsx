@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Catalogue des Formations | GestionMax',
     description: 'Découvrez notre catalogue complet de formations professionnelles.',
-    url: 'https://votresite.com/catalogue',
-    siteName: 'GestionMax',
+    url: `${process.env.NEXT_PUBLIC_API_URL || 'https://gestionmax-formation-hub.vercel.app'}/catalogue`,
+    siteName: 'GestionMax Formation Hub',
     locale: 'fr_FR',
     type: 'website',
   },

@@ -4,17 +4,35 @@ import HeroSection from '@/components/HeroSection';
 import AboutSection from '@/components/AboutSection';
 import FormationsPreview from '@/components/FormationsPreview';
 import Footer from '@/components/Footer';
-import { ArrowDownCircle } from 'lucide-react';
-import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
-  title: 'GestionMax Formation Hub - Accueil',
-  description: 'Centre de formation professionnelle et continue pour les entreprises et les particuliers',
+  title: 'GestionMax Formation Hub - Centre de Formation Professionnelle',
+  description: 'Organisme de formation professionnelle certifié Qualiopi. Formations WordPress, développement web, bureautique et management pour entreprises et particuliers.',
+  keywords: ['formation professionnelle', 'WordPress', 'développement web', 'Qualiopi', 'organisme formation', 'entreprise', 'particuliers'],
+  openGraph: {
+    title: 'GestionMax Formation Hub - Centre de Formation Professionnelle',
+    description: 'Organisme de formation professionnelle certifié Qualiopi. Formations WordPress, développement web, bureautique et management.',
+    url: process.env.NEXT_PUBLIC_API_URL || 'https://gestionmax-formation-hub.vercel.app',
+    siteName: 'GestionMax Formation Hub',
+    locale: 'fr_FR',
+    type: 'website',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function HomePage() {
-  redirect('/dashboard');
-  
-  // Ce code ne sera jamais exécuté
-  return null;
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <main>
+        <HeroSection />
+        <AboutSection />
+        <FormationsPreview />
+      </main>
+      <Footer />
+    </div>
+  );
 }
