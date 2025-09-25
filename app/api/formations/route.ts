@@ -56,7 +56,11 @@ export async function GET() {
         cessationAbandon: true,
         dateCreation: true,
         dateModification: true,
-        created_at: true,
+        modalitesTechniques: true,
+        contactOrganisme: true,
+        referentPedagogique: true,
+        referentQualite: true,
+        horaires: true,
       },
       orderBy: {
         dateCreation: 'desc'
@@ -66,15 +70,15 @@ export async function GET() {
     // Transformer les données pour correspondre à l'interface Frontend
     const formationsTransformed = formations.map(formation => ({
       ...formation,
-      objectifsPedagogiques: Array.isArray(formation.objectifs) 
-        ? formation.objectifs.join('\n') 
+      objectifsPedagogiques: Array.isArray(formation.objectifs)
+        ? formation.objectifs.join('\n')
         : formation.objectifs,
       tarif: formation.prix,
       accessibiliteHandicapee: formation.accessibiliteHandicap,
-      horaires: "À définir selon le programme", // Valeur par défaut
-      contactOrganisme: "contact@gestionmax.com", // Valeur par défaut
-      referentPedagogique: formation.formateur,
-      referentQualite: "qualité@gestionmax.com", // Valeur par défaut
+      horaires: formation.horaires || "À définir selon le programme",
+      contactOrganisme: formation.contactOrganisme || "contact@gestionmax.com",
+      referentPedagogique: formation.referentPedagogique || formation.formateur,
+      referentQualite: formation.referentQualite || "qualité@gestionmax.com",
       modalitesTechniques: formation.modalitesTechniques || "Non spécifié"
     }));
 
@@ -112,6 +116,7 @@ export async function POST(request: NextRequest) {
         titre: `Formation ${data.code}`,
         description: data.objectifsPedagogiques,
         type: 'catalogue',
+        typeProgramme: 'catalogue',
         duree: data.duree,
         prix: data.tarif,
         niveau: 'Tous niveaux',
