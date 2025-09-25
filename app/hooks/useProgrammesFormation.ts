@@ -181,6 +181,28 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
     }
   }, [fetchProgrammes, toast]);
 
+  const updateProgrammeStatus = useCallback(async (id: string, estActif: boolean) => {
+    try {
+      setLoading(true);
+      const response = await api.put(`/programmes-formation/${id}`, { estActif });
+      await fetchProgrammes();
+      toast({
+        title: 'Succès',
+        description: `Programme ${estActif ? 'activé' : 'désactivé'} avec succès`,
+      });
+      return response.data;
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.error || 'Erreur lors de la mise à jour du statut';
+      toast({
+        title: 'Erreur',
+        description: errorMessage,
+      });
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchProgrammes, toast]);
+
   // Méthodes utilitaires
   const getProgrammeById = useCallback((id: string) => {
     return programmes.find(p => p.id === id);
@@ -232,6 +254,7 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
     updateProgramme,
     deleteProgramme,
     duplicateProgramme,
+    updateProgrammeStatus,
     
     // Méthodes utilitaires de recherche et filtrage
     getProgrammeById,

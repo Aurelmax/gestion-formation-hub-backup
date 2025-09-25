@@ -149,16 +149,9 @@ export default function ProgrammeListEnhanced({
 
   const handleDuplicate = async () => {
     if (!programmeToModify) return;
-    
+
     try {
-      const newProgramme = {
-        ...programmeToModify,
-        type: duplicationType,
-        code: `${programmeToModify.code}-COPY`,
-        titre: `${programmeToModify.titre} (Copie)`,
-      };
-      
-      await duplicateProgramme(programmeToModify.id, newProgramme);
+      await duplicateProgramme(programmeToModify.id);
       
       toast({
         title: "Programme dupliqué",
@@ -180,7 +173,7 @@ export default function ProgrammeListEnhanced({
 
   const handleStatusChange = async (id: string, estActif: boolean) => {
     try {
-      await updateProgrammeStatus(id, { estActif });
+      await updateProgrammeStatus(id, estActif);
       toast({
         title: estActif ? "Programme activé" : "Programme désactivé",
         description: `Le programme a été ${estActif ? "activé" : "désactivé"} avec succès.`,
@@ -445,7 +438,7 @@ export default function ProgrammeListEnhanced({
               <CardFooter className="pt-2 flex justify-between items-center text-xs text-gray-500">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
-                  Mis à jour le {new Date(programme.updatedAt || Date.now()).toLocaleDateString('fr-FR')}
+                  Mis à jour le {programme.dateModification ? new Date(programme.dateModification).toLocaleDateString('fr-FR') : 'récemment'}
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" className="h-8" onClick={() => onEditClick(programme)}>

@@ -26,8 +26,9 @@ interface ProgrammeFormation {
   };
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const formation = await getFormation(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const formation = await getFormation(id);
 
   if (!formation) {
     return {
@@ -61,8 +62,9 @@ async function getFormation(id: string): Promise<ProgrammeFormation | null> {
   }
 }
 
-export default async function FormationDetailPage({ params }: { params: { id: string } }) {
-  const formation = await getFormation(params.id);
+export default async function FormationDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const formation = await getFormation(id);
   
   if (!formation) {
     notFound();

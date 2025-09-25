@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Edit, Trash2, Eye, Clock, Users, BookOpen, Info, GitBranch, Calendar, Download, Archive, FileText, Upload } from "lucide-react";
-import { useProgrammesFormation, ProgrammeFormation } from "@/hooks/useProgrammesFormation";
+import { useProgrammesFormation } from "@/hooks/useProgrammesFormation";
+import { ProgrammeFormation } from "@/types";
 import api from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 import ProgrammeForm from "./ProgrammeForm";
@@ -171,13 +172,14 @@ const EmptyState = ({ type, onCreate }: { type?: string; onCreate: () => void })
 
 const FormationsList = () => {
   // Hooks et état
-  const { 
-    programmes, 
-    loading: isLoading, 
+  const {
+    programmes,
+    loading: isLoading,
     refreshProgrammes,
     createProgramme,
     updateProgramme,
-    duplicateProgramme
+    duplicateProgramme,
+    categories
   } = useProgrammesFormation();
   
   console.log('🏷️ FormationsList render - État actuel:', {
@@ -185,7 +187,6 @@ const FormationsList = () => {
     isLoading
   });
   const { toast } = useToast();
-  const [categories, setCategories] = useState<any[]>([]);
   const [view, setView] = useState<ViewMode>("list");
   const [selectedFormation, setSelectedFormation] = useState<ProgrammeFormation | null>(null);
   const [editingFormation, setEditingFormation] = useState<ProgrammeFormation | null>(null);
@@ -211,44 +212,7 @@ const FormationsList = () => {
     }
   }, [programmes]);
 
-  // Charger les catégories
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch('/api/categories');
-        if (response.ok) {
-          const data = await response.json();
-          setCategories(data);
-        }
-      } catch (error) {
-        console.error('Erreur lors du chargement des catégories:', error);
-      }
-    };
-    fetchCategories();
-  }, []);
 
-  // Rafraîchissement périodique pour éviter les décalages
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-    
-    // Rafraîchir les données toutes les 30 secondes si la page est visible
-    const startPeriodicRefresh = () => {
-      intervalId = setInterval(() => {
-        if (document.visibilityState === 'visible' && view === 'list') {
-          console.log('🔄 Rafraîchissement périodique des programmes');
-          refreshProgrammes();
-        }
-      }, 30000);
-    };
-
-    startPeriodicRefresh();
-
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [view, refreshProgrammes]);
 
   // Handlers
   const handleCreate = useCallback(() => {
@@ -299,22 +263,16 @@ const FormationsList = () => {
     }
   }, [toast, refreshProgrammes]);
 
-  const handleSubmit = useCallback(async (formData: Omit<ProgrammeFormation, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleSubmit = useCallback(async (formData: Partial<ProgrammeFormation>) => {
     try {
       if (editingFormation) {
-        const updateData: Partial<ProgrammeFormation> = {};
-        Object.keys(formData).forEach(key => {
-          if (formData[key as keyof typeof formData] !== undefined) {
-            (updateData as any)[key] = formData[key as keyof typeof formData];
-          }
-        });
-        await updateProgramme(editingFormation.id, updateData);
+        await updateProgramme(editingFormation.id, formData);
         toast({
           title: "Programme modifié",
           description: "Le programme a été modifié avec succès.",
         });
       } else {
-        await createProgramme(formData as any);
+        await createProgramme(formData);
         toast({
           title: "Programme créé",
           description: "Le nouveau programme a été créé avec succès.",

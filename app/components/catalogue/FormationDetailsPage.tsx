@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { ProgrammeFormation } from '../../hooks/useProgrammesCatalogue';
+import { ProgrammeFormation } from '@/types';
 
 const FormationDetailsPage: React.FC = () => {
   const params = useParams();
