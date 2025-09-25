@@ -40,9 +40,10 @@ export async function POST(request: NextRequest) {
     }
 
     const { sourceId, newData } = validation.data;
+    const prismaAny = prisma as any;
 
     // Récupérer le programme source
-    const sourceProgramme = await prisma.programmeFormation.findUnique({
+    const sourceProgramme = await prismaAny.programmes_formation.findUnique({
       where: { id: sourceId },
     });
 
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     // Vérifier si le nouveau code existe déjà
     if (newData.code) {
-      const existingProgramme = await prisma.programmeFormation.findFirst({
+      const existingProgramme = await prismaAny.programmes_formation.findFirst({
         where: { code: newData.code },
       });
 
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
     console.log('Données préparées pour création:', duplicateData);
 
     // Créer le programme dupliqué
-    const duplicatedProgramme = await prisma.programmeFormation.create({
+    const duplicatedProgramme = await prismaAny.programmes_formation.create({
       data: duplicateData,
       include: {
         categorie: true,

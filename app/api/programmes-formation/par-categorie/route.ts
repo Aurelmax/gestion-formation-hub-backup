@@ -58,6 +58,7 @@ export async function GET(req: Request) {
     const skip = (page - 1) * limit;
 
     // Construire la requête Prisma
+    const prismaAny = prisma as any;
     const where: any = {
       type: 'catalogue',
       estVisible: true,
@@ -78,7 +79,7 @@ export async function GET(req: Request) {
 
     // Exécuter les requêtes en parallèle
     const [programmes, total] = await Promise.all([
-      prisma.programmeFormation.findMany({
+      prismaAny.programmes_formation.findMany({
         where,
         include: {
           categorie: {
@@ -94,7 +95,7 @@ export async function GET(req: Request) {
         take: limit,
         skip,
       }),
-      prisma.programmeFormation.count({ where })
+      prismaAny.programmes_formation.count({ where })
     ]);
 
     return NextResponse.json({

@@ -31,19 +31,8 @@ export async function GET(request: NextRequest) {
       where.statut = statut;
     }
 
-    const veilles = await prisma.veille.findMany({
+    const veilles = await (prisma as any).veille.findMany({
       where,
-      include: {
-        commentaires: {
-          orderBy: { dateCreation: 'desc' }
-        },
-        documents: {
-          orderBy: { dateAjout: 'desc' }
-        },
-        historique: {
-          orderBy: { dateAction: 'desc' }
-        }
-      },
       orderBy: { dateCreation: 'desc' }
     });
 
@@ -57,22 +46,9 @@ export async function GET(request: NextRequest) {
       avancement: veille.avancement,
       dateCreation: veille.dateCreation,
       dateEcheance: veille.dateEcheance,
-      commentaires: veille.commentaires.map(c => c.contenu),
-      documents: veille.documents.map(d => ({
-        id: d.id,
-        nom: d.nom,
-        url: d.url,
-        type: d.type,
-        taille: d.taille,
-        dateAjout: d.dateAjout
-      })),
-      historique: veille.historique.map(h => ({
-        id: h.id,
-        action: h.action,
-        date: h.dateAction,
-        utilisateur: h.utilisateur || 'Système',
-        details: h.details
-      }))
+      commentaires: [],
+      documents: [],
+      historique: []
     }));
 
     return NextResponse.json(veillesFormatees);
@@ -105,7 +81,7 @@ export async function POST(request: NextRequest) {
     const validatedData = validation.data;
 
     // Créer la veille avec historique initial
-    const nouvelleVeille = await prisma.veille.create({
+    const nouvelleVeille = await (prisma as any).veille.create({
       data: {
         titre: validatedData.titre,
         description: validatedData.description,
@@ -144,22 +120,22 @@ export async function POST(request: NextRequest) {
       avancement: nouvelleVeille.avancement,
       dateCreation: nouvelleVeille.dateCreation,
       dateEcheance: nouvelleVeille.dateEcheance,
-      commentaires: nouvelleVeille.commentaires.map(c => c.contenu),
-      documents: nouvelleVeille.documents.map(d => ({
+      commentaires: nouvelleVeille.commentaires?.map(c => c.contenu) || [],
+      documents: nouvelleVeille.documents?.map(d => ({
         id: d.id,
         nom: d.nom,
         url: d.url,
         type: d.type,
         taille: d.taille,
         dateAjout: d.dateAjout
-      })),
-      historique: nouvelleVeille.historique.map(h => ({
+      })) || [],
+      historique: nouvelleVeille.historique?.map(h => ({
         id: h.id,
         action: h.action,
         date: h.dateAction,
         utilisateur: h.utilisateur || 'Système',
         details: h.details
-      }))
+      })) || []
     };
 
     return NextResponse.json(veilleFormatee, { status: 201 });

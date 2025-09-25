@@ -3,17 +3,17 @@ import { z } from 'zod';
 import { PROGRAMME_TYPE_ENUM } from '@/types/programmes';
 import { prisma } from '@/lib/prisma';
 
-// Schéma de validation partiel pour les mises à jour - Version assouplie
+// Variable centralisée pour accès direct à la table SQL mappée
+const prismaAny = prisma as any;
+
+// Schéma de validation partiel pour mise à jour
 const updateProgrammeSchema = z.object({
-  // Champs essentiels
   code: z.string().min(1, 'Le code est requis').optional(),
   type: z.enum(PROGRAMME_TYPE_ENUM).optional(),
   titre: z.string().min(1, 'Le titre est requis').optional(),
   description: z.string().optional(),
   duree: z.string().min(1, 'La durée est requise').optional(),
   prix: z.string().min(1, 'Le prix est requis').optional(),
-  
-  // Champs optionnels sans validation stricte
   typeProgramme: z.string().optional(),
   niveau: z.string().optional(),
   participants: z.string().optional(),
@@ -33,21 +33,23 @@ const updateProgrammeSchema = z.object({
   delaiAcceptation: z.string().optional(),
   accessibiliteHandicap: z.string().optional(),
   cessationAbandon: z.string().optional(),
-  categorieId: z.string().uuid('ID de catégorie invalide').optional().nullable(),
+  categorieId: z.string().uuid().optional().nullable(),
   pictogramme: z.string().optional(),
   estActif: z.boolean().optional(),
   estVisible: z.boolean().optional(),
   version: z.number().int().positive().optional(),
   objectifsSpecifiques: z.string().optional().nullable(),
-  programmeUrl: z.string().url('URL de programme invalide').optional().nullable(),
+  programmeUrl: z.string().url().optional().nullable(),
   ressourcesAssociees: z.array(z.string()).optional(),
-  beneficiaireId: z.string().uuid('ID de bénéficiaire invalide').optional().nullable(),
-  formateurId: z.string().uuid('ID de formateur invalide').optional().nullable(),
-  programmeSourId: z.string().uuid('ID de programme source invalide').optional().nullable(),
-  positionnementRequestId: z.string().uuid('ID de demande de positionnement invalide').optional().nullable(),
+  beneficiaireId: z.string().uuid().optional().nullable(),
+  formateurId: z.string().uuid().optional().nullable(),
+  programmeSourId: z.string().uuid().optional().nullable(),
+  positionnementRequestId: z.string().uuid().optional().nullable(),
 });
 
-// GET /api/programmes-formation/[id] - Récupérer un programme par son ID
+// ------------------------
+// GET /api/programmes-formation/[id]
+// ------------------------
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -55,39 +57,22 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const programme = await prisma.programmeFormation.findUnique({
+    const programme = await prismaAny.programmes_formation.findUnique({
       where: { id },
       include: {
         categorie: true,
-        programmeCatalogue: {
-          select: {
-            id: true,
-            code: true,
-            titre: true,
-            version: true,
-          },
-        },
-        programmesDerivés: {
-          select: {
-            id: true,
-            code: true,
-            titre: true,
-            version: true,
-          },
-        },
+        programmeCatalogue: { select: { id: true, code: true, titre: true, version: true } },
+        programmesDérivés: { select: { id: true, code: true, titre: true, version: true } },
       },
     });
 
     if (!programme) {
-      return NextResponse.json(
-        { error: 'Programme non trouvé' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Programme non trouvé' }, { status: 404 });
     }
 
     return NextResponse.json(programme);
   } catch (error) {
-    console.error('Erreur lors de la récupération du programme:', error);
+    console.error('Erreur GET programmes-formation:', error);
     return NextResponse.json(
       { error: 'Une erreur est survenue lors de la récupération du programme' },
       { status: 500 }
@@ -95,90 +80,48 @@ export async function GET(
   }
 }
 
-// PUT /api/programmes-formation/[id] - Mettre à jour complètement un programme
+// ------------------------
+// PUT /api/programmes-formation/[id]
+// ------------------------
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-
-    // Debug: Log des headers reçus
-    const contentType = request.headers.get('content-type');
-    console.log('📄 PUT Content-Type reçu:', contentType);
-
     const data = await request.json();
 
-    // Debug: Log des données reçues et leur type
-    console.log('📋 PUT Données reçues pour mise à jour programme:', JSON.stringify(data, null, 2));
-    console.log('🔍 PUT Type des données:', typeof data);
+    const existingProgramme = await prismaAny.programmes_formation.findUnique({ where: { id } });
+    if (!existingProgramme) return NextResponse.json({ error: 'Programme non trouvé' }, { status: 404 });
 
-    // Vérifier si le programme existe
-    const existingProgramme = await prisma.programmeFormation.findUnique({
-      where: { id },
-    });
-
-    if (!existingProgramme) {
-      return NextResponse.json(
-        { error: 'Programme non trouvé' },
-        { status: 404 }
-      );
-    }
-
-    // Validation des données
     const validation = updateProgrammeSchema.safeParse(data);
-    
     if (!validation.success) {
-      console.error('❌ PUT Validation échouée:', validation.error.errors);
-      return NextResponse.json(
-        {
-          error: 'Données invalides',
-          details: validation.error.errors
-        },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Données invalides', details: validation.error.errors }, { status: 400 });
     }
 
-    // Vérifier si le code est déjà utilisé par un autre programme
     if (data.code && data.code !== existingProgramme.code) {
-      const codeExists = await prisma.programmeFormation.findFirst({
-        where: {
-          code: data.code,
-          id: { not: id },
-        },
+      const codeExists = await prismaAny.programmes_formation.findFirst({
+        where: { code: data.code, id: { not: id } },
       });
-
-      if (codeExists) {
-        return NextResponse.json(
-          { error: 'Un programme avec ce code existe déjà' },
-          { status: 409 } // Conflict
-        );
-      }
+      if (codeExists) return NextResponse.json({ error: 'Un programme avec ce code existe déjà' }, { status: 409 });
     }
 
-    // Mise à jour du programme
-    const updatedProgramme = await prisma.programmeFormation.update({
+    const updatedProgramme = await prismaAny.programmes_formation.update({
       where: { id },
-      data: {
-        ...validation.data,
-        dateModification: new Date(),
-      },
-      include: {
-        categorie: true,
-      },
+      data: { ...validation.data, date_modification: new Date() },
+      include: { categorie: true },
     });
 
     return NextResponse.json(updatedProgramme);
   } catch (error) {
-    console.error('Erreur lors de la mise à jour du programme:', error);
-    return NextResponse.json(
-      { error: 'Une erreur est survenue lors de la mise à jour du programme' },
-      { status: 500 }
-    );
+    console.error('Erreur PUT programmes-formation:', error);
+    return NextResponse.json({ error: 'Erreur lors de la mise à jour du programme' }, { status: 500 });
   }
 }
 
-// PATCH /api/programmes-formation/[id] - Mettre à jour partiellement un programme
+// ------------------------
+// PATCH /api/programmes-formation/[id]
+// ------------------------
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -186,121 +129,62 @@ export async function PATCH(
   try {
     const { id } = await params;
     const data = await request.json();
-    
-    // Vérifier si le programme existe
-    const existingProgramme = await prisma.programmeFormation.findUnique({
-      where: { id },
-    });
 
-    if (!existingProgramme) {
-      return NextResponse.json(
-        { error: 'Programme non trouvé' },
-        { status: 404 }
-      );
-    }
+    const existingProgramme = await prismaAny.programmes_formation.findUnique({ where: { id } });
+    if (!existingProgramme) return NextResponse.json({ error: 'Programme non trouvé' }, { status: 404 });
 
-    // Validation des données
     const validation = updateProgrammeSchema.safeParse(data);
-    
-    if (!validation.success) {
-      console.error('❌ PUT Validation échouée:', validation.error.errors);
-      return NextResponse.json(
-        {
-          error: 'Données invalides',
-          details: validation.error.errors
-        },
-        { status: 400 }
-      );
-    }
+    if (!validation.success) return NextResponse.json({ error: 'Données invalides', details: validation.error.errors }, { status: 400 });
 
-    // Vérifier si le code est déjà utilisé par un autre programme
     if (data.code && data.code !== existingProgramme.code) {
-      const codeExists = await prisma.programmeFormation.findFirst({
-        where: {
-          code: data.code,
-          id: { not: id },
-        },
+      const codeExists = await prismaAny.programmes_formation.findFirst({
+        where: { code: data.code, id: { not: id } },
       });
-
-      if (codeExists) {
-        return NextResponse.json(
-          { error: 'Un programme avec ce code existe déjà' },
-          { status: 409 } // Conflict
-        );
-      }
+      if (codeExists) return NextResponse.json({ error: 'Un programme avec ce code existe déjà' }, { status: 409 });
     }
 
-    // Mise à jour partielle du programme
-    const updatedProgramme = await prisma.programmeFormation.update({
+    const updatedProgramme = await prismaAny.programmes_formation.update({
       where: { id },
-      data: {
-        ...validation.data,
-        dateModification: new Date(),
-      },
-      include: {
-        categorie: true,
-      },
+      data: { ...validation.data, date_modification: new Date() },
+      include: { categorie: true },
     });
 
     return NextResponse.json(updatedProgramme);
   } catch (error) {
-    console.error('Erreur lors de la mise à jour partielle du programme:', error);
-    return NextResponse.json(
-      { error: 'Une erreur est survenue lors de la mise à jour du programme' },
-      { status: 500 }
-    );
+    console.error('Erreur PATCH programmes-formation:', error);
+    return NextResponse.json({ error: 'Erreur lors de la mise à jour partielle du programme' }, { status: 500 });
   }
 }
 
-// DELETE /api/programmes-formation/[id] - Supprimer un programme
+// ------------------------
+// DELETE /api/programmes-formation/[id]
+// ------------------------
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
+    const existingProgramme = await prismaAny.programmes_formation.findUnique({ where: { id } });
+    if (!existingProgramme) return NextResponse.json({ error: 'Programme non trouvé' }, { status: 404 });
 
-    // Vérifier si le programme existe
-    const existingProgramme = await prisma.programmeFormation.findUnique({
+    const programmeWithDossiers = await prismaAny.programmes_formation.findUnique({
       where: { id },
+      include: { dossiers: true },
     });
 
-    if (!existingProgramme) {
+    if (programmeWithDossiers?.dossiers?.length > 0) {
       return NextResponse.json(
-        { error: 'Programme non trouvé' },
-        { status: 404 }
-      );
-    }
-
-    // Vérifier si le programme a des dossiers liés (via la relation prisma)
-    const programmeWithDossiers = await prisma.programmeFormation.findUnique({
-      where: { id },
-      include: {
-        dossiers: true,
-      }
-    });
-
-    if (programmeWithDossiers?.dossiers && programmeWithDossiers.dossiers.length > 0) {
-      return NextResponse.json(
-        { 
-          error: 'Impossible de supprimer ce programme car il est utilisé dans un ou plusieurs dossiers',
-          usedInDossiers: programmeWithDossiers.dossiers.length,
-        },
+        { error: 'Impossible de supprimer ce programme, utilisé dans un ou plusieurs dossiers', usedInDossiers: programmeWithDossiers.dossiers.length },
         { status: 409 }
       );
     }
 
-    // Supprimer le programme
-    await prisma.programmeFormation.delete({
-      where: { id },
-    });
+    await prismaAny.programmes_formation.delete({ where: { id } });
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('Erreur lors de la suppression du programme:', error);
-    return NextResponse.json(
-      { error: 'Une erreur est survenue lors de la suppression du programme' },
-      { status: 500 }
-    );
+    console.error('Erreur DELETE programmes-formation:', error);
+    return NextResponse.json({ error: 'Erreur lors de la suppression du programme' }, { status: 500 });
   }
 }

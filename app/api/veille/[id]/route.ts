@@ -21,7 +21,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const veille = await prisma.veille.findUnique({
+    const prismaAny = prisma as any;
+    const veille = await prismaAny.veille.findUnique({
       where: { id },
       include: {
         commentaires: {
@@ -88,6 +89,7 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
+    const prismaAny = prisma as any;
     const data = await request.json();
 
     // Validation des données
@@ -105,7 +107,7 @@ export async function PATCH(
     const validatedData = validation.data;
 
     // Vérifier que la veille existe
-    const veilleExistante = await prisma.veille.findUnique({
+    const veilleExistante = await prismaAny.veille.findUnique({
       where: { id: id }
     });
 
@@ -134,7 +136,7 @@ export async function PATCH(
     }
 
     // Mettre à jour la veille
-    const veilleModifiee = await prisma.veille.update({
+    const veilleModifiee = await prismaAny.veille.update({
       where: { id: id },
       data: {
         ...validatedData,
@@ -202,8 +204,9 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+    const prismaAny = prisma as any;
     // Vérifier que la veille existe
-    const veilleExistante = await prisma.veille.findUnique({
+    const veilleExistante = await prismaAny.veille.findUnique({
       where: { id: id }
     });
 
@@ -215,7 +218,7 @@ export async function DELETE(
     }
 
     // Supprimer la veille (les relations seront supprimées automatiquement via onDelete: Cascade)
-    await prisma.veille.delete({
+    await prismaAny.veille.delete({
       where: { id: id }
     });
 

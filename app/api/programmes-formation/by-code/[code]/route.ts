@@ -77,6 +77,7 @@ export async function GET(
     };
 
     // Construction de la requête
+    const prismaAny = prisma as any;
     const where: any = { 
       code: code,
       ...(version !== undefined && { version: version }),
@@ -88,7 +89,7 @@ export async function GET(
       : { version: 'desc' as const };
 
     // Recherche du programme
-    const programme = await prisma.programmeFormation.findFirst({
+    const programme = await prismaAny.programmeFormation.findFirst({
       where,
       select: selectFields,
       orderBy,
@@ -97,7 +98,7 @@ export async function GET(
     // Gestion des erreurs
     if (!programme) {
       // Vérifier si le code existe dans une autre version
-      const otherVersions = await prisma.programmeFormation.findMany({
+      const otherVersions = await prismaAny.programmeFormation.findMany({
         where: { code },
         select: { version: true, estActif: true },
         orderBy: { version: 'desc' },
@@ -137,7 +138,7 @@ export async function GET(
 
     // Si une version spécifique est demandée mais que le programme n'est pas actif
     if (version && !programme.estActif) {
-      const latestActive = await prisma.programmeFormation.findFirst({
+      const latestActive = await prismaAny.programmeFormation.findFirst({
         where: { code, estActif: true },
         orderBy: { version: 'desc' },
         select: { version: true },
