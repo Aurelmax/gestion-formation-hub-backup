@@ -34,8 +34,9 @@ const MapLocation = ({
     const mapContainer = document.getElementById('map-container');
     if (!mapContainer) return;
 
-    // Nettoyer le conteneur pour éviter les doublons
-    mapContainer.innerHTML = '';
+    // Nettoyer le conteneur pour éviter les doublons (sécurisé)
+    const { clearElementSafely } = await import('@/lib/html-sanitizer');
+    clearElementSafely(mapContainer);
 
     const loadLeaflet = async () => {
       try {

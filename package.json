@@ -41,6 +41,8 @@
     "validate:typescript:simple": "npx tsx scripts/validate-typescript-simple.ts",
     "test:typescript": "npx tsx scripts/test-typescript-compilation.ts",
     "validate:all": "npx tsx scripts/validate-all-security.ts",
+    "analyze:xss": "npx tsx scripts/analyze-xss-vulnerabilities.ts",
+    "validate:final": "npx tsx scripts/validate-final-security.ts",
     "test": "jest",
     "test:watch": "jest --watch"
   },

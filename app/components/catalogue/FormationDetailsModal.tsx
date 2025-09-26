@@ -56,9 +56,21 @@ const FormationDetailsModal = ({
       const response = await fetch(programmeUrl);
       const htmlContent = await response.text();
       
-      // Créer un élément div temporaire pour contenir le HTML
+      // Importer l'utilitaire de sanitisation
+      const { sanitizeHTML } = await import('@/lib/html-sanitizer');
+      
+      // Sanitiser le contenu HTML pour éviter les attaques XSS
+      const sanitizedContent = sanitizeHTML(htmlContent, {
+        allowTags: ['div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br', 'strong', 'em', 'u', 'i', 'b', 'ul', 'ol', 'li'],
+        allowAttributes: ['class', 'id', 'style'],
+        stripScripts: true,
+        stripEvents: true,
+        stripDataAttributes: true,
+      });
+      
+      // Créer un élément div temporaire pour contenir le HTML sanitisé
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = htmlContent;
+      tempDiv.innerHTML = sanitizedContent;
       document.body.appendChild(tempDiv);
       
       // Configuration pour html2pdf

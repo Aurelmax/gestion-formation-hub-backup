@@ -54,8 +54,9 @@ const ClientOnlyMap: React.FC<ClientOnlyMapProps> = ({
         // Créer la carte
         const mapContainer = document.getElementById('leaflet-map');
         if (mapContainer) {
-          // Nettoyer le conteneur
-          mapContainer.innerHTML = '';
+          // Nettoyer le conteneur (sécurisé)
+          const { clearElementSafely } = await import('@/lib/html-sanitizer');
+          clearElementSafely(mapContainer);
 
           const map = L.map(mapContainer).setView([latitude, longitude], zoom);
 
