@@ -1,3 +1,5 @@
+'use client';
+
 import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
@@ -44,29 +46,7 @@ const GSAPCatalogueSection = dynamic(() => import('@/components/animations/GSAPC
 import { generateMetadata as generateSeoMetadata } from '@/lib/seo';
 import { SEO_CONFIG } from '@/lib/constants';
 
-export const metadata = generateSeoMetadata({
-  title: 'Centre de Formation Professionnelle Certifié Qualiopi',
-  description: 'Organisme de formation professionnelle certifié Qualiopi. Catalogue complet de formations WordPress, développement web, bureautique et management. Blog expertise et conseils. Formations éligibles CPF pour entreprises et particuliers.',
-  keywords: [
-    'formation professionnelle',
-    'catalogue formations',
-    'WordPress',
-    'développement web',
-    'Qualiopi',
-    'CPF',
-    'organisme formation',
-    'entreprise',
-    'particuliers',
-    'certification',
-    'bureautique',
-    'management',
-    'blog WordPress',
-    'conseils experts',
-    'tutoriels',
-    'actualités formation'
-  ],
-  image: SEO_CONFIG.images.ogCatalogue,
-});
+// Metadata moved to layout.tsx since this is now a client component
 
 export default function HomePage() {
   return (
