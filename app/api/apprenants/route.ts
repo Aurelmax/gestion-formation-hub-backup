@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
 
 const prisma = new PrismaClient();
@@ -13,6 +14,24 @@ const apprenantSchema = z.object({
 
 export async function GET() {
   try {
+    const { userId, sessionClaims } = auth();
+    
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Non autorisé' },
+        { status: 401 }
+      );
+    }
+
+    // Seuls les admins peuvent voir la liste des apprenants
+    const userRole = sessionClaims?.metadata?.role || 'user';
+    if (userRole !== 'admin') {
+      return NextResponse.json(
+        { error: 'Accès refusé - Permissions administrateur requises' },
+        { status: 403 }
+      );
+    }
+
     // Récupérer tous les utilisateurs avec rôle 'apprenant'
     const apprenants = await prisma.user.findMany({
       where: {

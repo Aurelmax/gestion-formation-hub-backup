@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { auth } from '@clerk/nextjs/server';
 
 const prisma = new PrismaClient();
 
 export async function GET() {
   try {
+    const { userId } = auth();
+    
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Non autorisé' },
+        { status: 401 }
+      );
+    }
+
     const reclamations = await prisma.reclamation.findMany({
       include: {
         assignee: {

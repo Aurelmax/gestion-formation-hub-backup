@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
 
 const prisma = new PrismaClient();
@@ -90,6 +91,24 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const { userId, sessionClaims } = auth();
+    
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Non autorisé' },
+        { status: 401 }
+      );
+    }
+
+    // Vérifier si l'utilisateur a les permissions d'admin
+    const userRole = sessionClaims?.metadata?.role || 'user';
+    if (userRole !== 'admin') {
+      return NextResponse.json(
+        { error: 'Accès refusé - Permissions administrateur requises' },
+        { status: 403 }
+      );
+    }
+
     const data = await request.json();
     
     // Validation des données
