@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import type { ProgrammeFormation } from '@prisma/client';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 /**
  * API Formations - Convention Hybride Stricte
@@ -9,6 +10,12 @@ import type { ProgrammeFormation } from '@prisma/client';
 
 export async function GET(_request: NextRequest) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
     // ✅ Accès Prisma Client typé avec nom DB snake_case
     const formations = await prisma.programmes_formation.findMany({
       where: {
@@ -62,6 +69,12 @@ export async function GET(_request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
     const data = await request.json();
 
     // ✅ Validation des données d'entrée

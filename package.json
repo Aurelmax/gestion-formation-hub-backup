@@ -34,6 +34,7 @@
     "db:sync": "npx tsx scripts/sync-databases.ts",
     "migrate:clerk": "npx tsx scripts/migrate-to-clerk.ts",
     "test:clerk": "npx tsx scripts/test-clerk-integration.ts",
+    "test:security": "npx tsx scripts/test-api-security.ts",
     "test": "jest",
     "test:watch": "jest --watch"
   },

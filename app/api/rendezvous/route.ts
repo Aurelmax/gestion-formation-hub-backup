@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 // Schéma de validation pour la création d'un rendez-vous
 const rendezvousSchema = z.object({
@@ -35,6 +36,12 @@ const rendezvousSchema = z.object({
 
 export async function GET() {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
     // Vérification de la connexion
     try {
       await prisma.$connect();
@@ -167,6 +174,12 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     

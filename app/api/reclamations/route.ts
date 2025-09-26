@@ -5,6 +5,7 @@ import type { Prisma } from '@prisma/client';
 import { withRateLimit, rateLimitConfigs } from '@/lib/rate-limit';
 import { withSecurity, secureLogger, getSecurityHeaders } from '@/lib/security';
 import { withCSRFProtection } from '@/lib/csrf';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 
 
@@ -38,6 +39,12 @@ const queryParamsSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
     // Valider les paramètres de requête
     const validation = queryParamsSchema.safeParse(
       Object.fromEntries(request.nextUrl.searchParams)

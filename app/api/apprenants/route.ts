@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 // Schéma de validation pour les apprenants (adapté au schéma Prisma)
 const apprenantSchema = z.object({
@@ -11,6 +12,12 @@ const apprenantSchema = z.object({
 
 export async function GET() {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
     const apprenants = await prisma.apprenant.findMany({
       orderBy: { createdAt: 'desc' },
       take: 100,
@@ -28,6 +35,12 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
     const data = await request.json();
     
     // Validation des données

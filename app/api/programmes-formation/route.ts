@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { PROGRAMME_TYPE_ENUM } from '@/types/programmes';
 import { createHash } from 'crypto';
 import type { ProgrammeFormation, Prisma } from '@prisma/client';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 // ✅ Convention Hybride Stricte - Client Prisma Typé
 
@@ -32,6 +33,12 @@ const programmeSchema = z.object({
 // ----------------------
 export async function GET(request: NextRequest) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
     const params = Object.fromEntries(request.nextUrl.searchParams);
 
     // ✅ Typage strict Prisma avec noms DB snake_case
@@ -94,6 +101,12 @@ export async function GET_BY_ID(id: string) {
 // ----------------------
 export async function POST(request: NextRequest) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
     const data = await request.json();
     const validation = programmeSchema.safeParse(data);
     if (!validation.success) return NextResponse.json({ error: 'Données invalides', details: validation.error.errors }, { status: 400 });
