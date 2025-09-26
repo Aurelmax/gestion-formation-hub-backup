@@ -37,6 +37,10 @@
     "test:security": "npx tsx scripts/test-api-security.ts",
     "validate:secrets": "npx tsx scripts/validate-secrets.ts",
     "test:secrets": "npx tsx scripts/test-secrets-security.ts",
+    "validate:typescript": "npx tsx scripts/validate-typescript-config.ts",
+    "validate:typescript:simple": "npx tsx scripts/validate-typescript-simple.ts",
+    "test:typescript": "npx tsx scripts/test-typescript-compilation.ts",
+    "validate:all": "npx tsx scripts/validate-all-security.ts",
     "test": "jest",
     "test:watch": "jest --watch"
   },
