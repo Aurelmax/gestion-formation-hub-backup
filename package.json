@@ -35,6 +35,8 @@
     "migrate:clerk": "npx tsx scripts/migrate-to-clerk.ts",
     "test:clerk": "npx tsx scripts/test-clerk-integration.ts",
     "test:security": "npx tsx scripts/test-api-security.ts",
+    "validate:secrets": "npx tsx scripts/validate-secrets.ts",
+    "test:secrets": "npx tsx scripts/test-secrets-security.ts",
     "test": "jest",
     "test:watch": "jest --watch"
   },

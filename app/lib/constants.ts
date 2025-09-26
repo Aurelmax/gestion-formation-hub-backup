@@ -1,6 +1,8 @@
+import { secureConfig } from './secure-env';
+
 // Configuration des URLs et constantes SEO
 export const SEO_CONFIG = {
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://gestionmax-formation-hub.vercel.app',
+  baseUrl: secureConfig.api.baseUrl,
   siteName: 'GestionMax Formation Hub',
   defaultTitle: 'GestionMax Formation Hub - Centre de Formation Professionnelle',
   defaultDescription: 'Organisme de formation professionnelle certifié Qualiopi. Formations WordPress, développement web, bureautique et management.',

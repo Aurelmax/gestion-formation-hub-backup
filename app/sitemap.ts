@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
+import { secureConfig } from '@/lib/secure-env'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://gestionmax-formation-hub.vercel.app'
+  const baseUrl = secureConfig.api.baseUrl
 
   // Pages statiques
   const staticPages = [
