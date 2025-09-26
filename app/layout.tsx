@@ -2,6 +2,7 @@ import './globals.css';
 import { ReactNode } from 'react';
 import Providers from './providers';
 import { Inter } from 'next/font/google';
+import { ClerkProvider } from '@clerk/nextjs';
 
 // Force dynamic rendering si nécessaire
 export const dynamic = 'force-dynamic';
@@ -41,12 +42,14 @@ export const metadata = {
 
 export default function RootLayout({ children }: LayoutProps) {
   return (
-    <html lang="fr" className={inter.variable}>
-      <body className="antialiased" style={{ fontFamily: 'var(--font-inter), system-ui, arial' }}>
-        <Providers>
-          {children}
-        </Providers>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="fr" className={inter.variable}>
+        <body className="antialiased" style={{ fontFamily: 'var(--font-inter), system-ui, arial' }}>
+          <Providers>
+            {children}
+          </Providers>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

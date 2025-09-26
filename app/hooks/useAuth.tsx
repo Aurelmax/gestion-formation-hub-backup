@@ -1,8 +1,6 @@
 "use client";
 
-import { createContext, useContext, ReactNode, useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import { signIn as nextAuthSignIn, signOut as nextAuthSignOut, useSession } from 'next-auth/react';
+import { useUser, useAuth as useClerkAuth } from '@clerk/nextjs';
 
 // Types
 export interface User {
@@ -15,125 +13,31 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
-  signIn: (email: string, password: string) => Promise<boolean>;
-  signOut: () => Promise<void>;
+  isSignedIn: boolean;
   loading: boolean;
   error: string | null;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const [cachedUser, setCachedUser] = useState<User | null>(null);
-  const loading = status === 'loading';
-
-  // Éviter les problèmes d'hydratation
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!loading) {
-      setError(null);
-    }
-  }, [loading]);
-
-  const signIn = async (email: string, password: string): Promise<boolean> => {
-    try {
-      setError(null);
-      const result = await nextAuthSignIn('credentials', {
-        redirect: false,
-        email,
-        password,
-      });
-
-      if (result?.error) {
-        const errorMessage = result.error === 'CredentialsSignin' 
-          ? 'Email ou mot de passe incorrect' 
-          : 'Erreur lors de la connexion';
-        
-        setError(errorMessage);
-        console.error('Erreur de connexion:', result.error);
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      const errorMessage = 'Une erreur est survenue lors de la connexion';
-      setError(errorMessage);
-      console.error('Erreur lors de la connexion:', error);
-      return false;
-    }
-  };
-
-  const signOut = async () => {
-    try {
-      await nextAuthSignOut({ redirect: false });
-      router.push('/auth');
-    } catch (error) {
-      setError('Erreur lors de la déconnexion');
-      console.error('Erreur lors de la déconnexion:', error);
-    }
-  };
-
-  // Ensure user object always has required fields avec cache optimisé
-  const user = useMemo(() => {
-    if (!session?.user) return null;
-    
-    const newUser = {
-      id: session.user.id || session.user.email || '',
-      email: session.user.email || null,
-      name: session.user.name || null,
-      role: session.user.role,
-      image: session.user.image || null
-    };
-
-    // Mettre à jour le cache si l'utilisateur a changé
-    if (!cachedUser || cachedUser.id !== newUser.id) {
-      setCachedUser(newUser);
-    }
-    
-    return newUser;
-  }, [session?.user, cachedUser]);
-
-  const value: AuthContextType = {
-    user,
-    signIn,
-    signOut,
-    loading,
-    error,
-  };
-
-  // Attendre que le composant soit monté côté client pour éviter l'hydratation
-  if (!mounted) {
-    return (
-      <AuthContext.Provider value={{ user: null, signIn, signOut, loading: true, error: null }}>
-        {children}
-      </AuthContext.Provider>
-    );
-  }
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const { user: clerkUser, isLoaded: userLoaded } = useUser();
+  const { isSignedIn } = useClerkAuth();
+  const loading = !userLoaded;
+
+  // Convertir l'utilisateur Clerk en format compatible
+  const user: User | null = clerkUser ? {
+    id: clerkUser.id,
+    email: clerkUser.primaryEmailAddress?.emailAddress || null,
+    name: clerkUser.fullName || null,
+    role: clerkUser.publicMetadata?.role as string || 'user',
+    image: clerkUser.imageUrl || null
+  } : null;
+
+  return {
+    user,
+    isSignedIn,
+    loading,
+    error: null
+  };
 }
 
 // Export types

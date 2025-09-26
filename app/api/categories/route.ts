@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { cache, CACHE_CONFIG, createCacheKey, withCache } from '@/lib/cache';
-import { createCachedResponse, CACHE_STRATEGIES } from '@/lib/http-cache';
+// Temporarily disabled caching imports to fix module resolution
+// import { cache, CACHE_CONFIG, createCacheKey, withCache } from '@/lib/cache';
+// import { createCachedResponse, CACHE_STRATEGIES } from '@/lib/http-cache';
 
 // Schéma de validation pour une catégorie
 const categorieSchema = z.object({
@@ -12,38 +13,28 @@ const categorieSchema = z.object({
   ordre: z.number().int().min(0).default(0)
 });
 
-// GET /api/categories - Récupérer toutes les catégories avec cache optimisé
-export async function GET(request: NextRequest) {
+// GET /api/categories - Récupérer toutes les catégories (cache temporairement désactivé)
+export async function GET() {
   try {
-    const url = new URL(request.url);
-    const cacheKey = createCacheKey('/api/categories', Object.fromEntries(url.searchParams));
-
-    const categories = await withCache(
-      async () => {
-        return await prisma.categories_programme.findMany({
-          orderBy: { ordre: 'asc' },
+    const categories = await prisma.categories_programme.findMany({
+      orderBy: { ordre: 'asc' },
+      select: {
+        id: true,
+        code: true,
+        titre: true,
+        description: true,
+        ordre: true,
+        _count: {
           select: {
-            id: true,
-            code: true,
-            titre: true,
-            description: true,
-            ordre: true,
-            _count: {
-              select: {
-                programmes_formation: {
-                  where: { est_actif: true, est_visible: true }
-                }
-              }
+            programmes_formation: {
+              where: { est_actif: true, est_visible: true }
             }
           }
-        });
-      },
-      cacheKey,
-      CACHE_CONFIG.categories
-    );
+        }
+      }
+    });
 
-    // Return response with optimized cache headers
-    return createCachedResponse(categories, CACHE_STRATEGIES.static);
+    return NextResponse.json(categories);
   } catch (error) {
     console.error('Erreur lors de la récupération des catégories:', error);
     return NextResponse.json(
@@ -77,9 +68,9 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Invalider le cache des catégories après création
-    cache.delete('api:categories');
-    console.log('🗑️ Cache invalidated: categories after POST');
+    // Cache invalidation temporarily disabled
+    // cache.delete('api:categories');
+    console.log('✅ Category created successfully');
 
     return NextResponse.json(categorie, { status: 201 });
   } catch (error) {

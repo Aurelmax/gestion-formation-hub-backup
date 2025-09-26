@@ -13,3 +13,6 @@ build/
 .env.test.local
 .env.production.local
 .vercel
+
+# clerk configuration (can include secrets)
+/.clerk/

@@ -413,6 +413,7 @@ model sessions {
 
 model users {
   id             String         @id
+  clerkId        String?        @unique
   email          String?        @unique
   password       String?
   nom            String?

@@ -3,11 +3,12 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/hooks/useAuth";
+import { UserButton } from '@clerk/nextjs';
 
 const Navigation = () => {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { user, isSignedIn } = useAuth();
   const isActive = (path: string) => pathname === path;
 
   return (
@@ -44,7 +45,7 @@ const Navigation = () => {
           Contact
         </Button>
       </Link>
-      {session ? (
+      {isSignedIn ? (
         <>
           <Link href="/apprenant/dashboard">
             <Button 
@@ -65,9 +66,16 @@ const Navigation = () => {
               Tableau de bord
             </Button>
           </Link>
+          <UserButton 
+            appearance={{
+              elements: {
+                avatarBox: "w-8 h-8"
+              }
+            }}
+          />
         </>
       ) : (
-        <Link href="/auth">
+        <Link href="/auth/sign-in">
           <Button 
             variant="outline"
             className="text-base"
