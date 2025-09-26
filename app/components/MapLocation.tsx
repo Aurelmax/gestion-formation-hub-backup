@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { Card } from '@/components/ui/card';
+import Image from 'next/image';
 
 // Nous utilisons une approche dynamique pour charger Leaflet côté client uniquement
 // afin d'éviter les problèmes de SSR et de typage TypeScript
@@ -95,10 +96,12 @@ const MapLocation = ({
           <div id="map-container" style={{ height: '100%', width: '100%' }}></div>
         ) : (
           // Solution de repli pour le SSR ou si Leaflet n'est pas chargé
-          <img 
-            src={staticMapUrl} 
-            alt="Carte de localisation GestionMax Formation" 
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+          <Image
+            src={staticMapUrl}
+            alt="Carte de localisation GestionMax Formation"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         )}
       </div>

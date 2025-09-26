@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Award, CheckCircle, Users, BookOpen, Clock, Mail, Phone, FileDown, ExternalLink } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Image from "next/image";
 
 const APropos = () => {
   return (
@@ -14,10 +15,12 @@ const APropos = () => {
       {/* Hero Section */}
       <section className="relative">
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/formation-wordpress-antibes.webp" 
-            alt="Formation WordPress Antibes" 
-            className="w-full h-full object-cover"
+          <Image
+            src="/formation-wordpress-antibes.webp"
+            alt="Formation WordPress Antibes"
+            fill
+            className="object-cover"
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-blue-900/70"></div>
         </div>

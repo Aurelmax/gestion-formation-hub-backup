@@ -9,495 +9,440 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model ProgrammeFormation {
-  id                      String                  @id @default(uuid())
-  code                    String
-  type                    String
-  version                 Int                     @default(1)
-  estActif                Boolean                 @default(true) @map("est_actif")
-  estVisible              Boolean                 @default(true) @map("est_visible")
-  categorieId             String?                 @map("categorie_id")
-  pictogramme             String?
-  titre                   String
-  description             String
-  duree                   String
-  prix                    String
-  niveau                  String
-  participants            String
-  objectifs               String[]
-  objectifsSpecifiques    String?                 @map("objectifs_specifiques")
-  prerequis               String
-  publicConcerne          String                  @map("public_concerne")
-  contenuDetailleJours    String                  @map("contenu_detaille_jours")
-  evaluationSur           String?                 @map("evaluation_sur")
-  horaires                String                  @default("9h-12h30 et 14h-17h30")
-  modalites               String?
-  modalitesAcces          String                  @map("modalites_acces")
-  modalitesTechniques     String                  @map("modalites_techniques")
-  delaiAcces              String?                 @map("delai_acces")
-  modalitesReglement      String                  @map("modalites_reglement")
-  contactOrganisme        String                  @default("GestionMax - aurelien@gestionmax.fr - 06.46.02.24.68") @map("contact_organisme")
-  referentPedagogique     String                  @default("Aurélien Lien - aurelien@gestionmax.fr") @map("referent_pedagogique")
-  referentQualite         String                  @default("Aurélien Lien - aurelien@gestionmax.fr") @map("referent_qualite")
-  formateur               String
-  ressourcesDisposition   String                  @map("ressources_disposition")
-  modalitesEvaluation     String                  @map("modalites_evaluation")
-  sanctionFormation       String                  @map("sanction_formation")
-  niveauCertification     String                  @map("niveau_certification")
-  delaiAcceptation        String                  @map("delai_acceptation")
-  accessibiliteHandicap   String                  @map("accessibilite_handicap")
-  cessationAbandon        String                  @map("cessation_abandon")
-  programmeUrl            String?                 @map("programme_url")
-  ressourcesAssociees     String[]                @map("ressources_associees")
-  dateCreation            DateTime                @default(now()) @map("date_creation")
-  dateModification        DateTime                @default(now()) @updatedAt @map("date_modification")
-  beneficiaireId          String?                 @map("beneficiaire_id")
-  formateurId             String?                 @map("formateur_id")
-  positionnementRequestId String?                 @unique @map("positionnement_request_id")
-  programmeCatalogueId    String?                 @map("programme_catalogue_id")
-  dossiers                DossierFormation[]
-  positionnements         PositionnementRequest[] @relation("PositionnementProgramme")
-  categorie               CategorieProgramme?     @relation("ProgrammesCategorie", fields: [categorieId], references: [id])
-  programmeCatalogue      ProgrammeFormation?     @relation("ProgrammeCataloguePersonnalise", fields: [programmeCatalogueId], references: [id])
-  programmesDerivés      ProgrammeFormation[]    @relation("ProgrammeCataloguePersonnalise")
-  programmesPersonnalises ProgrammePersonnalise[]
-  rendezvous              Rendezvous[]
+model accounts {
+  id                  String  @id
+  user_id             String
+  type                String
+  provider            String
+  provider_account_id String
+  refresh_token       String?
+  access_token        String?
+  expires_at          Int?
+  token_type          String?
+  scope               String?
+  id_token            String?
+  session_state       String?
+  users               users   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  @@index([categorieId])
-  @@index([estActif])
-  @@index([estVisible])
-  @@index([type])
-  @@index([dateCreation])
-  @@index([programmeCatalogueId])
-  @@index([categorieId, estActif, estVisible])
-  @@index([type, estActif, estVisible])
-  @@map("programmes_formation")
+  @@unique([provider, provider_account_id])
 }
 
-model CategorieProgramme {
-  id          String               @id @default(uuid())
-  code        String               @unique
-  titre       String
-  description String
-  ordre       Int                  @default(0)
-  createdAt   DateTime             @default(now()) @map("created_at")
-  updatedAt   DateTime             @default(now()) @updatedAt @map("updated_at")
-  programmes  ProgrammeFormation[] @relation("ProgrammesCategorie")
-
-  @@map("categories_programme")
+model actions_correctives {
+  id                             String                           @id
+  titre                          String
+  description                    String
+  statut                         String                           @default("planifiee")
+  origine_type                   String
+  origine_ref                    String?
+  origine_date                   DateTime?
+  origine_resume                 String?
+  priorite                       String                           @default("moyenne")
+  avancement                     Int                              @default(0)
+  responsable_nom                String?
+  responsable_email              String?
+  date_echeance                  DateTime?
+  indicateur_efficacite          String?
+  reclamation_id                 String?
+  created_at                     DateTime                         @default(now())
+  updated_at                     DateTime                         @default(now())
+  reclamations                   reclamations?                    @relation(fields: [reclamation_id], references: [id])
+  historique_actions_correctives historique_actions_correctives[]
 }
 
-model Account {
-  id                String  @id @default(cuid())
-  userId            String  @map("user_id")
-  type              String
-  provider          String
-  providerAccountId String  @map("provider_account_id")
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@map("accounts")
+model apprenants {
+  id                 String               @id
+  nom                String
+  email              String
+  telephone          String?
+  created_at         DateTime             @default(now())
+  dossiers_formation dossiers_formation[]
 }
 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique @map("session_token")
-  userId       String   @map("user_id")
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sessions")
+model categories_programme {
+  id                   String                 @id
+  code                 String                 @unique
+  titre                String
+  description          String
+  ordre                Int                    @default(0)
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @default(now())
+  programmes_formation programmes_formation[]
 }
 
-model User {
-  id                    String        @id @default(cuid())
-  email                 String?       @unique
-  password              String?
-  nom                   String?
-  prenom                String?
-  role                  String        @default("user")
-  createdAt             DateTime      @default(now()) @map("created_at")
-  updatedAt             DateTime      @default(now()) @updatedAt @map("updated_at")
-  emailVerified         DateTime?     @map("email_verified")
-  image                 String?
-  name                  String?
-  accounts              Account[]
-  reclamationsAssignees Reclamation[] @relation("ReclamationsAssignees")
-  sessions              Session[]
-
-  @@map("users")
+model competences {
+  id                    String   @id
+  nom                   String
+  description           String
+  categorie             String
+  domaine_developpement String
+  niveau_actuel         Int
+  objectif_niveau       Int
+  statut                String
+  action_prevue         String
+  plateforme_formation  String?
+  lien_formation        String?
+  type_preuve           String
+  contenu_preuve        String
+  date_creation         DateTime @default(now())
+  date_modification     DateTime @default(now())
+  formateur_id          String?
 }
 
-model VerificationToken {
+model conformite_qualiopi {
+  id                 String   @id
+  indicateur         String
+  description        String
+  statut_conformite  String
+  date_verification  DateTime
+  prochaine_echeance DateTime
+  element_preuve     String?
+  commentaire        String?
+}
+
+model demandes_accessibilite {
+  id              String    @id
+  nom             String
+  email           String
+  telephone       String?
+  description     String
+  date_creation   DateTime  @default(now())
+  statut          String    @default("nouvelle")
+  reponse         String?
+  date_resolution DateTime?
+}
+
+model documents_formation {
+  id                   String             @id
+  dossier_formation_id String
+  nom                  String
+  type                 String
+  url                  String
+  date_creation        DateTime           @default(now())
+  dossiers_formation   dossiers_formation @relation(fields: [dossier_formation_id], references: [id])
+}
+
+model dossiers_formation {
+  id                      String                   @id
+  apprenant_id            String
+  positionnement_id       String?                  @unique
+  date_inscription        DateTime                 @default(now())
+  date_debut              DateTime?
+  date_fin                DateTime?
+  created_at              DateTime                 @default(now())
+  updated_at              DateTime                 @default(now())
+  programme_formation_id  String?
+  statut                  String                   @default("inscrit")
+  formation_id            String
+  documents_formation     documents_formation[]
+  apprenants              apprenants               @relation(fields: [apprenant_id], references: [id])
+  formations              formations               @relation(fields: [formation_id], references: [id])
+  positionnement_requests positionnement_requests? @relation(fields: [positionnement_id], references: [id])
+  programmes_formation    programmes_formation?    @relation(fields: [programme_formation_id], references: [id])
+  rendezvous              rendezvous[]
+}
+
+model formations {
+  id                       String                     @id
+  duree                    String
+  prerequis                String
+  tarif                    String
+  date_creation            DateTime                   @default(now())
+  date_modification        DateTime                   @default(now())
+  created_at               DateTime                   @default(now())
+  accessibilite_handicapee String                     @default("Formation accessible aux personnes en situation de handicap. Contactez notre référent handicap pour adapter le parcours.")
+  delai_acceptation        String                     @default("7 jours ouvrables")
+  formateur                String                     @default("Formateur spécialisé WordPress avec 5+ ans d'expérience")
+  horaires                 String                     @default("9h-12h30 et 14h-17h30, adaptables selon les besoins du bénéficiaire")
+  modalites_acces          String                     @default("Formation accessible à distance ou en présentiel selon le contexte")
+  niveau_certification     String                     @default("Formation non certifiante")
+  objectifs_pedagogiques   String
+  referent_pedagogique     String                     @default("Aurélien Lien - aurelien@gestionmax.fr")
+  referent_qualite         String                     @default("Aurélien Lien - aurelien@gestionmax.fr")
+  ressources_disposition   String                     @default("Support de cours, tutoriels vidéo, accès à une plateforme d'exercices")
+  code                     String
+  libelle                  String
+  contenu_detaille_jours   String?
+  cessation_abandon        String
+  contact_organisme        String                     @default("GestionMax - aurelien@gestionmax.fr - 01.23.45.67.89")
+  modalites_evaluation     String
+  modalites_reglement      String
+  public_concerne          String
+  sanction_formation       String
+  modalitesTechniques      String                     @default("Formation en présentiel individuel")
+  dossiers_formation       dossiers_formation[]
+  programmes_personnalises programmes_personnalises[]
+}
+
+model historique_actions_correctives {
+  id                   String              @id
+  action_corrective_id String
+  date_action          DateTime            @default(now())
+  action               String
+  utilisateur          String
+  commentaire          String?
+  created_at           DateTime            @default(now())
+  actions_correctives  actions_correctives @relation(fields: [action_corrective_id], references: [id])
+}
+
+model plans_accessibilite {
+  id                String   @id
+  titre             String
+  description       String
+  date_creation     DateTime @default(now())
+  date_modification DateTime @default(now())
+  actions_requises  String[]
+  statut            String   @default("actif")
+}
+
+model positionnement_requests {
+  id                       String                    @id
+  formation_selectionnee   String?
+  nom_beneficiaire         String
+  prenom_beneficiaire      String
+  statut                   String                    @default("nouveau")
+  created_at               DateTime                  @default(now())
+  updated_at               DateTime                  @default(now())
+  adresse_entreprise       String?
+  entreprise               String?
+  interlocuteur_email      String?
+  interlocuteur_fonction   String?
+  interlocuteur_nom        String?
+  interlocuteur_telephone  String?
+  organisme_financeur      String?
+  siret                    String?
+  type_financement         String?
+  attentes                 String
+  besoin_handicap          String?
+  commentaires             String?
+  date_contact             DateTime?
+  date_debut_souhaitee     DateTime?
+  date_dispo               String
+  date_fin_souhaitee       DateTime?
+  date_rdv                 DateTime?
+  details_handicap         String?
+  email_beneficiaire       String
+  has_handicap             Boolean                   @default(false)
+  is_financement           Boolean                   @default(false)
+  modalite_formation       String?
+  niveau_beneficiaire      String?
+  objectifs                String[]
+  pratique_actuelle        String
+  situation_actuelle       String
+  telephone_beneficiaire   String?
+  dossiers_formation       dossiers_formation?
+  programmes_formation     programmes_formation?
+  programmes_personnalises programmes_personnalises?
+}
+
+model programmes_formation {
+  id                         String                   @id
+  code                       String
+  type                       String
+  version                    Int                      @default(1)
+  est_actif                  Boolean                  @default(true)
+  est_visible                Boolean                  @default(true)
+  categorie_id               String?
+  pictogramme                String?
+  titre                      String
+  description                String
+  duree                      String
+  prix                       String
+  niveau                     String
+  participants               String
+  objectifs                  String[]
+  objectifs_specifiques      String?
+  prerequis                  String
+  public_concerne            String
+  contenu_detaille_jours     String
+  evaluation_sur             String?
+  horaires                   String                   @default("9h-12h30 et 14h-17h30")
+  modalites                  String
+  modalites_acces            String
+  modalites_techniques       String
+  delai_acces                String?
+  modalites_reglement        String
+  contact_organisme          String                   @default("GestionMax - aurelien@gestionmax.fr - 06.46.02.24.68")
+  referent_pedagogique       String                   @default("Aurélien Lien - aurelien@gestionmax.fr")
+  referent_qualite           String                   @default("Aurélien Lien - aurelien@gestionmax.fr")
+  formateur                  String
+  ressources_disposition     String
+  modalites_evaluation       String
+  sanction_formation         String
+  niveau_certification       String
+  delai_acceptation          String
+  accessibilite_handicap     String
+  cessation_abandon          String
+  programme_url              String?
+  ressources_associees       String[]
+  date_creation              DateTime                 @default(now())
+  date_modification          DateTime                 @default(now())
+  beneficiaire_id            String?
+  formateur_id               String?
+  positionnement_request_id  String?                  @unique
+  programme_source_id        String?
+  type_programme             String?
+  dossiers_formation         dossiers_formation[]
+  categories_programme       categories_programme?    @relation(fields: [categorie_id], references: [id])
+  positionnement_requests    positionnement_requests? @relation(fields: [positionnement_request_id], references: [id])
+  programmes_formation       programmes_formation?    @relation("programmes_formationToprogrammes_formation", fields: [programme_source_id], references: [id])
+  other_programmes_formation programmes_formation[]   @relation("programmes_formationToprogrammes_formation")
+  rendezvous                 rendezvous[]
+}
+
+model programmes_personnalises {
+  id                        String                   @id
+  titre                     String
+  description               String
+  contenu                   String
+  duree                     String
+  objectifs_specifiques     String
+  evaluation_sur            String
+  created_at                DateTime                 @default(now())
+  updated_at                DateTime                 @default(now())
+  accessibilite_handicap    String?
+  cessation_anticipee       String?
+  delai_acceptation         String?
+  delai_acces               String?
+  formateur                 String?
+  horaires                  String?
+  modalites_acces           String?
+  modalites_evaluation      String?
+  modalites_reglement       String?
+  modalites_techniques      String?
+  niveau_certification      String?
+  prerequis                 String?
+  public_concerne           String?
+  referent_pedagogique      String?
+  referent_qualite          String?
+  ressources_disposition    String?
+  sanction_formation        String?
+  tarif                     String?
+  positionnement_request_id String?                  @unique
+  formation_id              String
+  formations                formations               @relation(fields: [formation_id], references: [id])
+  positionnement_requests   positionnement_requests? @relation(fields: [positionnement_request_id], references: [id])
+  rendezvous                rendezvous[]
+}
+
+model reclamations {
+  id                  String                @id
+  nom                 String
+  email               String
+  telephone           String?
+  sujet               String
+  message             String
+  statut              String                @default("nouvelle")
+  priorite            String                @default("normale")
+  assignee_id         String?
+  notes_internes      String?
+  date_resolution     DateTime?
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @default(now())
+  actions_correctives actions_correctives[]
+  users               users?                @relation(fields: [assignee_id], references: [id])
+}
+
+model rendezvous {
+  id                        String                    @id
+  type                      String
+  status                    String
+  prenom                    String
+  nom                       String
+  email                     String
+  telephone                 String?
+  objectifs                 String?
+  competences_actuelles     String?
+  niveau                    String?
+  format_souhaite           String?
+  disponibilites            String?
+  commentaires              String?
+  date_rdv                  DateTime?
+  duree_rdv                 Int?
+  format_rdv                String?
+  lieu_rdv                  String?
+  lien_visio                String?
+  notes                     String?
+  synthese                  String?
+  formation_titre           String?
+  formation_selectionnee    String?
+  situation_actuelle        String?
+  attentes                  String?
+  pratique_actuelle         String?
+  is_financement            Boolean?                  @default(false)
+  type_financement          String?
+  organisme_financeur       String?
+  has_handicap              Boolean?                  @default(false)
+  details_handicap          String?
+  besoin_handicap           String?
+  entreprise                String?
+  siret                     String?
+  adresse_entreprise        String?
+  interlocuteur_nom         String?
+  interlocuteur_fonction    String?
+  interlocuteur_email       String?
+  interlocuteur_telephone   String?
+  date_contact              DateTime?
+  date_debut_souhaitee      DateTime?
+  date_fin_souhaitee        DateTime?
+  created_at                DateTime                  @default(now())
+  updated_at                DateTime                  @default(now())
+  formation_id              String?
+  dossier_formation_id      String?
+  programme_personnalise_id String?
+  ameliorations_suggerees   String?
+  commentaires_impact       String?
+  competences_appliquees    String?
+  date_impact               DateTime?
+  rendezvous_parent_id      String?
+  satisfaction_impact       Int?
+  competences_recherchees   String?
+  dossiers_formation        dossiers_formation?       @relation(fields: [dossier_formation_id], references: [id], map: "rendezvous_dossier_formation_fkey")
+  programmes_formation      programmes_formation?     @relation(fields: [formation_id], references: [id], map: "rendezvous_formation_fkey")
+  programmes_personnalises  programmes_personnalises? @relation(fields: [programme_personnalise_id], references: [id], map: "rendezvous_programme_personnalise_fkey")
+  rendezvous                rendezvous?               @relation("rendezvousTorendezvous", fields: [rendezvous_parent_id], references: [id])
+  other_rendezvous          rendezvous[]              @relation("rendezvousTorendezvous")
+}
+
+model sessions {
+  id            String   @id
+  session_token String   @unique
+  user_id       String
+  expires       DateTime
+  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model users {
+  id             String         @id
+  email          String?        @unique
+  password       String?
+  nom            String?
+  prenom         String?
+  role           String         @default("user")
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @default(now())
+  email_verified DateTime?
+  image          String?
+  name           String?
+  accounts       accounts[]
+  reclamations   reclamations[]
+  sessions       sessions[]
+}
+
+model veilles {
+  id            String    @id
+  titre         String
+  description   String
+  type          String
+  statut        String    @default("nouvelle")
+  avancement    Int       @default(0)
+  date_creation DateTime  @default(now())
+  date_echeance DateTime?
+}
+
+model verification_tokens {
   identifier String
   token      String   @unique
   expires    DateTime
 
   @@unique([identifier, token])
-  @@map("verification_tokens")
-}
-
-model Apprenant {
-  id        String             @id @default(uuid())
-  nom       String
-  email     String
-  telephone String?
-  createdAt DateTime           @default(now()) @map("created_at")
-  dossiers  DossierFormation[]
-
-  @@map("apprenants")
-}
-
-model Competence {
-  id                   String   @id @default(uuid())
-  nom                  String
-  description          String
-  categorie            String
-  domaineDeveloppement String   @map("domaine_developpement")
-  niveauActuel         Int      @map("niveau_actuel")
-  objectifNiveau       Int      @map("objectif_niveau")
-  statut               String
-  actionPrevue         String   @map("action_prevue")
-  plateformeFomation   String?  @map("plateforme_formation")
-  lienFormation        String?  @map("lien_formation")
-  typePreuve           String   @map("type_preuve")
-  contenuPreuve        String   @map("contenu_preuve")
-  dateCreation         DateTime @default(now()) @map("date_creation")
-  dateModification     DateTime @default(now()) @updatedAt @map("date_modification")
-  formateurId          String?  @map("formateur_id")
-
-  @@map("competences")
-}
-
-model PositionnementRequest {
-  id                      String                 @id @default(uuid())
-  formationSelectionnee   String?                @map("formation_selectionnee")
-  nomBeneficiaire         String                 @map("nom_beneficiaire")
-  prenomBeneficiaire      String                 @map("prenom_beneficiaire")
-  statut                  String                 @default("nouveau")
-  createdAt               DateTime               @default(now()) @map("created_at")
-  updatedAt               DateTime               @default(now()) @updatedAt @map("updated_at")
-  adresseEntreprise       String?                @map("adresse_entreprise")
-  entreprise              String?
-  interlocuteurEmail      String?                @map("interlocuteur_email")
-  interlocuteurFonction   String?                @map("interlocuteur_fonction")
-  interlocuteurNom        String?                @map("interlocuteur_nom")
-  interlocuteurTelephone  String?                @map("interlocuteur_telephone")
-  organismeFinanceur      String?                @map("organisme_financeur")
-  siret                   String?                @map("siret")
-  typeFinancement         String?                @map("type_financement")
-  attentes                String
-  besoinHandicap          String?                @map("besoin_handicap")
-  commentaires            String?
-  dateContact             DateTime?              @map("date_contact")
-  dateDebutSouhaitee      DateTime?              @map("date_debut_souhaitee")
-  dateDispo               String                 @map("date_dispo")
-  dateFinSouhaitee        DateTime?              @map("date_fin_souhaitee")
-  dateRdv                 DateTime?              @map("date_rdv")
-  detailsHandicap         String?                @map("details_handicap")
-  emailBeneficiaire       String                 @map("email_beneficiaire")
-  hasHandicap             Boolean                @default(false) @map("has_handicap")
-  isFinancement           Boolean                @default(false) @map("is_financement")
-  modaliteFormation       String?                @map("modalite_formation")
-  niveauBeneficiaire      String?                @map("niveau_beneficiaire")
-  objectifs               String[]
-  pratiqueActuelle        String                 @map("pratique_actuelle")
-  situationActuelle       String                 @map("situation_actuelle")
-  telephoneBeneficiaire   String?                @map("telephone_beneficiaire")
-  dossierFormationId      String?                @map("dossier_formation_id")
-  programmeFormationId    String?                @map("programme_formation_id")
-  programmePersonnaliseId String?                @map("programme_personnalise_id")
-  dossierFormation        DossierFormation?      @relation("PositionnementDossier", fields: [dossierFormationId], references: [id])
-  programmeFormation      ProgrammeFormation?    @relation("PositionnementProgramme", fields: [programmeFormationId], references: [id])
-  programmePersonnalise   ProgrammePersonnalise? @relation("PositionnementProgrammePersonnalise", fields: [programmePersonnaliseId], references: [id])
-
-  @@map("positionnement_requests")
-}
-
-model Reclamation {
-  id                 String             @id @default(uuid())
-  nom                String
-  email              String
-  telephone          String?
-  sujet              String
-  message            String
-  statut             String             @default("nouvelle")
-  priorite           String             @default("normale")
-  assigneeId         String?            @map("assignee_id")
-  notesInternes      String?            @map("notes_internes")
-  dateResolution     DateTime?          @map("date_resolution")
-  createdAt          DateTime           @default(now()) @map("created_at")
-  updatedAt          DateTime           @default(now()) @updatedAt @map("updated_at")
-  actionsCorrectives ActionCorrective[]
-  assignee           User?              @relation("ReclamationsAssignees", fields: [assigneeId], references: [id])
-
-  @@map("reclamations")
-}
-
-model ActionCorrective {
-  id                   String                       @id @default(uuid())
-  titre                String
-  description          String
-  statut               String                       @default("planifiee")
-  origineType          String                       @map("origine_type")
-  origineRef           String?                      @map("origine_ref")
-  origineDate          DateTime?                    @map("origine_date")
-  origineResume        String?                      @map("origine_resume")
-  priorite             String                       @default("moyenne")
-  avancement           Int                          @default(0)
-  responsableNom       String?                      @map("responsable_nom")
-  responsableEmail     String?                      @map("responsable_email")
-  dateEcheance         DateTime?                    @map("date_echeance")
-  indicateurEfficacite String?                      @map("indicateur_efficacite")
-  reclamationId        String?                      @map("reclamation_id")
-  createdAt            DateTime                     @default(now()) @map("created_at")
-  updatedAt            DateTime                     @default(now()) @updatedAt @map("updated_at")
-  reclamation          Reclamation?                 @relation(fields: [reclamationId], references: [id])
-  historiqueActions    HistoriqueActionCorrective[]
-
-  @@map("actions_correctives")
-}
-
-model HistoriqueActionCorrective {
-  id                 String           @id @default(uuid())
-  actionCorrectiveId String           @map("action_corrective_id")
-  dateAction         DateTime         @default(now()) @map("date_action")
-  action             String
-  utilisateur        String
-  commentaire        String?
-  createdAt          DateTime         @default(now()) @map("created_at")
-  actionCorrective   ActionCorrective @relation(fields: [actionCorrectiveId], references: [id])
-
-  @@map("historique_actions_correctives")
-}
-
-model PlanAccessibilite {
-  id               String   @id @default(uuid())
-  titre            String
-  description      String
-  dateCreation     DateTime @default(now()) @map("date_creation")
-  dateModification DateTime @default(now()) @updatedAt @map("date_modification")
-  actionsRequises  String[] @map("actions_requises")
-  statut           String   @default("actif")
-
-  @@map("plans_accessibilite")
-}
-
-model DemandeAccessibilite {
-  id             String    @id @default(uuid())
-  nom            String
-  email          String
-  telephone      String?
-  description    String
-  dateCreation   DateTime  @default(now()) @map("date_creation")
-  statut         String    @default("nouvelle")
-  reponse        String?
-  dateResolution DateTime? @map("date_resolution")
-
-  @@map("demandes_accessibilite")
-}
-
-model DossierFormation {
-  id                   String                  @id @default(uuid())
-  apprenantId          String                  @map("apprenant_id")
-  positionnementId     String?                 @unique @map("positionnement_id")
-  dateInscription      DateTime                @default(now()) @map("date_inscription")
-  dateDebut            DateTime?               @map("date_debut")
-  dateFin              DateTime?               @map("date_fin")
-  createdAt            DateTime                @default(now()) @map("created_at")
-  updatedAt            DateTime                @default(now()) @updatedAt @map("updated_at")
-  programmeFormationId String                  @map("programme_formation_id")
-  statut               String                  @default("inscrit")
-  documents            DocumentFormation[]
-  apprenant            Apprenant               @relation(fields: [apprenantId], references: [id])
-  programmeFormation   ProgrammeFormation      @relation(fields: [programmeFormationId], references: [id])
-  positionnements      PositionnementRequest[] @relation("PositionnementDossier")
-  rendezvous           Rendezvous[]
-
-  @@map("dossiers_formation")
-}
-
-model DocumentFormation {
-  id                 String           @id @default(uuid())
-  dossierFormationId String           @map("dossier_formation_id")
-  nom                String
-  type               String
-  url                String
-  dateCreation       DateTime         @default(now()) @map("date_creation")
-  dossierFormation   DossierFormation @relation(fields: [dossierFormationId], references: [id])
-
-  @@map("documents_formation")
-}
-
-model ProgrammePersonnalise {
-  id                      String                  @id @default(uuid())
-  titre                   String
-  description             String
-  contenu                 String
-  duree                   String
-  objectifsSpecifiques    String                  @map("objectifs_specifiques")
-  evaluationSur           String                  @map("evaluation_sur")
-  createdAt               DateTime                @default(now()) @map("created_at")
-  updatedAt               DateTime                @default(now()) @updatedAt @map("updated_at")
-  accessibiliteHandicap   String?                 @map("accessibilite_handicap")
-  cessationAnticipee      String?                 @map("cessation_anticipee")
-  delaiAcceptation        String?                 @map("delai_acceptation")
-  delaiAcces              String?                 @map("delai_acces")
-  formateur               String?                 @map("formateur")
-  horaires                String?                 @map("horaires")
-  modalitesAcces          String?                 @map("modalites_acces")
-  modalitesEvaluation     String?                 @map("modalites_evaluation")
-  modalitesReglement      String?                 @map("modalites_reglement")
-  modalitesTechniques     String?                 @map("modalites_techniques")
-  niveauCertification     String?                 @map("niveau_certification")
-  prerequis               String?                 @map("prerequis")
-  publicConcerne          String?                 @map("public_concerne")
-  referentPedagogique     String?                 @map("referent_pedagogique")
-  referentQualite         String?                 @map("referent_qualite")
-  ressourcesDisposition   String?                 @map("ressources_disposition")
-  sanctionFormation       String?                 @map("sanction_formation")
-  tarif                   String?                 @map("tarif")
-  positionnementRequestId String?                 @unique @map("positionnement_request_id")
-  programmeFormationId    String                  @map("programme_formation_id")
-  positionnements         PositionnementRequest[] @relation("PositionnementProgrammePersonnalise")
-  programmeFormation      ProgrammeFormation      @relation(fields: [programmeFormationId], references: [id])
-  rendezvous              Rendezvous[]
-
-  @@map("programmes_personnalises")
-}
-
-model Veille {
-  id               String              @id @default(uuid())
-  titre            String
-  description      String
-  type             String
-  statut           String              @default("nouvelle")
-  avancement       Int                 @default(0)
-  dateCreation     DateTime            @default(now()) @map("date_creation")
-  dateEcheance     DateTime?           @map("date_echeance")
-  dateModification DateTime            @default(now()) @updatedAt @map("date_modification")
-  commentaires     VeilleCommentaire[]
-  documents        VeilleDocument[]
-  historique       VeilleHistorique[]
-
-  @@map("veilles")
-}
-
-model VeilleCommentaire {
-  id           String   @id @default(uuid())
-  veilleId     String   @map("veille_id")
-  contenu      String
-  dateCreation DateTime @default(now()) @map("date_creation")
-  utilisateur  String?
-  veille       Veille   @relation(fields: [veilleId], references: [id], onDelete: Cascade)
-
-  @@map("veille_commentaires")
-}
-
-model VeilleDocument {
-  id        String   @id @default(uuid())
-  veilleId  String   @map("veille_id")
-  nom       String
-  url       String
-  type      String
-  taille    Int
-  dateAjout DateTime @default(now()) @map("date_ajout")
-  veille    Veille   @relation(fields: [veilleId], references: [id], onDelete: Cascade)
-
-  @@map("veille_documents")
-}
-
-model VeilleHistorique {
-  id          String   @id @default(uuid())
-  veilleId    String   @map("veille_id")
-  action      String
-  details     String?
-  dateAction  DateTime @default(now()) @map("date_action")
-  utilisateur String?
-  veille      Veille   @relation(fields: [veilleId], references: [id], onDelete: Cascade)
-
-  @@map("veille_historique")
-}
-
-model ConformiteQualiopi {
-  id                String   @id @default(uuid())
-  indicateur        String
-  description       String
-  statutConformite  String   @map("statut_conformite")
-  dateVerification  DateTime @map("date_verification")
-  prochaineEcheance DateTime @map("prochaine_echeance")
-  elementPreuve     String?  @map("element_preuve")
-  commentaire       String?
-
-  @@map("conformite_qualiopi")
-}
-
-model Rendezvous {
-  id                      String                 @id @default(uuid())
-  type                    String
-  status                  String
-  prenom                  String
-  nom                     String
-  email                   String
-  telephone               String?
-  objectifs               String?
-  competencesActuelles    String?                @map("competences_actuelles")
-  niveau                  String?
-  formatSouhaite          String?                @map("format_souhaite")
-  disponibilites          String?
-  commentaires            String?
-  dateRdv                 DateTime?              @map("date_rdv")
-  dureeRdv                Int?                   @map("duree_rdv")
-  formatRdv               String?                @map("format_rdv")
-  lieuRdv                 String?                @map("lieu_rdv")
-  lienVisio               String?                @map("lien_visio")
-  notes                   String?
-  synthese                String?
-  formationTitre          String?                @map("formation_titre")
-  formationSelectionnee   String?                @map("formation_selectionnee")
-  situationActuelle       String?                @map("situation_actuelle")
-  attentes                String?
-  pratiqueActuelle        String?                @map("pratique_actuelle")
-  isFinancement           Boolean?               @default(false) @map("is_financement")
-  typeFinancement         String?                @map("type_financement")
-  organismeFinanceur      String?                @map("organisme_financeur")
-  hasHandicap             Boolean?               @default(false) @map("has_handicap")
-  detailsHandicap         String?                @map("details_handicap")
-  besoinHandicap          String?                @map("besoin_handicap")
-  entreprise              String?
-  siret                   String?
-  adresseEntreprise       String?                @map("adresse_entreprise")
-  interlocuteurNom        String?                @map("interlocuteur_nom")
-  interlocuteurFonction   String?                @map("interlocuteur_fonction")
-  interlocuteurEmail      String?                @map("interlocuteur_email")
-  interlocuteurTelephone  String?                @map("interlocuteur_telephone")
-  dateContact             DateTime?              @map("date_contact")
-  dateDebutSouhaitee      DateTime?              @map("date_debut_souhaitee")
-  dateFinSouhaitee        DateTime?              @map("date_fin_souhaitee")
-  createdAt               DateTime               @default(now()) @map("created_at")
-  updatedAt               DateTime               @default(now()) @updatedAt @map("updated_at")
-  formationId             String?                @map("formation_id")
-  dossierFormationId      String?                @map("dossier_formation_id")
-  programmePersonnaliseId String?                @map("programme_personnalise_id")
-  ameliorationsSuggeres   String?                @map("ameliorations_suggerees")
-  commentairesImpact      String?                @map("commentaires_impact")
-  competencesAppliquees   String?                @map("competences_appliquees")
-  dateImpact              DateTime?              @map("date_impact")
-  rendezvousParentId      String?                @map("rendezvous_parent_id")
-  satisfactionImpact      Int?                   @map("satisfaction_impact")
-  competencesRecherchees  String?                @map("competences_recherchees")
-  dossierFormation        DossierFormation?      @relation(fields: [dossierFormationId], references: [id], map: "rendezvous_dossier_formation_fkey")
-  programmeFormation      ProgrammeFormation?    @relation(fields: [formationId], references: [id], map: "rendezvous_formation_fkey")
-  programmePersonnalise   ProgrammePersonnalise? @relation(fields: [programmePersonnaliseId], references: [id], map: "rendezvous_programme_personnalise_fkey")
-  rendezvousParent        Rendezvous?            @relation("RendezvousImpact", fields: [rendezvousParentId], references: [id])
-  rendezvousImpacts       Rendezvous[]           @relation("RendezvousImpact")
-
-  @@map("rendezvous")
 }

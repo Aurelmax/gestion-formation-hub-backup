@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Button, Typography, Box, CircularProgress, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
-import { InsertDriveFile as DocumentIcon } from '@mui/icons-material';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { FileText } from 'lucide-react';
 
 interface DocumentGeneratorProps {
   dossierId: string;
@@ -62,65 +63,61 @@ const DocumentGenerator: React.FC<DocumentGeneratorProps> = ({
   };
 
   return (
-    <Box sx={{ mt: 2, mb: 2 }}>
+    <div className="mt-4 mb-4">
       {!documents && (
         <Button
-          variant="contained"
-          color="primary"
           onClick={handleGenerateDocuments}
           disabled={loading}
-          sx={{ mb: 2 }}
+          className="mb-4"
         >
-          {loading ? <CircularProgress size={24} color="inherit" /> : buttonText}
+          {loading ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              Génération...
+            </div>
+          ) : (
+            buttonText
+          )}
         </Button>
       )}
 
       {error && (
-        <Typography color="error" variant="body1" sx={{ mt: 2 }}>
+        <p className="text-red-600 mt-4">
           {error}
-        </Typography>
+        </p>
       )}
 
       {documents && documents.length > 0 && (
-        <Box>
-          <Typography variant="h6" sx={{ mb: 1 }}>
+        <div>
+          <h3 className="text-lg font-semibold mb-4">
             Documents générés:
-          </Typography>
-          <List>
+          </h3>
+          <div className="space-y-2">
             {documents.map((doc, index) => (
-              <ListItem 
+              <Card
                 key={index}
-                component="a"
-                href={doc.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={{
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '4px',
-                  mb: 1,
-                  padding: '8px 16px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    backgroundColor: '#f5f5f5',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0px 2px 4px rgba(0,0,0,0.1)'
-                  }
-                }}
+                className="hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
               >
-                <ListItemIcon>
-                  <DocumentIcon />
-                </ListItemIcon>
-                <ListItemText 
-                  primary={getDocumentName(doc.name)}
-                  secondary="Cliquez pour télécharger le PDF"
-                />
-              </ListItem>
+                <CardContent className="p-4">
+                  <a
+                    href={doc.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 text-decoration-none"
+                  >
+                    <FileText className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <p className="font-medium">{getDocumentName(doc.name)}</p>
+                      <p className="text-sm text-gray-500">Cliquez pour télécharger le PDF</p>
+                    </div>
+                  </a>
+                </CardContent>
+              </Card>
             ))}
-          </List>
-        </Box>
+          </div>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 

@@ -89,10 +89,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!session?.user) return null;
     
     const newUser = {
-      id: (session.user as any).id || session.user.email || '',
+      id: session.user.id || session.user.email || '',
       email: session.user.email || null,
       name: session.user.name || null,
-      role: (session.user as any).role,
+      role: session.user.role,
       image: session.user.image || null
     };
 

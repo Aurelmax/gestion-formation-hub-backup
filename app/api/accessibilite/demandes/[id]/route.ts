@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from '@prisma/client';
 
 
 
@@ -59,7 +60,7 @@ export async function PUT(
       );
     }
 
-    const updateData: any = {};
+    const updateData: Prisma.DemandeAccessibiliteUpdateInput = {};
     
     if (nom) updateData.nom = nom;
     if (email) updateData.email = email;

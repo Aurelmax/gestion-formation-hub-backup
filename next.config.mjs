@@ -9,7 +9,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Disable static generation to avoid prerender errors during build analysis
+  // Standard build configuration
   output: 'standalone',
   // Bundle optimization
   experimental: {

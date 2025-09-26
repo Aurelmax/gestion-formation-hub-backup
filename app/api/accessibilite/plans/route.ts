@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 
 // GET - Récupérer tous les plans d'accessibilité
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const plans = await prisma.planAccessibilite.findMany({
       orderBy: { dateCreation: 'desc' }

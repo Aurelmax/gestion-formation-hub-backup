@@ -5,6 +5,7 @@ import { Calendar, User, Clock } from "lucide-react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Image from "next/image";
 
 const Blog = () => {
   const articles = [
@@ -85,10 +86,12 @@ const Blog = () => {
       {/* Hero Section */}
       <section className="relative">
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/formation-wordpress-antibes.webp" 
-            alt="Formation WordPress Antibes" 
-            className="w-full h-full object-cover"
+          <Image
+            src="/formation-wordpress-antibes.webp"
+            alt="Formation WordPress Antibes"
+            fill
+            className="object-cover"
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-blue-900/70"></div>
         </div>

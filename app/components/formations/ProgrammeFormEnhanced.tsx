@@ -43,7 +43,7 @@ const formSchema = z.object({
   typeProgramme: z.string().optional(),
   version: z.coerce.number().default(1),
   estActif: z.boolean().default(true),
-  estVisible: z.boolean().default(true),
+  estVisible: z.boolean().default(false),
   categorieId: z.string().optional().nullable(),
   description: z.string().min(10, 'La description doit contenir au moins 10 caractères'),
   duree: z.string().min(1, 'La durée est requise'),

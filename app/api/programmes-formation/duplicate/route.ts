@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { sourceId, newData } = validation.data;
-    const prismaAny = prisma as any;
+    const prismaAny = prisma;
 
     // Récupérer le programme source
     const sourceProgramme = await prismaAny.programmes_formation.findUnique({

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,8 +13,20 @@ import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useReclamations } from "@/hooks/useReclamations";
 import Header from "@/components/Header";
-import MapLocation from "@/components/MapLocation";
 import { Mail, Phone, MapPin, FileText, Shield, Scale } from "lucide-react";
+
+// Lazy load the MapLocation component since it's heavy (Leaflet)
+const MapLocation = dynamic(() => import('@/components/MapLocation'), {
+  loading: () => (
+    <div className="flex justify-center items-center h-[450px] bg-gray-100 rounded-lg border">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+        <p className="text-gray-600">Chargement de la carte...</p>
+      </div>
+    </div>
+  ),
+  ssr: false // Map components should not be server-side rendered
+});
 
 const formSchema = z.object({
   nom: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -55,7 +68,7 @@ const ContactPage = () => {
           telephone: values.telephone,
           sujet: values.sujet,
           message: values.message,
-          priorite: values.priorite as any,
+          priorite: values.priorite,
         });
         
         if (success) {

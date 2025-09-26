@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { FileEdit, FilePlus, Eye, Trash2, Calendar, Download, CheckSquare } from 'lucide-react';
+import { FileEdit, FilePlus, Eye, Trash2, Download, CheckSquare } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -40,6 +40,8 @@ interface ProgrammeDialogProps {
   onClose: () => void;
 }
 
+type ToastVariant = 'default' | 'destructive' | 'success';
+
 export default function ProgrammesPersonnalises() {
   const [programmes, setProgrammes] = useState<ProgrammePersonnalise[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,15 +50,17 @@ export default function ProgrammesPersonnalises() {
   const [showProgrammeDetails, setShowProgrammeDetails] = useState(false);
   const { toast } = useToast();
 
+  // Wrapper toast function with variant typing enforcement
+  const showToast = (params: { title: string; description: string; variant: ToastVariant }) => {
+    toast(params);
+  };
+
   const fetchProgrammes = async (statut?: string) => {
     try {
       setLoading(true);
-      const endpoint = statut && statut !== 'tous' 
-        ? `/programmes-personnalises?statut=${statut}` 
-        : '/programmes-personnalises';
-      
+      const endpoint = statut && statut !== 'tous' ? `/programmes-personnalises?statut=${statut}` : '/programmes-personnalises';
       const response = await api.get<ApiResponse<ProgrammePersonnalise[]>>(endpoint);
-      
+
       if (Array.isArray(response.data)) {
         setProgrammes(response.data);
       } else if (response.data && typeof response.data === 'object') {
@@ -64,12 +68,11 @@ export default function ProgrammesPersonnalises() {
       }
     } catch (error) {
       console.error('Erreur lors du chargement des programmes:', error);
-      toast({
+      showToast({
         title: 'Erreur',
         description: 'Impossible de charger les programmes personnalisés.',
         variant: 'destructive',
       });
-      // En mode démonstration, générer des données de test
       generateDemoData();
     } finally {
       setLoading(false);
@@ -90,7 +93,7 @@ export default function ProgrammesPersonnalises() {
             duree: 3,
             objectifs: ['Comprendre l\'architecture', 'Installer WordPress'],
             prerequis: ['Connaissances web basiques'],
-            contenu: ['Installation', 'Configuration initiale', 'Tableau de bord']
+            contenu: ['Installation', 'Configuration initiale', 'Tableau de bord'],
           },
           {
             id: 'm2',
@@ -99,14 +102,14 @@ export default function ProgrammesPersonnalises() {
             duree: 7,
             objectifs: ['Créer des thèmes personnalisés', 'Maîtriser les templates'],
             prerequis: ['Bases HTML/CSS'],
-            contenu: ['Structure des thèmes', 'Hiérarchie des templates', 'Hooks et filtres']
-          }
+            contenu: ['Structure des thèmes', 'Hiérarchie des templates', 'Hooks et filtres'],
+          },
         ],
         rendezvousId: '101',
         beneficiaire: 'Jean Dupont',
         dateCreation: '2023-08-16T10:30:00Z',
         statut: 'brouillon',
-        estValide: false
+        estValide: false,
       },
       {
         id: '2',
@@ -120,24 +123,23 @@ export default function ProgrammesPersonnalises() {
             duree: 4,
             objectifs: ['Comprendre les algorithmes', 'Optimiser le contenu'],
             prerequis: ['Aucun'],
-            contenu: ['Fonctionnement des moteurs', 'Mots-clés', 'Structure de site']
-          }
+            contenu: ['Fonctionnement des moteurs', 'Mots-clés', 'Structure de site'],
+          },
         ],
         rendezvousId: '102',
         beneficiaire: 'Marie Martin',
         dateCreation: '2023-08-18T14:45:00Z',
         statut: 'valide',
         estValide: true,
-        documentUrl: '/documents/programme-2.pdf'
-      }
+        documentUrl: '/documents/programme-2.pdf',
+      },
     ];
-    
+
     setProgrammes(demoData);
   };
 
   useEffect(() => {
     fetchProgrammes(activeTab === 'tous' ? undefined : activeTab);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleTabChange = (value: string) => {
@@ -153,14 +155,15 @@ export default function ProgrammesPersonnalises() {
   const handleValidateProgramme = async (programmeId: string) => {
     try {
       await api.put<ApiResponse<ProgrammePersonnalise>>(`/programmes-personnalises/${programmeId}/valider`);
-      toast({
+      showToast({
         title: 'Programme validé',
         description: 'Le programme a été validé avec succès.',
+        variant: 'success',
       });
       fetchProgrammes(activeTab === 'tous' ? undefined : activeTab);
     } catch (error) {
       console.error('Erreur lors de la validation du programme:', error);
-      toast({
+      showToast({
         title: 'Erreur',
         description: 'Impossible de valider le programme.',
         variant: 'destructive',
@@ -169,20 +172,19 @@ export default function ProgrammesPersonnalises() {
   };
 
   const handleDeleteProgramme = async (programmeId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce programme ?')) {
-      return;
-    }
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce programme ?')) return;
 
     try {
       await api.delete<ApiResponse<void>>(`/programmes-personnalises/${programmeId}`);
-      toast({
+      showToast({
         title: 'Programme supprimé',
         description: 'Le programme a été supprimé avec succès.',
+        variant: 'success',
       });
       fetchProgrammes(activeTab === 'tous' ? undefined : activeTab);
     } catch (error) {
       console.error('Erreur lors de la suppression du programme:', error);
-      toast({
+      showToast({
         title: 'Erreur',
         description: 'Impossible de supprimer le programme.',
         variant: 'destructive',
@@ -192,18 +194,19 @@ export default function ProgrammesPersonnalises() {
 
   const handleGenerateDocument = async (programmeId: string) => {
     try {
-      const response = await api.post<{url: string}>(`/programmes-personnalises/${programmeId}/generer-document`);
-      if (response.data && response.data.url) {
+      const response = await api.post<{ url: string }>(`/programmes-personnalises/${programmeId}/generer-document`);
+      if (response.data?.url) {
         window.open(response.data.url, '_blank');
-        toast({
+        showToast({
           title: 'Document généré',
           description: 'Le document a été généré avec succès.',
+          variant: 'success',
         });
         fetchProgrammes(activeTab === 'tous' ? undefined : activeTab);
       }
     } catch (error) {
       console.error('Erreur lors de la génération du document:', error);
-      toast({
+      showToast({
         title: 'Erreur',
         description: 'Impossible de générer le document.',
         variant: 'destructive',
@@ -233,14 +236,16 @@ export default function ProgrammesPersonnalises() {
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">{programme.titre}</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">
                   Créé le {format(new Date(programme.dateCreation), 'dd MMMM yyyy à HH:mm', { locale: fr })}
                 </p>
-                <p className="text-sm">Bénéficiaire: <span className="font-medium">{programme.beneficiaire}</span></p>
+                <p className="text-sm">
+                  Bénéficiaire: <span className="font-medium">{programme.beneficiaire}</span>
+                </p>
               </div>
               <div>{getStatusBadge(programme.statut)}</div>
             </div>
@@ -252,7 +257,7 @@ export default function ProgrammesPersonnalises() {
 
             <div className="space-y-4">
               <h3 className="font-medium">Modules ({programme.modules.length})</h3>
-              {programme.modules.map(module => (
+              {programme.modules.map((module) => (
                 <Card key={module.id}>
                   <CardHeader className="pb-2">
                     <div className="flex justify-between">
@@ -270,7 +275,7 @@ export default function ProgrammesPersonnalises() {
                         ))}
                       </ul>
                     </div>
-                    
+
                     <div>
                       <h4 className="text-sm font-medium mb-1">Prérequis</h4>
                       <ul className="list-disc pl-5 text-sm space-y-1">
@@ -279,7 +284,7 @@ export default function ProgrammesPersonnalises() {
                         ))}
                       </ul>
                     </div>
-                    
+
                     <div>
                       <h4 className="text-sm font-medium mb-1">Contenu</h4>
                       <ul className="list-disc pl-5 text-sm space-y-1">
@@ -349,57 +354,40 @@ export default function ProgrammesPersonnalises() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {programmes.map(programme => (
+              {programmes.map((programme) => (
                 <Card key={programme.id}>
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg">{programme.titre}</CardTitle>
                       {getStatusBadge(programme.statut)}
                     </div>
-                    <CardDescription>
-                      {format(new Date(programme.dateCreation), 'dd MMMM yyyy', { locale: fr })}
-                    </CardDescription>
+                    <CardDescription>{format(new Date(programme.dateCreation), 'dd MMMM yyyy', { locale: fr })}</CardDescription>
                   </CardHeader>
                   <CardContent className="pb-2">
                     <p className="mb-2 line-clamp-2">{programme.description}</p>
                     <p className="text-sm mb-4">
                       <span className="font-medium">Modules:</span> {programme.modules.length}
                     </p>
-                    
+
                     <div className="flex flex-wrap gap-2 mt-4">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => handleViewProgramme(programme)}
-                      >
+                      <Button variant="outline" size="sm" onClick={() => handleViewProgramme(programme)}>
                         <Eye className="h-4 w-4 mr-1" />
                         Détails
                       </Button>
-                      
+
                       {!programme.estValide && (
-                        <Button 
-                          size="sm" 
-                          onClick={() => handleValidateProgramme(programme.id)}
-                        >
+                        <Button size="sm" onClick={() => handleValidateProgramme(programme.id)}>
                           <CheckSquare className="h-4 w-4 mr-1" />
                           Valider
                         </Button>
                       )}
 
-                      <Button 
-                        variant="secondary" 
-                        size="sm" 
-                        onClick={() => handleGenerateDocument(programme.id)}
-                      >
+                      <Button variant="secondary" size="sm" onClick={() => handleGenerateDocument(programme.id)}>
                         <Download className="h-4 w-4 mr-1" />
                         Document
                       </Button>
 
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
-                        onClick={() => handleDeleteProgramme(programme.id)}
-                      >
+                      <Button variant="destructive" size="sm" onClick={() => handleDeleteProgramme(programme.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -411,7 +399,7 @@ export default function ProgrammesPersonnalises() {
         </TabsContent>
       </Tabs>
 
-      <ProgrammeDetailsDialog 
+      <ProgrammeDetailsDialog
         programme={selectedProgramme}
         isOpen={showProgrammeDetails}
         onClose={() => {

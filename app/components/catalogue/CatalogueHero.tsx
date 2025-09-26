@@ -1,12 +1,15 @@
+import Image from "next/image";
 
 const CatalogueHero = () => {
   return (
     <section className="relative">
       <div className="absolute inset-0 z-0">
-        <img 
-          src="/formation-wordpress-antibes.webp" 
-          alt="Formation WordPress Antibes pour les artisans" 
-          className="w-full h-full object-cover"
+        <Image
+          src="/formation-wordpress-antibes.webp"
+          alt="Formation WordPress Antibes pour les artisans"
+          fill
+          className="object-cover"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-blue-900/70"></div>
       </div>

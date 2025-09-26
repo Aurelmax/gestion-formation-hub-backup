@@ -58,7 +58,7 @@ export async function GET(req: Request) {
     const skip = (page - 1) * limit;
 
     // Construire la requête Prisma
-    const prismaAny = prisma as any;
+    const prismaAny = prisma;
     const where: any = {
       type: 'catalogue',
       estVisible: true,

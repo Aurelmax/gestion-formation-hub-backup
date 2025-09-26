@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
+import type { Prisma } from '@prisma/client';
+import { withRateLimit, rateLimitConfigs } from '@/lib/rate-limit';
+import { withSecurity, secureLogger, getSecurityHeaders } from '@/lib/security';
+import { withCSRFProtection } from '@/lib/csrf';
 
 
 
@@ -13,15 +17,15 @@ const reclamationSchema = z.object({
   message: z.string().min(1, 'Le message est requis'),
   statut: z.enum(['nouvelle', 'en_cours', 'resolue', 'fermee']).optional().default('nouvelle'),
   priorite: z.enum(['basse', 'normale', 'haute', 'urgente']).optional().default('normale'),
-  assigneeId: z.string().uuid().optional(),
-  notesInternes: z.string().optional(),
+  assignee_id: z.string().uuid().optional(),
+  notes_internes: z.string().optional(),
 });
 
 // Schéma pour les paramètres de requête
 const queryParamsSchema = z.object({
   statut: z.enum(['nouvelle', 'en_cours', 'resolue', 'fermee']).optional(),
   priorite: z.enum(['basse', 'normale', 'haute', 'urgente']).optional(),
-  assigneeId: z.string().uuid().optional(),
+  assignee_id: z.string().uuid().optional(),
   page: z.preprocess(
     val => parseInt(String(val || '1'), 10),
     z.number().int().positive()
@@ -49,10 +53,10 @@ export async function GET(request: NextRequest) {
     const params = validation.data;
     
     // Construire le filtre
-    const where: any = {};
+    const where: Prisma.ReclamationsWhereInput = {};
     if (params.statut) where.statut = params.statut;
     if (params.priorite) where.priorite = params.priorite;
-    if (params.assigneeId) where.assigneeId = params.assigneeId;
+    if (params.assignee_id) where.assignee_id = params.assignee_id;
 
     // Pagination
     const skip = (params.page - 1) * params.limit;
@@ -60,21 +64,21 @@ export async function GET(request: NextRequest) {
 
     // Récupérer les réclamations
     const [reclamations, total] = await Promise.all([
-      prisma.reclamation.findMany({
+      prisma.reclamations.findMany({
         where,
         skip,
         take,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { created_at: 'desc' },
         include: {
-          assignee: {
+          users: {
             select: { id: true, nom: true, prenom: true, email: true }
           },
-          actionsCorrectives: {
+          actions_correctives: {
             select: { id: true, titre: true, statut: true }
           }
         }
       }),
-      prisma.reclamation.count({ where })
+      prisma.reclamations.count({ where })
     ]);
 
     const totalPages = Math.ceil(total / params.limit);
@@ -100,28 +104,20 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+// Handler interne pour POST avec sécurité
+async function postHandler(request: NextRequest, context: any, data: z.infer<typeof reclamationSchema>) {
   try {
-    const data = await request.json();
-    
-    // Validation des données
-    const validation = reclamationSchema.safeParse(data);
-    
-    if (!validation.success) {
-      return NextResponse.json(
-        { 
-          error: 'Données invalides',
-          details: validation.error.errors 
-        },
-        { status: 400 }
-      );
-    }
+    secureLogger.info('Creating new reclamation', {
+      route: '/api/reclamations',
+      method: 'POST',
+      userAgent: request.headers.get('user-agent')
+    });
 
     // Créer la réclamation
-    const reclamation = await prisma.reclamation.create({
-      data: validation.data as any, // Type cast temporaire pour éviter les conflits de types Prisma
+    const reclamation = await prisma.reclamations.create({
+      data: validation.data as Prisma.ReclamationsCreateInput,
       include: {
-        assignee: {
+        users: {
           select: { id: true, nom: true, prenom: true, email: true }
         }
       }

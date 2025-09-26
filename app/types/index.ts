@@ -334,7 +334,7 @@ export const programmeFormationSchema = z.object({
   ressourcesAssociees: z.array(z.string()).optional(),
   objectifsSpecifiques: z.string().optional().nullable(),
   estActif: z.boolean().default(true),
-  estVisible: z.boolean().default(true)
+  estVisible: z.boolean().default(false)
 });
 
 /**

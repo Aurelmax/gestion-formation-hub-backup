@@ -66,47 +66,38 @@ export default function Catalogue() {
   }, [fetchCategories]);
 
   // --- Fetch programmes ---
-  const fetchProgrammes = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+ const fetchProgrammes = useCallback(async () => {
+  try {
+    setLoading(true);
+    setError(null);
 
-      const params = new URLSearchParams({
-        page: searchState.page.toString(),
-        limit: searchState.limit.toString(),
-        ...(searchState.categorieId && { categorieId: searchState.categorieId }),
-        ...(searchState.search && { search: searchState.search }),
-      });
-
-      const res = await fetch(`/api/programmes-formation/par-categorie?${params}`);
-      if (!res.ok) throw new Error('Erreur lors du chargement des programmes');
-
-      const data = await res.json();
-      setProgrammes(data.data);
-      setPagination(prev => ({
-        ...prev,
-        total: data.pagination.total,
-        totalPages: data.pagination.totalPages,
-        currentPage: searchState.page,
-      }));
-    } catch (err) {
-      console.error(err);
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
-      setProgrammes([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [searchState]);
-
-  useEffect(() => {
-    const url = new URLSearchParams();
-    Object.entries(searchState).forEach(([key, value]) => {
-      if (value) url.set(key, value.toString());
+    const params = new URLSearchParams({
+      page: searchState.page.toString(),
+      limit: searchState.limit.toString(),
+      ...(searchState.categorieId && { categorieId: searchState.categorieId }),
+      ...(searchState.search && { search: searchState.search }),
     });
-    router.replace(`${pathname}?${url.toString()}`);
-    fetchProgrammes();
-  }, [searchState, pathname, router, fetchProgrammes]);
 
+    const res = await fetch(`/api/programmes-formation/par-categorie?${params}`);
+    if (!res.ok) throw new Error('Erreur lors du chargement des programmes');
+
+    const data = await res.json();
+    setProgrammes(data.data);
+    setPagination(prev => ({
+      ...prev,
+      total: data.pagination.total,
+      totalPages: data.pagination.totalPages,
+      currentPage: searchState.page,
+    }));
+  } catch (err) {
+    console.error(err);
+    setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+    setProgrammes([]);
+  } finally {
+    setLoading(false);
+  }
+}, [searchState]);
+  
   // --- Handlers ---
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchState(prev => ({ ...prev, search: e.target.value, page: 1 }));

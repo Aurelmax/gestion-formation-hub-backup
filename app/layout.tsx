@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import Providers from './providers';
 import { Inter } from 'next/font/google';
 
-// Force dynamic rendering to prevent Html import errors
+// Force dynamic rendering si nécessaire
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -21,7 +21,7 @@ type LayoutProps = {
 export const metadata = {
   title: {
     default: 'GestionMax Formation Hub',
-    template: '%s | GestionMax Formation Hub'
+    template: '%s | GestionMax Formation Hub',
   },
   description: 'Organisme de formation professionnelle certifié Qualiopi. Spécialisé dans les formations WordPress, développement web, bureautique et management.',
   keywords: ['formation professionnelle', 'Qualiopi', 'WordPress', 'développement web', 'organisme formation'],
@@ -42,7 +42,7 @@ export const metadata = {
 export default function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="fr" className={inter.variable}>
-      <body className={`${inter.className} antialiased`}>
+      <body className="antialiased" style={{ fontFamily: 'var(--font-inter), system-ui, arial' }}>
         <Providers>
           {children}
         </Providers>

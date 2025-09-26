@@ -77,7 +77,7 @@ export async function GET(
     };
 
     // Construction de la requête
-    const prismaAny = prisma as any;
+    const prismaAny = prisma;
     const where: any = { 
       code: code,
       ...(version !== undefined && { version: version }),

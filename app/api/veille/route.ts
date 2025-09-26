@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import type { Veille, Prisma } from '@prisma/client';
 
-
-
+// ✅ Convention Hybride Stricte - Client Prisma Typé
 // Schéma de validation pour la création d'une veille
 const veilleSchema = z.object({
   titre: z.string().min(1, 'Le titre est requis'),
@@ -23,7 +23,8 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type');
     const statut = searchParams.get('statut');
 
-    const where: any = {};
+    // ✅ Typage strict Prisma - Convention camelCase
+    const where: Prisma.VeilleWhereInput = {};
     if (type && ['reglementaire', 'metier', 'innovation'].includes(type)) {
       where.type = type;
     }
@@ -31,7 +32,8 @@ export async function GET(request: NextRequest) {
       where.statut = statut;
     }
 
-    const veilles = await (prisma as any).veille.findMany({
+    // ✅ Accès Prisma Client typé
+    const veilles = await prisma.veille.findMany({
       where,
       orderBy: { dateCreation: 'desc' }
     });
@@ -80,8 +82,8 @@ export async function POST(request: NextRequest) {
 
     const validatedData = validation.data;
 
-    // Créer la veille avec historique initial
-    const nouvelleVeille = await (prisma as any).veille.create({
+    // ✅ Création avec client Prisma typé
+    const nouvelleVeille = await prisma.veille.create({
       data: {
         titre: validatedData.titre,
         description: validatedData.description,

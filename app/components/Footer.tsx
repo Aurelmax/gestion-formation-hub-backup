@@ -5,9 +5,11 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { Facebook, Instagram, Linkedin, Mail, Phone, MapPin, Award, ExternalLink, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCurrentYear } from "@/hooks/useHydrationSafe";
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
+  // ✅ Hook hydratation-safe pour l'année courante
+  const currentYear = useCurrentYear();
   const pathname = usePathname();
   const isCataloguePage = pathname === "/catalogue";
   

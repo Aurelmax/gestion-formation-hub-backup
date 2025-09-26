@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { useClientTimestamp } from "@/hooks/useHydrationSafe";
 import {
   Form,
   FormControl,
@@ -38,12 +39,14 @@ interface ContactFormProps {
   formationTitre?: string;
 }
 
-const ContactForm = ({ 
+const ContactForm = ({
   formationTitre = "",
   onSuccess = () => {},
   onError = () => {}
 }: ContactFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // ✅ Timestamp hydratation-safe
+  const clientTimestamp = useClientTimestamp();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -80,7 +83,7 @@ const ContactForm = ({
           entreprise: data.entreprise,
           formation_titre: data.formation_titre,
           commentaires: data.message,
-          dateContact: new Date().toISOString(),
+          dateContact: clientTimestamp?.toISOString() || new Date().toISOString(),
         }),
       });
 

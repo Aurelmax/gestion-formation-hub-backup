@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { PROGRAMME_TYPE_ENUM } from '@/types/programmes';
 import { prisma } from '@/lib/prisma';
+import type { ProgrammeFormation, Prisma } from '@prisma/client';
 
-// Variable centralisée pour accès direct à la table SQL mappée
-const prismaAny = prisma as any;
+// ✅ Convention Hybride Stricte - Client Prisma Typé
 
 // Schéma de validation partiel pour mise à jour
 const updateProgrammeSchema = z.object({
@@ -57,7 +57,7 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const programme = await prismaAny.programmes_formation.findUnique({
+    const programme = await prisma.programmes_formation.findUnique({
       where: { id },
       include: {
         categorie: true,
@@ -91,7 +91,7 @@ export async function PUT(
     const { id } = await params;
     const data = await request.json();
 
-    const existingProgramme = await prismaAny.programmes_formation.findUnique({ where: { id } });
+    const existingProgramme = await prisma.programmes_formation.findUnique({ where: { id } });
     if (!existingProgramme) return NextResponse.json({ error: 'Programme non trouvé' }, { status: 404 });
 
     const validation = updateProgrammeSchema.safeParse(data);
@@ -99,16 +99,100 @@ export async function PUT(
       return NextResponse.json({ error: 'Données invalides', details: validation.error.errors }, { status: 400 });
     }
 
+    console.log('🔍 PUT - Données reçues:', Object.keys(data), data);
+    console.log('🔍 PUT - Données validées:', Object.keys(validation.data), validation.data);
+
     if (data.code && data.code !== existingProgramme.code) {
-      const codeExists = await prismaAny.programmes_formation.findFirst({
+      const codeExists = await prisma.programmes_formation.findFirst({
         where: { code: data.code, id: { not: id } },
       });
       if (codeExists) return NextResponse.json({ error: 'Un programme avec ce code existe déjà' }, { status: 409 });
     }
 
-    const updatedProgramme = await prismaAny.programmes_formation.update({
+    // Mapper les champs camelCase vers snake_case pour Prisma
+    const mappedData: any = { date_modification: new Date() };
+
+    Object.entries(validation.data).forEach(([key, value]) => {
+      switch (key) {
+        case 'estActif':
+          mappedData.est_actif = value;
+          break;
+        case 'estVisible':
+          mappedData.est_visible = value;
+          break;
+        case 'publicConcerne':
+          mappedData.public_concerne = value;
+          break;
+        case 'contenuDetailleJours':
+          mappedData.contenu_detaille_jours = value;
+          break;
+        case 'modalitesAcces':
+          mappedData.modalites_acces = value;
+          break;
+        case 'modalitesTechniques':
+          mappedData.modalites_techniques = value;
+          break;
+        case 'modalitesReglement':
+          mappedData.modalites_reglement = value;
+          break;
+        case 'modalitesEvaluation':
+          mappedData.modalites_evaluation = value;
+          break;
+        case 'sanctionFormation':
+          mappedData.sanction_formation = value;
+          break;
+        case 'niveauCertification':
+          mappedData.niveau_certification = value;
+          break;
+        case 'delaiAcceptation':
+          mappedData.delai_acceptation = value;
+          break;
+        case 'accessibiliteHandicap':
+          mappedData.accessibilite_handicap = value;
+          break;
+        case 'cessationAbandon':
+          mappedData.cessation_abandon = value;
+          break;
+        case 'ressourcesDisposition':
+          mappedData.ressources_disposition = value;
+          break;
+        case 'categorieId':
+          mappedData.categorie_id = value;
+          break;
+        case 'beneficiaireId':
+          mappedData.beneficiaire_id = value;
+          break;
+        case 'formateurId':
+          mappedData.formateur_id = value;
+          break;
+        case 'programmeSourId':
+          mappedData.programme_source_id = value;
+          break;
+        case 'positionnementRequestId':
+          mappedData.positionnement_request_id = value;
+          break;
+        case 'typeProgramme':
+          mappedData.type_programme = value;
+          break;
+        case 'programmeUrl':
+          mappedData.programme_url = value;
+          break;
+        case 'objectifsSpecifiques':
+          mappedData.objectifs_specifiques = value;
+          break;
+        case 'ressourcesAssociees':
+          mappedData.ressources_associees = value;
+          break;
+        default:
+          mappedData[key] = value;
+      }
+    });
+
+    console.log('🔍 PUT - Données mappées pour Prisma:', Object.keys(mappedData), mappedData);
+
+    const updatedProgramme = await prisma.programmes_formation.update({
       where: { id },
-      data: { ...validation.data, date_modification: new Date() },
+      data: mappedData,
       include: { categorie: true },
     });
 
@@ -130,22 +214,101 @@ export async function PATCH(
     const { id } = await params;
     const data = await request.json();
 
-    const existingProgramme = await prismaAny.programmes_formation.findUnique({ where: { id } });
+    const existingProgramme = await prisma.programmes_formation.findUnique({ where: { id } });
     if (!existingProgramme) return NextResponse.json({ error: 'Programme non trouvé' }, { status: 404 });
 
     const validation = updateProgrammeSchema.safeParse(data);
     if (!validation.success) return NextResponse.json({ error: 'Données invalides', details: validation.error.errors }, { status: 400 });
 
     if (data.code && data.code !== existingProgramme.code) {
-      const codeExists = await prismaAny.programmes_formation.findFirst({
+      const codeExists = await prisma.programmes_formation.findFirst({
         where: { code: data.code, id: { not: id } },
       });
       if (codeExists) return NextResponse.json({ error: 'Un programme avec ce code existe déjà' }, { status: 409 });
     }
 
-    const updatedProgramme = await prismaAny.programmes_formation.update({
+    // Mapper les champs camelCase vers snake_case pour Prisma
+    const mappedData: any = { date_modification: new Date() };
+
+    Object.entries(validation.data).forEach(([key, value]) => {
+      switch (key) {
+        case 'estActif':
+          mappedData.est_actif = value;
+          break;
+        case 'estVisible':
+          mappedData.est_visible = value;
+          break;
+        case 'publicConcerne':
+          mappedData.public_concerne = value;
+          break;
+        case 'contenuDetailleJours':
+          mappedData.contenu_detaille_jours = value;
+          break;
+        case 'modalitesAcces':
+          mappedData.modalites_acces = value;
+          break;
+        case 'modalitesTechniques':
+          mappedData.modalites_techniques = value;
+          break;
+        case 'modalitesReglement':
+          mappedData.modalites_reglement = value;
+          break;
+        case 'modalitesEvaluation':
+          mappedData.modalites_evaluation = value;
+          break;
+        case 'sanctionFormation':
+          mappedData.sanction_formation = value;
+          break;
+        case 'niveauCertification':
+          mappedData.niveau_certification = value;
+          break;
+        case 'delaiAcceptation':
+          mappedData.delai_acceptation = value;
+          break;
+        case 'accessibiliteHandicap':
+          mappedData.accessibilite_handicap = value;
+          break;
+        case 'cessationAbandon':
+          mappedData.cessation_abandon = value;
+          break;
+        case 'ressourcesDisposition':
+          mappedData.ressources_disposition = value;
+          break;
+        case 'categorieId':
+          mappedData.categorie_id = value;
+          break;
+        case 'beneficiaireId':
+          mappedData.beneficiaire_id = value;
+          break;
+        case 'formateurId':
+          mappedData.formateur_id = value;
+          break;
+        case 'programmeSourId':
+          mappedData.programme_source_id = value;
+          break;
+        case 'positionnementRequestId':
+          mappedData.positionnement_request_id = value;
+          break;
+        case 'typeProgramme':
+          mappedData.type_programme = value;
+          break;
+        case 'programmeUrl':
+          mappedData.programme_url = value;
+          break;
+        case 'objectifsSpecifiques':
+          mappedData.objectifs_specifiques = value;
+          break;
+        case 'ressourcesAssociees':
+          mappedData.ressources_associees = value;
+          break;
+        default:
+          mappedData[key] = value;
+      }
+    });
+
+    const updatedProgramme = await prisma.programmes_formation.update({
       where: { id },
-      data: { ...validation.data, date_modification: new Date() },
+      data: mappedData,
       include: { categorie: true },
     });
 
@@ -165,10 +328,10 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const existingProgramme = await prismaAny.programmes_formation.findUnique({ where: { id } });
+    const existingProgramme = await prisma.programmes_formation.findUnique({ where: { id } });
     if (!existingProgramme) return NextResponse.json({ error: 'Programme non trouvé' }, { status: 404 });
 
-    const programmeWithDossiers = await prismaAny.programmes_formation.findUnique({
+    const programmeWithDossiers = await prisma.programmes_formation.findUnique({
       where: { id },
       include: { dossiers: true },
     });
@@ -180,7 +343,7 @@ export async function DELETE(
       );
     }
 
-    await prismaAny.programmes_formation.delete({ where: { id } });
+    await prisma.programmes_formation.delete({ where: { id } });
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {

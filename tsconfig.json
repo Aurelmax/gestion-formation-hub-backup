@@ -7,19 +7,19 @@
       "@/components/*": ["./app/components/*"],
       "@/hooks/*": ["./app/hooks/*"]
     },
-    "noImplicitAny": false,
-    "noUnusedParameters": false,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "skipLibCheck": true,
     "allowJs": true,
-    "noUnusedLocals": false,
-    "strictNullChecks": false,
     "target": "ES2017",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
-    "strict": false,
     "noEmit": true,
     "incremental": true,
     "module": "esnext",
@@ -39,6 +39,7 @@
     "**/*.tsx",
     "next-env.d.ts",
     "src/**/*",
+    "types/**/*.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": [

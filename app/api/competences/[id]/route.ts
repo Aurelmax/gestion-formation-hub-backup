@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
+import { isPrismaError } from '@/types/prisma-errors';
 
 // Schéma de validation pour les compétences
 const competenceUpdateSchema = z.object({
@@ -80,7 +81,7 @@ export async function PUT(
     return NextResponse.json(competence);
     
   } catch (error) {
-    if ((error as any)?.code === 'P2025') {
+    if (isPrismaError(error) && error.code === 'P2025') {
       return NextResponse.json(
         { error: 'Compétence non trouvée' },
         { status: 404 }
@@ -108,7 +109,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Compétence supprimée avec succès' });
   } catch (error) {
-    if ((error as any)?.code === 'P2025') {
+    if (isPrismaError(error) && error.code === 'P2025') {
       return NextResponse.json(
         { error: 'Compétence non trouvée' },
         { status: 404 }

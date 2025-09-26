@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
-import api from "@/services/api";
 import { 
   ProgrammeFormation, 
   ProgrammeType, 
@@ -41,10 +40,11 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
   // Charger les catégories
   const fetchCategories = useCallback(async () => {
     try {
-      const response = await api.get('/categories');
-      const categoriesData = response.data || [];
-      setCategories(categoriesData);
-      return categoriesData;
+      const response = await fetch('/api/categories');
+      const categoriesData = await response.json();
+      console.log('📂 Categories fetched:', categoriesData?.length || 0, 'items');
+      setCategories(categoriesData || []);
+      return categoriesData || [];
     } catch (error) {
       console.error('Erreur lors du chargement des catégories:', error);
       return [];
@@ -58,21 +58,29 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
       setLoading(true);
       setError(null);
 
-      let url = '/programmes-formation';
+      let url = '/api/programmes-formation';
       const params = new URLSearchParams();
-      
+
       if (filters?.type) params.append('type', filters.type);
       if (filters?.categorieId) params.append('categorieId', filters.categorieId);
       if (filters?.search) params.append('search', filters.search);
       if (filters?.estActif !== undefined) params.append('estActif', filters.estActif.toString());
-      
+
       if (params.toString()) url += `?${params.toString()}`;
 
-      const response = await api.get(url);
-      console.log('📡 API response:', response.data);
+      const response = await fetch(url);
+      const responseData = await response.json();
+      console.log('📡 Fetch response:', responseData);
+      console.log('📡 Full response structure:', {
+        status: response.status,
+        hasData: !!responseData,
+        dataKeys: Object.keys(responseData || {}),
+        dataType: typeof responseData
+      });
 
-      const programmesData = response.data.data || [];
+      const programmesData = responseData.data || [];
       console.log('💾 Setting programmes:', programmesData.length, 'items');
+      console.log('💾 Programmes data sample:', programmesData.slice(0, 2));
       setProgrammes(programmesData);
 
       return programmesData;
@@ -80,10 +88,12 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
       console.error('❌ Error fetching programmes:', error);
       const errorMessage = error?.response?.data?.error || error?.message || 'Erreur de chargement';
       setError(errorMessage);
-      toast({
-        title: 'Erreur',
-        description: `Impossible de charger les programmes: ${errorMessage}`,
-      });
+      if (toast) {
+        toast({
+          title: 'Erreur',
+          description: `Impossible de charger les programmes: ${errorMessage}`,
+        });
+      }
       return [];
     } finally {
       setLoading(false);
@@ -97,19 +107,37 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
       // Debug: Log des données envoyées côté client
       console.log('🚀 Client - Données à envoyer:', JSON.stringify(programmeData, null, 2));
 
-      const response = await api.post('/programmes-formation', programmeData);
+      const response = await fetch('/api/programmes-formation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(programmeData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la création');
+      }
+
+      const responseData = await response.json();
       await fetchProgrammes();
-      toast({
-        title: 'Succès',
-        description: 'Programme créé avec succès',
-      });
-      return response.data;
+
+      if (toast) {
+        toast({
+          title: 'Succès',
+          description: 'Programme créé avec succès',
+        });
+      }
+      return responseData;
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.error || 'Erreur lors de la création';
-      toast({
-        title: 'Erreur',
-        description: errorMessage,
-      });
+      const errorMessage = error?.message || 'Erreur lors de la création';
+      if (toast) {
+        toast({
+          title: 'Erreur',
+          description: errorMessage,
+        });
+      }
       throw error;
     } finally {
       setLoading(false);
@@ -119,19 +147,40 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
   const updateProgramme = useCallback(async (id: string, programmeData: Partial<ProgrammeFormation>) => {
     try {
       setLoading(true);
-      const response = await api.put(`/programmes-formation/${id}`, programmeData);
+
+      console.log('🔄 Données envoyées à l\'API:', programmeData);
+
+      const response = await fetch(`/api/programmes-formation/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(programmeData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la mise à jour');
+      }
+
+      const responseData = await response.json();
       await fetchProgrammes();
-      toast({
-        title: 'Succès',
-        description: 'Programme mis à jour avec succès',
-      });
-      return response.data;
+
+      if (toast) {
+        toast({
+          title: 'Succès',
+          description: 'Programme mis à jour avec succès',
+        });
+      }
+      return responseData;
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.error || 'Erreur lors de la mise à jour';
-      toast({
-        title: 'Erreur',
-        description: errorMessage,
-      });
+      const errorMessage = error?.message || 'Erreur lors de la mise à jour';
+      if (toast) {
+        toast({
+          title: 'Erreur',
+          description: errorMessage,
+        });
+      }
       throw error;
     } finally {
       setLoading(false);
@@ -141,18 +190,30 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
   const deleteProgramme = useCallback(async (id: string) => {
     try {
       setLoading(true);
-      await api.delete(`/programmes-formation/${id}`);
+      const response = await fetch(`/api/programmes-formation/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la suppression');
+      }
+
       await fetchProgrammes();
-      toast({
-        title: 'Succès',
-        description: 'Programme supprimé avec succès',
-      });
+      if (toast) {
+        toast({
+          title: 'Succès',
+          description: 'Programme supprimé avec succès',
+        });
+      }
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.error || 'Erreur lors de la suppression';
-      toast({
-        title: 'Erreur',
-        description: errorMessage,
-      });
+      const errorMessage = error?.message || 'Erreur lors de la suppression';
+      if (toast) {
+        toast({
+          title: 'Erreur',
+          description: errorMessage,
+        });
+      }
       throw error;
     } finally {
       setLoading(false);
@@ -162,19 +223,36 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
   const duplicateProgramme = useCallback(async (id: string) => {
     try {
       setLoading(true);
-      const response = await api.post(`/programmes-formation/duplicate/${id}`);
+      const response = await fetch(`/api/programmes-formation/duplicate/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la duplication');
+      }
+
+      const responseData = await response.json();
       await fetchProgrammes();
-      toast({
-        title: 'Succès',
-        description: 'Programme dupliqué avec succès',
-      });
-      return response.data;
+
+      if (toast) {
+        toast({
+          title: 'Succès',
+          description: 'Programme dupliqué avec succès',
+        });
+      }
+      return responseData;
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.error || 'Erreur lors de la duplication';
-      toast({
-        title: 'Erreur',
-        description: errorMessage,
-      });
+      const errorMessage = error?.message || 'Erreur lors de la duplication';
+      if (toast) {
+        toast({
+          title: 'Erreur',
+          description: errorMessage,
+        });
+      }
       throw error;
     } finally {
       setLoading(false);
@@ -184,19 +262,37 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
   const updateProgrammeStatus = useCallback(async (id: string, estActif: boolean) => {
     try {
       setLoading(true);
-      const response = await api.put(`/programmes-formation/${id}`, { estActif });
+      const response = await fetch(`/api/programmes-formation/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ estActif: estActif }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la mise à jour du statut');
+      }
+
+      const responseData = await response.json();
       await fetchProgrammes();
-      toast({
-        title: 'Succès',
-        description: `Programme ${estActif ? 'activé' : 'désactivé'} avec succès`,
-      });
-      return response.data;
+
+      if (toast) {
+        toast({
+          title: 'Succès',
+          description: `Programme ${estActif ? 'activé' : 'désactivé'} avec succès`,
+        });
+      }
+      return responseData;
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.error || 'Erreur lors de la mise à jour du statut';
-      toast({
-        title: 'Erreur',
-        description: errorMessage,
-      });
+      const errorMessage = error?.message || 'Erreur lors de la mise à jour du statut';
+      if (toast) {
+        toast({
+          title: 'Erreur',
+          description: errorMessage,
+        });
+      }
       throw error;
     } finally {
       setLoading(false);
@@ -231,12 +327,23 @@ export const useProgrammesFormation = (options: UseProgrammesFormationOptions = 
 
   // Initialisation au montage
   useEffect(() => {
+    console.log('🔄 Hook unifié - useEffect called with:', { autoFetch });
     if (autoFetch) {
-      console.log('🔄 Hook unifié - useEffect initial load');
-      fetchProgrammes();
-      fetchCategories();
+      console.log('🔄 Hook unifié - useEffect initial load - calling fetchProgrammes');
+      fetchProgrammes().then(() => {
+        console.log('✅ fetchProgrammes completed');
+      }).catch((err) => {
+        console.error('❌ fetchProgrammes failed:', err);
+      });
+      fetchCategories().then(() => {
+        console.log('✅ fetchCategories completed');
+      }).catch((err) => {
+        console.error('❌ fetchCategories failed:', err);
+      });
+    } else {
+      console.log('🔄 Hook unifié - autoFetch disabled, skipping fetch');
     }
-  }, [autoFetch, fetchProgrammes, fetchCategories]);
+  }, [autoFetch]); // Suppression des dépendances circulaires
 
   // Retour de l'API complète unifiée
   return {

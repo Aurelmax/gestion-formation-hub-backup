@@ -2,15 +2,19 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Award, CheckCircle, Phone } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const HeroSection = () => {
   return (
     <section className="relative">
       <div className="absolute inset-0 z-0">
-        <img 
-          src="/formation-wordpress-antibes.webp" 
-          alt="Formation WordPress Antibes" 
-          className="w-full h-full object-cover"
+        <Image
+          src="/formation-wordpress-antibes.webp"
+          alt="Formation WordPress Antibes"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-primary/80"></div>
       </div>

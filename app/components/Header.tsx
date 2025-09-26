@@ -1,5 +1,6 @@
 
 import Navigation from "@/components/Navigation";
+import Image from "next/image";
 
 const Header = () => {
   return (
@@ -8,12 +9,13 @@ const Header = () => {
         <div className="flex justify-between items-center py-6">
           <div className="flex items-center gap-4">
             <div className="relative w-48 h-48">
-              <img 
-                src="/logo-gestionmax-antibes.png" 
-                alt="Logo GestionMax" 
-                width={192} 
-                height={192} 
-                className="object-contain" 
+              <Image
+                src="/logo-gestionmax-antibes.png"
+                alt="Logo GestionMax"
+                width={192}
+                height={192}
+                className="object-contain"
+                priority
               />
             </div>
           </div>

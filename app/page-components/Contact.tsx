@@ -54,7 +54,7 @@ const Contact = () => {
           telephone: values.telephone,
           sujet: values.sujet,
           message: values.message,
-          priorite: values.priorite as any,
+          priorite: values.priorite,
         });
         
         if (success) {

@@ -119,12 +119,12 @@ const FormationImport = ({ onBack, onSuccess }: FormationImportProps) => {
             throw new Error(`Champs obligatoires manquants: ${missingFields.join(', ')}`);
           }
           
-          // Génération d'un code unique si non fourni
+          // ✅ Génération d'un code unique côté client uniquement
           if (!formationData.code) {
             const prefix = formationData.type === 'catalogue' ? 'CAT' : 'SM';
-            const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-            const randomPart = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-            formationData.code = `${prefix}-${dateStr}-${randomPart}`;
+            const timestamp = Date.now().toString(36); // Base36 plus compact
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            formationData.code = `${prefix}-${timestamp}-${random}`;
           }
           
           // Créer la formation

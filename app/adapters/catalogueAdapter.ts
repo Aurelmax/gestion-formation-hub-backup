@@ -4,6 +4,21 @@
 // ====================================
 
 import { ProgrammeFormation } from '@/types';
+import type { CategorieProgramme } from '@prisma/client';
+
+/**
+ * Interface pour le hook unifié
+ */
+interface UnifiedHook {
+  allProgrammes: ProgrammeFormation[];
+  categories: CategorieProgramme[];
+  loading: boolean;
+  error?: string | null;
+  fetchProgrammes?: () => void;
+  updateProgramme?: (id: string, data: Partial<ProgrammeFormation>) => Promise<ProgrammeFormation>;
+  duplicateProgramme?: (id: string) => Promise<ProgrammeFormation>;
+  deleteProgramme?: (id: string) => Promise<void>;
+}
 
 /**
  * Interface de catégorie compatible avec l'ancien hook
@@ -27,7 +42,7 @@ export class CatalogueAdapter {
    */
   static adaptProgrammesToCategories(
     programmes: ProgrammeFormation[],
-    categories: any[]
+    categories: CategorieProgramme[]
   ): CategorieFormation[] {
     // Grouper les programmes par catégorie
     const programmesByCategorie = programmes.reduce((acc, programme) => {
@@ -81,7 +96,7 @@ export class CatalogueAdapter {
   /**
    * Adapte les méthodes du hook unifié pour la compatibilité
    */
-  static createCatalogueHookAdapter(unifiedHook: any) {
+  static createCatalogueHookAdapter(unifiedHook: UnifiedHook) {
     return {
       programmes: unifiedHook.allProgrammes || [],
       categories: this.adaptProgrammesToCategories(
@@ -96,7 +111,7 @@ export class CatalogueAdapter {
             return await unifiedHook.updateProgramme(programmeId, { estActif });
           }
         : undefined,
-      createNewVersion: async (programmeId: string, modifications = {}) => {
+      createNewVersion: async (programmeId: string) => {
         if (unifiedHook.duplicateProgramme) {
           return await unifiedHook.duplicateProgramme(programmeId);
         }
@@ -110,6 +125,6 @@ export class CatalogueAdapter {
 /**
  * Hook adaptateur pour remplacer useProgrammesCatalogue
  */
-export const useCatalogueAdapter = (unifiedHook: any) => {
+export const useCatalogueAdapter = (unifiedHook: UnifiedHook) => {
   return CatalogueAdapter.createCatalogueHookAdapter(unifiedHook);
 };

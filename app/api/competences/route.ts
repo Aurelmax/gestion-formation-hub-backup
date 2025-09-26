@@ -115,9 +115,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Créer la compétence
+    // Créer la compétence avec mapping explicite
     const competence = await prisma.competence.create({
-      data: validation.data as any, // Type cast temporaire pour éviter les conflits de types Prisma
+      data: {
+        nom: validation.data.nom,
+        description: validation.data.description,
+        categorie: validation.data.categorie,
+        domaine_developpement: validation.data.domaineDeveloppement,
+        niveau_actuel: validation.data.niveauActuel,
+        objectif_niveau: validation.data.objectifNiveau,
+        statut: validation.data.statut,
+        action_prevue: validation.data.actionPrevue,
+        plateforme_formation: validation.data.plateformeFomation,
+        lien_formation: validation.data.lienFormation,
+        type_preuve: validation.data.typePreuve,
+        contenu_preuve: validation.data.contenuPreuve,
+        formateur_id: validation.data.formateurId,
+      },
     });
 
     return NextResponse.json(competence, { status: 201 });

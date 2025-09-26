@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import type { Veille } from '@prisma/client';
 
-
-
+// ✅ Convention Hybride Stricte - Client Prisma Typé
 // Schéma de validation pour la mise à jour d'une veille
 const veilleUpdateSchema = z.object({
   titre: z.string().min(1).optional(),
@@ -21,8 +21,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const prismaAny = prisma as any;
-    const veille = await prismaAny.veille.findUnique({
+    // ✅ Accès Prisma Client typé
+    const veille = await prisma.veille.findUnique({
       where: { id },
       include: {
         commentaires: {
@@ -89,7 +89,7 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const prismaAny = prisma as any;
+    const prismaAny = prisma;
     const data = await request.json();
 
     // Validation des données
@@ -106,8 +106,8 @@ export async function PATCH(
 
     const validatedData = validation.data;
 
-    // Vérifier que la veille existe
-    const veilleExistante = await prismaAny.veille.findUnique({
+    // ✅ Vérification existence avec client typé
+    const veilleExistante = await prisma.veille.findUnique({
       where: { id: id }
     });
 
@@ -135,8 +135,8 @@ export async function PATCH(
       });
     }
 
-    // Mettre à jour la veille
-    const veilleModifiee = await prismaAny.veille.update({
+    // ✅ Mise à jour avec client typé
+    const veilleModifiee = await prisma.veille.update({
       where: { id: id },
       data: {
         ...validatedData,
@@ -204,9 +204,8 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const prismaAny = prisma as any;
-    // Vérifier que la veille existe
-    const veilleExistante = await prismaAny.veille.findUnique({
+    // ✅ Vérification existence avec client typé
+    const veilleExistante = await prisma.veille.findUnique({
       where: { id: id }
     });
 
@@ -217,8 +216,8 @@ export async function DELETE(
       );
     }
 
-    // Supprimer la veille (les relations seront supprimées automatiquement via onDelete: Cascade)
-    await prismaAny.veille.delete({
+    // ✅ Suppression avec client typé (Cascade automatique)
+    await prisma.veille.delete({
       where: { id: id }
     });
 

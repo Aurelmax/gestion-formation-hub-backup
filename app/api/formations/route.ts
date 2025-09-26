@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import type { ProgrammeFormation } from '@prisma/client';
 
 /**
- * API Formations - Compatible avec l'ancienne interface
- * Redirige vers les données de programmes-formation pour maintenir la compatibilité
+ * API Formations - Convention Hybride Stricte
+ * Accès Prisma Client typé avec mapping automatique camelCase <-> snake_case
  */
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
-    // Récupérer les programmes de formation actifs de type catalogue
-    const prismaAny = prisma as any;
-    const formations = await prismaAny.programmes_formation.findMany({
+    // ✅ Accès Prisma Client typé avec nom DB snake_case
+    const formations = await prisma.programmes_formation.findMany({
       where: {
-        estActif: true,
+        est_actif: true,
         type: 'catalogue'
       },
       select: {
@@ -26,15 +26,15 @@ export async function GET(request: NextRequest) {
         participants: true,
         objectifs: true,
         prerequis: true,
-        publicConcerne: true,
+        public_concerne: true,
         modalites: true,
         formateur: true,
         pictogramme: true,
-        dateCreation: true,
-        estActif: true,
-        estVisible: true,
+        date_creation: true,
+        est_actif: true,
+        est_visible: true,
         version: true,
-        categorie: {
+        categories_programme: {
           select: {
             id: true,
             titre: true
@@ -42,34 +42,14 @@ export async function GET(request: NextRequest) {
         }
       },
       orderBy: {
-        dateCreation: 'desc'
+        date_creation: 'desc'
       }
     });
 
-    // Transformer les données pour la compatibilité avec l'ancienne API
-    const formattedFormations = formations.map(formation => ({
-      id: formation.id,
-      code: formation.code,
-      titre: formation.titre,
-      description: formation.description,
-      duree: formation.duree,
-      prix: formation.prix,
-      niveau: formation.niveau,
-      participants: formation.participants,
-      objectifs: formation.objectifs,
-      prerequis: formation.prerequis,
-      publicConcerne: formation.publicConcerne,
-      modalites: formation.modalites,
-      formateur: formation.formateur,
-      pictogramme: formation.pictogramme,
-      dateCreation: formation.dateCreation,
-      estActif: formation.estActif,
-      estVisible: formation.estVisible,
-      version: formation.version,
-      categorie: formation.categorie
-    }));
+    // ✅ Données déjà au format camelCase via Prisma Client typé
+    // Pas de transformation nécessaire - mapping automatique
 
-    return NextResponse.json(formattedFormations);
+    return NextResponse.json(formations);
 
   } catch (error) {
     console.error('Erreur lors de la récupération des formations:', error);
@@ -84,19 +64,19 @@ export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
 
-    // Rediriger vers l'API programmes-formation avec le bon format
+    // ✅ Validation des données d'entrée
     const programmeData = {
       ...data,
-      type: 'catalogue',
+      type: 'catalogue' as const,
       estActif: true,
       estVisible: true
     };
 
-    const prismaAny = prisma as any;
-    const programme = await prismaAny.programmes_formation.create({
+    // ✅ Accès Prisma Client typé
+    const programme = await prisma.programmeFormation.create({
       data: programmeData,
       include: {
-        categoriesProgramme: true
+        categorie: true
       }
     });
 
