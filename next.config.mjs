@@ -26,6 +26,29 @@ const nextConfig = {
   distDir: '.next',
   poweredByHeader: false,
   reactStrictMode: false,
+  // Configure external images
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'staticmap.openstreetmap.de',
+        port: '',
+        pathname: '/staticmap.php**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'tile.openstreetmap.org',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.tile.openstreetmap.org',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
   // Prevent static generation of error pages to avoid Html import conflicts
   generateBuildId: async () => {
     return 'build-' + Date.now();
