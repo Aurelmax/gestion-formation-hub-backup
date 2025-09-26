@@ -15,7 +15,10 @@ export async function GET() {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
     const apprenants = await prisma.apprenant.findMany({
@@ -24,21 +27,22 @@ export async function GET() {
     });
 
     return NextResponse.json(apprenants);
-  } catch (error) {
-    console.error('Erreur lors de la récupération des apprenants:', error);
-    return NextResponse.json(
-      { error: 'Erreur lors de la récupération des apprenants' },
-      { status: 500 }
-    );
+
+  );
   }
 }
 
+    );
+  }
 export async function POST(request: NextRequest) {
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
     const data = await request.json();
@@ -56,6 +60,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    );
+  }
     // Vérifier si l'apprenant existe déjà (par email s'il n'y a pas d'unicité sur email)
     const existingApprenant = await prisma.apprenant.findFirst({
       where: { email: validation.data.email },
@@ -74,11 +80,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(nouvelApprenant, { status: 201 });
-  } catch (error) {
-    console.error('Erreur lors de la création de l\'apprenant:', error);
-    return NextResponse.json(
-      { error: 'Erreur lors de la création de l\'apprenant' },
-      { status: 500 }
+
     );
   }
 }

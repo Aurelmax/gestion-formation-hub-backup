@@ -13,9 +13,14 @@ export async function GET(_request: NextRequest) {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
+    );
+  }
     // ✅ Accès Prisma Client typé avec nom DB snake_case
     const formations = await prisma.programmes_formation.findMany({
       where: {
@@ -58,21 +63,20 @@ export async function GET(_request: NextRequest) {
 
     return NextResponse.json(formations);
 
-  } catch (error) {
-    console.error('Erreur lors de la récupération des formations:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur lors de la récupération des formations' },
-      { status: 500 }
-    );
+  );
   }
 }
 
+}
 export async function POST(request: NextRequest) {
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
     const data = await request.json();
@@ -95,11 +99,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(programme, { status: 201 });
 
-  } catch (error) {
-    console.error('Erreur lors de la création de la formation:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur lors de la création de la formation' },
-      { status: 500 }
-    );
+  );
   }
 }

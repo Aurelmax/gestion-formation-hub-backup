@@ -1,9 +1,8 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
 import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
-
-
 
 // Schéma de validation des paramètres de requête
 export const querySchema = z.object({
@@ -57,10 +56,12 @@ export async function GET() {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Unauthorized" },
+    { status: 401 }
+  );
     }
 
-    
     console.log('Requête reçue sur /api/programmes-formation/par-categorie/groupes');
 
     // Récupérer toutes les catégories avec leurs programmes actifs et visibles
@@ -105,16 +106,10 @@ export async function GET() {
     console.log('Catégories formatées:', formattedCategories.map(cat => `${cat.titre}: ${cat.formations.length} programmes`));
 
     return NextResponse.json(formattedCategories);
-  } catch (error) {
-    console.error('Erreur lors de la récupération des programmes par catégorie:', error);
-    return NextResponse.json(
-      { 
-        error: 'Erreur serveur',
-        details: process.env.NODE_ENV === 'development' 
-          ? error instanceof Error ? error.message : String(error)
-          : undefined
-      },
-      { status: 500 }
+
     );
   }
 }
+
+    );
+  }

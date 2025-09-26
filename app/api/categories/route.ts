@@ -17,54 +17,66 @@ const categorieSchema = z.object({
 // GET /api/categories - Récupérer toutes les catégories (cache temporairement désactivé)
 export async function GET() {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
-  try {
-    const categories = await prisma.categories_programme.findMany({
-      orderBy: { ordre: 'asc' },
-      select: {
-        id: true,
-        code: true,
-        titre: true,
-        description: true,
-        ordre: true,
-        _count: {
-          select: {
-            programmes_formation: {
-              where: { est_actif: true, est_visible: true }
-            }
-          }
-        }
-      }
-    });
-
-    return NextResponse.json(categories);
-  } catch (error) {
-    console.error('Erreur lors de la récupération des catégories:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur lors de la récupération des catégories' },
-      { status: 500 }
     );
   }
-}
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
 
-// POST /api/categories - Créer une nouvelle catégorie
-export async function POST(request: NextRequest) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+  try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     const data = await request.json();
     const validatedData = categorieSchema.parse(data);
@@ -92,11 +104,7 @@ export async function POST(request: NextRequest) {
     console.log('✅ Category created successfully');
 
     return NextResponse.json(categorie, { status: 201 });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Données invalides', details: error.errors },
-        { status: 400 }
+
       );
     }
     console.error('Erreur lors de la création de la catégorie:', error);
@@ -107,6 +115,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
+    );
+  }
 // GET /api/categories/programmes - Récupérer les catégories de programmes avec cache
 export async function GETProgrammes() {
   try {
@@ -132,20 +142,13 @@ export async function GETProgrammes() {
     );
 
     return createCachedResponse(categories, CACHE_STRATEGIES.static);
-  } catch (error) {
-    console.error('Erreur API catégories programme:', error);
-    return NextResponse.json(
-      {
-        error: 'Erreur serveur',
-        details: process.env.NODE_ENV === 'development'
-          ? error instanceof Error ? error.message : String(error)
-          : undefined
-      },
-      { status: 500 }
-    );
-  }
+
+  );
+}
 }
 
+    );
+  }
 // Mettre à jour le schéma pour inclure la validation des paramètres de requête
 declare global {
   interface RequestInit {

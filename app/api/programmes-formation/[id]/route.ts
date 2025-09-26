@@ -53,18 +53,39 @@ const updateProgrammeSchema = z.object({
 // ------------------------
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  try {
   try {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
     const { id } = await params;
 
     const programme = await prisma.programmes_formation.findUnique({
@@ -81,13 +102,9 @@ export async function GET(
     }
 
     return NextResponse.json(programme);
-  } catch (error) {
-    console.error('Erreur GET programmes-formation:', error);
-    return NextResponse.json(
-      { error: 'Une erreur est survenue lors de la récupération du programme' },
-      { status: 500 }
-    );
-  }
+
+  );
+}
 }
 
 // ------------------------
@@ -95,17 +112,39 @@ export async function GET(
 // ------------------------
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     const { id } = await params;
     const data = await request.json();
@@ -128,6 +167,8 @@ export async function PUT(
       if (codeExists) return NextResponse.json({ error: 'Un programme avec ce code existe déjà' }, { status: 409 });
     }
 
+    );
+  }
     // Mapper les champs camelCase vers snake_case pour Prisma
     const mappedData: any = { date_modification: new Date() };
 
@@ -216,10 +257,9 @@ export async function PUT(
     });
 
     return NextResponse.json(updatedProgramme);
-  } catch (error) {
-    console.error('Erreur PUT programmes-formation:', error);
-    return NextResponse.json({ error: 'Erreur lors de la mise à jour du programme' }, { status: 500 });
-  }
+
+  );
+}
 }
 
 // ------------------------
@@ -227,17 +267,39 @@ export async function PUT(
 // ------------------------
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     const { id } = await params;
     const data = await request.json();
@@ -255,6 +317,8 @@ export async function PATCH(
       if (codeExists) return NextResponse.json({ error: 'Un programme avec ce code existe déjà' }, { status: 409 });
     }
 
+    );
+  }
     // Mapper les champs camelCase vers snake_case pour Prisma
     const mappedData: any = { date_modification: new Date() };
 
@@ -341,10 +405,9 @@ export async function PATCH(
     });
 
     return NextResponse.json(updatedProgramme);
-  } catch (error) {
-    console.error('Erreur PATCH programmes-formation:', error);
-    return NextResponse.json({ error: 'Erreur lors de la mise à jour partielle du programme' }, { status: 500 });
-  }
+
+  );
+}
 }
 
 // ------------------------
@@ -352,17 +415,39 @@ export async function PATCH(
 // ------------------------
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     const { id } = await params;
     const existingProgramme = await prisma.programmes_formation.findUnique({ where: { id } });
@@ -383,8 +468,10 @@ export async function DELETE(
     await prisma.programmes_formation.delete({ where: { id } });
 
     return new NextResponse(null, { status: 204 });
-  } catch (error) {
-    console.error('Erreur DELETE programmes-formation:', error);
-    return NextResponse.json({ error: 'Erreur lors de la suppression du programme' }, { status: 500 });
-  }
+
+  );
 }
+}
+
+    );
+  }

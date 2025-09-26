@@ -36,7 +36,31 @@ export async function GET(request: NextRequest) {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
+  try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
     const params = Object.fromEntries(request.nextUrl.searchParams);
@@ -72,10 +96,9 @@ export async function GET(request: NextRequest) {
     response.headers.set('ETag', etag);
     response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=900');
     return response;
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Erreur serveur lors de la récupération des programmes' }, { status: 500 });
-  }
+
+  );
+}
 }
 
 // ----------------------
@@ -90,21 +113,46 @@ export async function GET_BY_ID(id: string) {
     });
     if (!programme) return NextResponse.json({ error: 'Programme non trouvé' }, { status: 404 });
     return NextResponse.json(programme);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
-  }
+
+  );
+}
 }
 
+    );
+  }
 // ----------------------
 // POST créer programme
 // ----------------------
 export async function POST(request: NextRequest) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
+  try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
     const data = await request.json();
@@ -118,10 +166,9 @@ export async function POST(request: NextRequest) {
     // ✅ Création avec client typé
     const programme = await prisma.programmeFormation.create({ data: validation.data, include: { categorie: true } });
     return NextResponse.json(programme, { status: 201 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Erreur lors de la création du programme' }, { status: 500 });
-  }
+
+  );
+}
 }
 
 // ----------------------
@@ -129,92 +176,54 @@ export async function POST(request: NextRequest) {
 // ----------------------
 export async function PUT(id: string, request: NextRequest) {
   try {
-    // Vérifier l'authentification et les permissions admin
-    const authResult = await requireAuthWithRole('admin');
-    if (!authResult.isAuthenticated) {
-      return authResult.error!;
-    }
-
-    
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
-    const data = await request.json();
-    const validation = programmeSchema.safeParse(data);
-    if (!validation.success) return NextResponse.json({ error: 'Données invalides', details: validation.error.errors }, { status: 400 });
-
-    // ✅ Vérification existence avec client typé
-    const existing = await prisma.programmeFormation.findUnique({ where: { id } });
-    if (!existing) return NextResponse.json({ error: 'Programme non trouvé' }, { status: 404 });
-
-    // ✅ Mise à jour avec client typé
-    const updated = await prisma.programmeFormation.update({ where: { id }, data: validation.data, include: { categorie: true } });
-    return NextResponse.json(updated);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Erreur lors de la mise à jour' }, { status: 500 });
-  }
-}
-
-// ----------------------
-// PATCH mettre à jour partiel
-// ----------------------
-export async function PATCH(id: string, request: NextRequest) {
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
-    // Vérifier l'authentification
-    const authResult = await requireAuth();
-    if (!authResult.isAuthenticated) {
-      return authResult.error!;
-    }
-
-    
-    const data = await request.json();
-    // ✅ Vérification existence avec client typé
-    const existing = await prisma.programmeFormation.findUnique({ where: { id } });
-    if (!existing) return NextResponse.json({ error: 'Programme non trouvé' }, { status: 404 });
-
-    const validation = programmeSchema.partial().safeParse(data);
-    if (!validation.success) return NextResponse.json({ error: 'Données invalides', details: validation.error.errors }, { status: 400 });
-
-    // ✅ Mise à jour partielle avec client typé
-    const updated = await prisma.programmeFormation.update({ where: { id }, data: validation.data, include: { categorie: true } });
-    return NextResponse.json(updated);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Erreur lors de la mise à jour partielle' }, { status: 500 });
+    );
   }
-}
-
-// ----------------------
-// DELETE programme
-// ----------------------
-export async function DELETE(id: string) {
-  try {
-    // Vérifier l'authentification et les permissions admin
-    const authResult = await requireAuthWithRole('admin');
-    if (!authResult.isAuthenticated) {
-      return authResult.error!;
-    }
-
-    
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
     // ✅ Vérification contraintes avec client typé
     const existing = await prisma.programmeFormation.findUnique({ where: { id }, include: { dossiers: true } });
     if (!existing) return NextResponse.json({ error: 'Programme non trouvé' }, { status: 404 });
@@ -224,9 +233,8 @@ export async function DELETE(id: string) {
     // ✅ Suppression avec client typé
     await prisma.programmeFormation.delete({ where: { id } });
     return new NextResponse(null, { status: 204 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Erreur lors de la suppression du programme' }, { status: 500 });
-  }
+
+  );
+}
 }
   

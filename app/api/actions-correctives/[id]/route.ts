@@ -3,8 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
 import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
-
-
 // Schéma pour les mises à jour
 const updateActionCorrectiveSchema = z.object({
   titre: z.string().min(3).optional(),
@@ -24,16 +22,39 @@ const updateActionCorrectiveSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+  try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
     const { id } = await params;
 
     const action = await prisma.actionCorrective.findUnique({
@@ -57,34 +78,47 @@ export async function GET(
     }
 
     return NextResponse.json(action);
-  } catch (error) {
-    console.error('Erreur lors de la récupération de l\'action corrective:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur lors de la récupération de l\'action corrective' },
-      { status: 500 }
-    );
-  }
+
+  );
+}
 }
 
+}
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
+  try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+    );
+  }
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
     const { id } = await params;
     const data = await request.json();
 
@@ -140,34 +174,47 @@ export async function PUT(
     });
 
     return NextResponse.json(updatedAction);
-  } catch (error) {
-    console.error('Erreur lors de la mise à jour de l\'action corrective:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur lors de la mise à jour de l\'action corrective' },
-      { status: 500 }
-    );
-  }
+
+  );
+}
 }
 
+}
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
+  try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+    );
+  }
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
     const { id } = await params;
 
     // Vérifier que l'action corrective existe
@@ -193,11 +240,7 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: 'Action corrective supprimée avec succès' });
-  } catch (error) {
-    console.error('Erreur lors de la suppression de l\'action corrective:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur lors de la suppression de l\'action corrective' },
-      { status: 500 }
-    );
-  }
+
+  );
+}
 }

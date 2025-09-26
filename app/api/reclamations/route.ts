@@ -7,8 +7,6 @@ import { withSecurity, secureLogger, getSecurityHeaders } from '@/lib/security';
 import { withCSRFProtection } from '@/lib/csrf';
 import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
-
-
 // Schéma de validation pour les réclamations
 const reclamationSchema = z.object({
   nom: z.string().min(1, 'Le nom est requis'),
@@ -42,9 +40,14 @@ export async function GET(request: NextRequest) {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
+    );
+  }
     // Valider les paramètres de requête
     const validation = queryParamsSchema.safeParse(
       Object.fromEntries(request.nextUrl.searchParams)
@@ -101,13 +104,8 @@ export async function GET(request: NextRequest) {
         hasPreviousPage: params.page > 1
       }
     });
-    
-  } catch (error) {
-    console.error('Erreur lors de la récupération des réclamations:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur lors de la récupération des réclamations' },
-      { status: 500 }
-    );
+
+  );
   }
 }
 
@@ -131,12 +129,10 @@ async function postHandler(request: NextRequest, context: any, data: z.infer<typ
     });
 
     return NextResponse.json(reclamation, { status: 201 });
-    
-  } catch (error) {
-    console.error('Erreur lors de la création de la réclamation:', error);
-    return NextResponse.json(
-      { error: 'Erreur lors de la création de la réclamation' },
-      { status: 500 }
-    );
+
+  );
   }
 }
+
+    );
+  }

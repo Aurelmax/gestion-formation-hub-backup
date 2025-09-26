@@ -3,8 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
 import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
-
-
 // Schéma pour les mises à jour
 const updateReclamationSchema = z.object({
   nom: z.string().min(1).optional(),
@@ -21,17 +19,39 @@ const updateReclamationSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  try {
   try {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+  try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     const { id } = await params;
 
@@ -55,28 +75,48 @@ export async function GET(
     }
 
     return NextResponse.json(reclamation);
-  } catch (error) {
-    console.error('Erreur lors de la récupération de la réclamation:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur lors de la récupération de la réclamation' },
-      { status: 500 }
-    );
-  }
+
+  );
+}
 }
 
+    );
+  }
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     const { id } = await params;
     const data = await request.json();
@@ -94,6 +134,8 @@ export async function PUT(
       );
     }
 
+    );
+  }
     // Vérifier que la réclamation existe
     const existingReclamation = await prisma.reclamation.findUnique({
       where: { id }
@@ -121,28 +163,47 @@ export async function PUT(
     });
 
     return NextResponse.json(updatedReclamation);
-  } catch (error) {
-    console.error('Erreur lors de la mise à jour de la réclamation:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur lors de la mise à jour de la réclamation' },
-      { status: 500 }
-    );
-  }
+
+  );
+}
 }
 
+}
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     const { id } = await params;
 
@@ -158,17 +219,15 @@ export async function DELETE(
       );
     }
 
+    );
+  }
     // Supprimer la réclamation
     await prisma.reclamation.delete({
       where: { id }
     });
 
     return NextResponse.json({ message: 'Réclamation supprimée avec succès' });
-  } catch (error) {
-    console.error('Erreur lors de la suppression de la réclamation:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur lors de la suppression de la réclamation' },
-      { status: 500 }
-    );
-  }
+
+  );
+}
 }

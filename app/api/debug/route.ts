@@ -9,7 +9,8 @@ export async function GET(request: NextRequest) {
       return authResult.error!;
     }
 
-    
+    );
+  }
     // Informations sur l'environnement
     const debug = {
       timestamp: new Date().toISOString(),
@@ -45,16 +46,7 @@ export async function GET(request: NextRequest) {
         '/api/accessibilite/demandes'
       ]
     });
-  } catch (error) {
-    console.error('Debug endpoint error:', error);
-    return NextResponse.json(
-      { 
-        status: 'error',
-        error: 'Debug endpoint failed',
-        message: error instanceof Error ? error.message : String(error),
-        timestamp: new Date().toISOString()
-      }, 
-      { status: 500 }
+
     );
   }
 }

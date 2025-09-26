@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
@@ -41,10 +42,12 @@ export async function GET(req: Request) {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Unauthorized" },
+    { status: 401 }
+  );
     }
 
-    
     const url = new URL(req.url);
     
     // Valider et parser les paramètres
@@ -85,6 +88,8 @@ export async function GET(req: Request) {
       ];
     }
 
+    );
+  }
     // Exécuter les requêtes en parallèle
     const [programmes, total] = await Promise.all([
       prismaAny.programmes_formation.findMany({
@@ -116,16 +121,6 @@ export async function GET(req: Request) {
       }
     });
 
-  } catch (error) {
-    console.error('Erreur API programmes par catégorie:', error);
-    return NextResponse.json(
-      { 
-        error: 'Erreur serveur',
-        details: process.env.NODE_ENV === 'development' 
-          ? error instanceof Error ? error.message : String(error)
-          : undefined
-      },
-      { status: 500 }
     );
   }
 }

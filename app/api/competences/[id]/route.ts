@@ -23,18 +23,39 @@ const competenceUpdateSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  try {
   try {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
     const { id } = await params;
     
     const competence = await prisma.competence.findUnique({
@@ -49,29 +70,47 @@ export async function GET(
     }
 
     return NextResponse.json(competence);
-  } catch (error) {
-    console.error('Erreur lors de la récupération de la compétence:', error);
-    return NextResponse.json(
-      { error: 'Erreur lors de la récupération de la compétence' },
-      { status: 500 }
-    );
-  }
+
+  );
+}
 }
 
+}
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
-  try {
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
     const { id } = await params;
     const data = await request.json();
     
@@ -98,12 +137,7 @@ export async function PUT(
     });
 
     return NextResponse.json(competence);
-    
-  } catch (error) {
-    if (isPrismaError(error) && error.code === 'P2025') {
-      return NextResponse.json(
-        { error: 'Compétence non trouvée' },
-        { status: 404 }
+
       );
     }
     
@@ -115,20 +149,42 @@ export async function PUT(
   }
 }
 
+}
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
-  try {
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
     const { id } = await params;
     
     await prisma.competence.delete({
@@ -136,11 +192,7 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: 'Compétence supprimée avec succès' });
-  } catch (error) {
-    if (isPrismaError(error) && error.code === 'P2025') {
-      return NextResponse.json(
-        { error: 'Compétence non trouvée' },
-        { status: 404 }
+
       );
     }
     

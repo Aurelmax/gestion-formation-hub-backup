@@ -39,46 +39,14 @@ export async function GET() {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Unauthorized" },
+    { status: 401 }
+  );
     }
 
-    // Vérification de la connexion
-    try {
-      await prisma.$connect();
-    } catch (connectError) {
-      console.warn('Reconnexion Prisma nécessaire:', connectError);
-    }
-
-    const rendezvous = await prisma.rendezvous.findMany({
-      orderBy: { dateContact: 'desc' },
-      take: 100,
-    });
-    return NextResponse.json(rendezvous);
-  } catch (error) {
-    console.error('Erreur lors de la récupération des rendez-vous:', error);
-    return NextResponse.json(
-      { error: 'Erreur lors de la récupération des rendez-vous' },
-      { status: 500 }
     );
   }
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    // Vérifier l'authentification et les permissions admin
-    const authResult = await requireAuthWithRole('admin');
-    if (!authResult.isAuthenticated) {
-      return authResult.error!;
-    }
-
-    
-    // Vérifier l'authentification
-    const authResult = await requireAuth();
-    if (!authResult.isAuthenticated) {
-      return authResult.error!;
-    }
-
-    
   // Headers CORS
   const origin = request.headers.get('origin');
   const allowedOrigins = [
@@ -105,13 +73,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    );
+  }
     // Tentative de reconnexion si nécessaire
     try {
       await prisma.$connect();
-    } catch (connectError) {
-      console.warn('Reconnexion Prisma nécessaire:', connectError);
-    }
 
+    );
+  }
     // Création du rendez-vous dans la base de données avec retry
     let nouveauRendezvous: any;
     let retryCount = 0;
@@ -133,14 +102,9 @@ export async function POST(request: NextRequest) {
           },
         });
         break;
-      } catch (dbError: any) {
-        retryCount++;
-        console.error(`Tentative ${retryCount} échouée:`, dbError);
-        
-        if (retryCount >= maxRetries) {
-          throw dbError;
-        }
-        
+
+    );
+  }
         // Attendre avant de réessayer
         await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
         
@@ -148,12 +112,12 @@ export async function POST(request: NextRequest) {
         try {
           await prisma.$disconnect();
           await prisma.$connect();
-        } catch (reconnectError) {
-          console.warn('Erreur de reconnexion:', reconnectError);
-        }
+
       }
     }
 
+    );
+  }
     // Envoyer un email de confirmation (à implémenter)
     // await sendConfirmationEmail(data.email, data.prenom);
 
@@ -174,25 +138,21 @@ export async function POST(request: NextRequest) {
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     
     return response;
-    
-  } catch (error) {
-    console.error('Erreur lors de la création du rendez-vous:', error);
-    return NextResponse.json(
-      { 
-        error: 'Une erreur est survenue lors de la création du rendez-vous',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      },
-      { status: 500 }
+
     );
   }
 }
 
+}
 export async function DELETE(request: NextRequest) {
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Unauthorized" },
+    { status: 401 }
+  );
     }
 
     const { searchParams } = new URL(request.url);
@@ -210,10 +170,9 @@ export async function DELETE(request: NextRequest) {
     // Tentative de reconnexion si nécessaire
     try {
       await prisma.$connect();
-    } catch (connectError) {
-      console.warn('Reconnexion Prisma nécessaire:', connectError);
-    }
 
+    );
+  }
     // Vérifier si le rendez-vous existe
     const existingRendezvous = await prisma.rendezvous.findUnique({
       where: { id }
@@ -238,18 +197,11 @@ export async function DELETE(request: NextRequest) {
       { status: 200 }
     );
 
-  } catch (error) {
-    console.error('❌ Erreur lors de la suppression:', error);
-    return NextResponse.json(
-      { 
-        error: 'Erreur lors de la suppression du rendez-vous',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      },
-      { status: 500 }
     );
   }
 }
 
+}
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin');
   const allowedOrigins = [

@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-09-26T16:34:35.806Z",
+  "total": 14,
+  "files": [
+    "app/api/accessibilite/demandes/[id]/route.ts",
+    "app/api/accessibilite/demandes/route.ts",
+    "app/api/accessibilite/plans/[id]/route.ts",
+    "app/api/accessibilite/plans/route.ts",
+    "app/api/categories/[id]/route.ts",
+    "app/api/categories-programme/route.ts",
+    "app/api/csrf/route.ts",
+    "app/api/files/veille/[veilleId]/[filename]/route.ts",
+    "app/api/programmes-formation/by-code/[code]/route.ts",
+    "app/api/programmes-formation/par-categorie/groups/route.ts",
+    "app/api/rendezvous/[id]/statut/route.ts",
+    "app/api/veille/[id]/commentaire/route.ts",
+    "app/api/veille/[id]/commentaires/[commentaireId]/route.ts",
+    "app/api/veille/[id]/route.ts"
+  ]
+}

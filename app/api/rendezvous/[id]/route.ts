@@ -4,17 +4,39 @@ import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  try {
   try {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+  try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     const { id } = await params;
     const rendezvous = await prisma.rendezvous.findUnique({
@@ -29,28 +51,48 @@ export async function GET(
     }
 
     return NextResponse.json(rendezvous);
-  } catch (error) {
-    console.error('Erreur lors de la récupération du rendez-vous:', error);
-    return NextResponse.json(
-      { error: 'Erreur lors de la récupération du rendez-vous' },
-      { status: 500 }
-    );
-  }
+
+  );
+}
 }
 
+    );
+  }
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     const { id } = await params;
     const data = await request.json();
@@ -64,28 +106,48 @@ export async function PUT(
     });
 
     return NextResponse.json(rendezvous);
-  } catch (error) {
-    console.error('Erreur lors de la mise à jour du rendez-vous:', error);
-    return NextResponse.json(
-      { error: 'Erreur lors de la mise à jour du rendez-vous' },
-      { status: 500 }
-    );
-  }
+
+  );
+}
 }
 
+    );
+  }
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
+    );
+  }
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
+    }
+
   try {
     const { id } = await params;
     await prisma.rendezvous.delete({
@@ -93,11 +155,7 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: 'Rendez-vous supprimé avec succès' });
-  } catch (error) {
-    console.error('Erreur lors de la suppression du rendez-vous:', error);
-    return NextResponse.json(
-      { error: 'Erreur lors de la suppression du rendez-vous' },
-      { status: 500 }
-    );
-  }
+
+  );
+}
 }

@@ -52,14 +52,15 @@ const actionCorrectiveSchema = z.object({
  */
 export async function GET(request: NextRequest) {
   try {
-  try {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
   try {
     const { searchParams } = new URL(request.url);
     const statut = searchParams.get('statut');
@@ -89,12 +90,8 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(actions);
-  } catch (error) {
-    console.error('Erreur lors de la récupération des actions correctives:', error);
-    return NextResponse.json(
-      { error: 'Erreur lors de la récupération des actions correctives' },
-      { status: 500 }
-    );
+
+  );
   }
 }
 
@@ -124,14 +121,15 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-  try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
   try {
     const data = await request.json();
     
@@ -148,6 +146,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    );
+  }
     // Création de l'action corrective
     const nouvelleAction = await prisma.actionCorrective.create({
       data: {
@@ -179,15 +179,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(nouvelleAction, { status: 201 });
-    
-  } catch (error) {
-    console.error('Erreur lors de la création de l\'action corrective:', error);
-    return NextResponse.json(
-      { 
-        error: 'Une erreur est survenue lors de la création de l\'action corrective',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      },
-      { status: 500 }
+
     );
   }
 }

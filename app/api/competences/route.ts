@@ -3,8 +3,6 @@ import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
-
-
 // Schéma de validation pour les compétences
 const competenceSchema = z.object({
   nom: z.string().min(1, 'Le nom est requis'),
@@ -43,9 +41,14 @@ export async function GET(request: NextRequest) {
     // Vérifier l'authentification
     const authResult = await requireAuth();
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
+    );
+  }
     // Valider les paramètres de requête
     const validation = queryParamsSchema.safeParse(
       Object.fromEntries(request.nextUrl.searchParams)
@@ -95,22 +98,21 @@ export async function GET(request: NextRequest) {
         hasPreviousPage: params.page > 1
       }
     });
-    
-  } catch (error) {
-    console.error('Erreur lors de la récupération des compétences:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur lors de la récupération des compétences' },
-      { status: 500 }
-    );
+
+  );
   }
 }
 
+}
 export async function POST(request: NextRequest) {
   try {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
     const data = await request.json();
@@ -128,6 +130,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    );
+  }
     // Créer la compétence avec mapping explicite
     const competence = await prisma.competence.create({
       data: {
@@ -148,12 +152,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(competence, { status: 201 });
-    
-  } catch (error) {
-    console.error('Erreur lors de la création de la compétence:', error);
-    return NextResponse.json(
-      { error: 'Erreur lors de la création de la compétence' },
-      { status: 500 }
-    );
+
+  );
   }
 }

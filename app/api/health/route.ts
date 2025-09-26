@@ -9,6 +9,8 @@ export async function GET() {
       return authResult.error!;
     }
 
-    
   return NextResponse.json({ status: 'ok', timestamp: new Date().toISOString() });
 }
+
+    );
+  }

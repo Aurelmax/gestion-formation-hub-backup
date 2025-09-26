@@ -3,8 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
 import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
-
-
 // Schéma pour la duplication
 const duplicateSchema = z.object({
   sourceId: z.string().uuid('ID source invalide'),
@@ -25,17 +23,12 @@ export async function POST(request: NextRequest) {
     // Vérifier l'authentification et les permissions admin
     const authResult = await requireAuthWithRole('admin');
     if (!authResult.isAuthenticated) {
-      return authResult.error!;
+      return NextResponse.json(
+    { error: "Non authentifié" },
+    { status: 401 }
+  );
     }
 
-    
-    // Vérifier l'authentification
-    const authResult = await requireAuth();
-    if (!authResult.isAuthenticated) {
-      return authResult.error!;
-    }
-
-    
     const data = await request.json();
     
     console.log('Données reçues pour duplication:', data);
@@ -69,6 +62,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    );
+  }
     // Vérifier si le nouveau code existe déjà
     if (newData.code) {
       const existingProgramme = await prismaAny.programmes_formation.findFirst({
@@ -120,11 +115,7 @@ export async function POST(request: NextRequest) {
     console.log('Programme dupliqué créé:', duplicatedProgramme.id);
 
     return NextResponse.json(duplicatedProgramme, { status: 201 });
-  } catch (error) {
-    console.error('Erreur lors de la duplication du programme:', error);
-    return NextResponse.json(
-      { error: 'Une erreur est survenue lors de la duplication du programme' },
-      { status: 500 }
-    );
+
+  );
   }
 }

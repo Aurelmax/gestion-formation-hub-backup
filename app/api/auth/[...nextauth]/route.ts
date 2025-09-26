@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from 'next/server';
 import NextAuth from "next-auth"
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from "@/lib/prisma";
@@ -21,12 +22,11 @@ const handler = NextAuth({
             throw new Error('Email et mot de passe requis');
           }
 
+    );
+  }
           // Vérification de la connexion Prisma
           try {
             await prisma.$connect();
-          } catch (connectError) {
-            console.warn('Reconnexion Prisma nécessaire dans NextAuth:', connectError);
-          }
 
           const user = await prisma.user.findUnique({
             where: { email: credentials.email as string },
@@ -48,10 +48,7 @@ const handler = NextAuth({
             name: user.name,
             role: user.role,
           };
-        } catch (error) {
-          console.error('Erreur lors de l\'autorisation:', error);
-          throw error;
-        }
+
       },
     }),
   ],
@@ -63,10 +60,7 @@ const handler = NextAuth({
           session.user.role = token.role;
         }
         return session;
-      } catch (error) {
-        console.error('Erreur lors de la session callback:', error);
-        return session;
-      }
+
     },
     async jwt({ token, user }) {
       try {
@@ -75,10 +69,7 @@ const handler = NextAuth({
           token.role = user.role;
         }
         return token;
-      } catch (error) {
-        console.error('Erreur lors du JWT callback:', error);
-        return token;
-      }
+
     },
   },
   pages: {
