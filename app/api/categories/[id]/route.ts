@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 
 
@@ -18,6 +19,13 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const categorie = await prisma.categorieProgramme.findUnique({
       where: { id: params.id },
       include: {
@@ -54,6 +62,20 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const data = await request.json();
     const validatedData = updateCategorieSchema.parse(data);
 
@@ -116,6 +138,20 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     // Vérifier si la catégorie existe
     const categorie = await prisma.categorieProgramme.findUnique({
       where: { id: params.id },

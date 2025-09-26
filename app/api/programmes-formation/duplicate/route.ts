@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 
 
@@ -21,6 +22,20 @@ const duplicateSchema = z.object({
  */
 export async function POST(request: NextRequest) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const data = await request.json();
     
     console.log('Données reçues pour duplication:', data);

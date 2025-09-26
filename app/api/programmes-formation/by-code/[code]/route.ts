@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 
 
@@ -22,6 +23,13 @@ export async function GET(
   { params }: { params: { code: string } }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const { code } = params;
     const { searchParams } = new URL(request.url);
     
@@ -207,7 +215,7 @@ export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' ? 'https://gestionmax-formation-hub.vercel.app' : 'http://localhost:3000',
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       'Cache-Control': 'public, max-age=86400', // 24h

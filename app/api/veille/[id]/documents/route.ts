@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 
 
@@ -25,6 +26,20 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const { id } = await params;
 
     // Vérifier que la veille existe
@@ -134,6 +149,20 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const { id } = await params;
     const { searchParams } = new URL(request.url);
     const documentId = searchParams.get('documentId');

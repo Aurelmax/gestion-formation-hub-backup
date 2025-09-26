@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { prisma } from "@/lib/prisma";
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 
 
@@ -10,6 +11,13 @@ export async function GET(
   { params }: { params: Promise<{ veilleId: string; filename: string }> }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const { veilleId, filename } = await params;
 
     // Vérifier que le document existe et appartient à cette veille

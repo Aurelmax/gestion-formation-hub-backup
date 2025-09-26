@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import type { Veille, Prisma } from '@prisma/client';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 // ✅ Convention Hybride Stricte - Client Prisma Typé
 // Schéma de validation pour la création d'une veille
@@ -18,6 +19,15 @@ const veilleSchema = z.object({
 
 // GET /api/veille - Récupérer toutes les veilles
 export async function GET(request: NextRequest) {
+  try {
+  try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
   try {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
@@ -65,6 +75,15 @@ export async function GET(request: NextRequest) {
 
 // POST /api/veille - Créer une nouvelle veille
 export async function POST(request: NextRequest) {
+  try {
+  try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
   try {
     const data = await request.json();
 

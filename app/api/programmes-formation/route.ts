@@ -129,6 +129,20 @@ export async function POST(request: NextRequest) {
 // ----------------------
 export async function PUT(id: string, request: NextRequest) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const data = await request.json();
     const validation = programmeSchema.safeParse(data);
     if (!validation.success) return NextResponse.json({ error: 'Données invalides', details: validation.error.errors }, { status: 400 });
@@ -151,6 +165,20 @@ export async function PUT(id: string, request: NextRequest) {
 // ----------------------
 export async function PATCH(id: string, request: NextRequest) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const data = await request.json();
     // ✅ Vérification existence avec client typé
     const existing = await prisma.programmeFormation.findUnique({ where: { id } });
@@ -173,6 +201,20 @@ export async function PATCH(id: string, request: NextRequest) {
 // ----------------------
 export async function DELETE(id: string) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     // ✅ Vérification contraintes avec client typé
     const existing = await prisma.programmeFormation.findUnique({ where: { id }, include: { dossiers: true } });
     if (!existing) return NextResponse.json({ error: 'Programme non trouvé' }, { status: 404 });

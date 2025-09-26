@@ -43,6 +43,10 @@
     "validate:all": "npx tsx scripts/validate-all-security.ts",
     "analyze:xss": "npx tsx scripts/analyze-xss-vulnerabilities.ts",
     "validate:final": "npx tsx scripts/validate-final-security.ts",
+    "audit:api": "npx tsx scripts/audit-api-security.ts",
+    "fix:api": "npx tsx scripts/fix-api-security.ts",
+    "fix:all-api": "npx tsx scripts/fix-all-api-security.ts",
+    "fix:structure": "npx tsx scripts/fix-api-structure.ts",
     "test": "jest",
     "test:watch": "jest --watch"
   },

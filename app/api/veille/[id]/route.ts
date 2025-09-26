@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import type { Veille } from '@prisma/client';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 // ✅ Convention Hybride Stricte - Client Prisma Typé
 // Schéma de validation pour la mise à jour d'une veille
@@ -20,6 +21,13 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const { id } = await params;
     // ✅ Accès Prisma Client typé
     const veille = await prisma.veille.findUnique({
@@ -88,6 +96,20 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const { id } = await params;
     const prismaAny = prisma;
     const data = await request.json();
@@ -203,6 +225,20 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const { id } = await params;
     // ✅ Vérification existence avec client typé
     const veilleExistante = await prisma.veille.findUnique({

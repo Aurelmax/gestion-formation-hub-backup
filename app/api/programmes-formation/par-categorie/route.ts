@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 // Schéma de validation des paramètres de requête
 export const querySchema = z.object({
@@ -37,6 +38,13 @@ export const querySchema = z.object({
 
 export async function GET(req: Request) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const url = new URL(req.url);
     
     // Valider et parser les paramètres

@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { generateCSRFTokenResponse } from '@/lib/csrf';
 import { secureLogger } from '@/lib/security';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 /**
  * API pour générer un nouveau token CSRF
@@ -8,6 +9,13 @@ import { secureLogger } from '@/lib/security';
  */
 export async function GET(request: NextRequest) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     secureLogger.info('CSRF token requested', {
       route: '/api/csrf',
       method: 'GET',

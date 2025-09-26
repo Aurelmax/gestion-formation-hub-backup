@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 import { z } from 'zod';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 
 
@@ -53,6 +54,13 @@ export const querySchema = z.object({
 
 export async function GET() {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     console.log('Requête reçue sur /api/programmes-formation/par-categorie/groupes');
 
     // Récupérer toutes les catégories avec leurs programmes actifs et visibles

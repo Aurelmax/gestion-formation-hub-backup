@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 
 
 // GET - Récupérer tous les plans d'accessibilité
 export async function GET() {
+  try {
+  try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
   try {
     const plans = await prisma.planAccessibilite.findMany({
       orderBy: { dateCreation: 'desc' }
@@ -22,6 +32,15 @@ export async function GET() {
 
 // POST - Créer un nouveau plan d'accessibilité
 export async function POST(request: NextRequest) {
+  try {
+  try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
   try {
     const {
       titre,

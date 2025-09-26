@@ -64,6 +64,21 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
   // Headers CORS
   const origin = request.headers.get('origin');
   const allowedOrigins = [

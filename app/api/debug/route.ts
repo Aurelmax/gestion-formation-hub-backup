@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 export async function GET(request: NextRequest) {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     // Informations sur l'environnement
     const debug = {
       timestamp: new Date().toISOString(),

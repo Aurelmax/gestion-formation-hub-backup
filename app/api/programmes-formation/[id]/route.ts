@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { PROGRAMME_TYPE_ENUM } from '@/types/programmes';
 import { prisma } from '@/lib/prisma';
 import type { ProgrammeFormation, Prisma } from '@prisma/client';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 // ✅ Convention Hybride Stricte - Client Prisma Typé
 
@@ -55,6 +56,15 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+  try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+  try {
     const { id } = await params;
 
     const programme = await prisma.programmes_formation.findUnique({
@@ -87,6 +97,15 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  try {
+  try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
   try {
     const { id } = await params;
     const data = await request.json();
@@ -211,6 +230,15 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+  try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+  try {
     const { id } = await params;
     const data = await request.json();
 
@@ -326,6 +354,15 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  try {
+  try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
   try {
     const { id } = await params;
     const existingProgramme = await prisma.programmes_formation.findUnique({ where: { id } });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 // Temporarily disabled caching imports to fix module resolution
 // import { cache, CACHE_CONFIG, createCacheKey, withCache } from '@/lib/cache';
 // import { createCachedResponse, CACHE_STRATEGIES } from '@/lib/http-cache';
@@ -15,6 +16,15 @@ const categorieSchema = z.object({
 
 // GET /api/categories - Récupérer toutes les catégories (cache temporairement désactivé)
 export async function GET() {
+  try {
+  try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
   try {
     const categories = await prisma.categories_programme.findMany({
       orderBy: { ordre: 'asc' },
@@ -46,6 +56,15 @@ export async function GET() {
 
 // POST /api/categories - Créer une nouvelle catégorie
 export async function POST(request: NextRequest) {
+  try {
+  try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
   try {
     const data = await request.json();
     const validatedData = categorieSchema.parse(data);

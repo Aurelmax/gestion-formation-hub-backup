@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 // Schéma de validation pour une catégorie
 const categorieSchema = z.object({
@@ -18,6 +19,14 @@ const querySchema = z.object({
 
 // GET /api/categories-programme - Récupérer toutes les catégories
 export async function GET(request: NextRequest) {
+  try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
   console.log('[API] GET /api/categories-programme - Début de la requête');
   
   try {
@@ -145,6 +154,20 @@ export async function GET(request: NextRequest) {
 // POST /api/categories-programme - Créer une nouvelle catégorie
 export async function POST(request: NextRequest) {
   try {
+    // Vérifier l'authentification et les permissions admin
+    const authResult = await requireAuthWithRole('admin');
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     const data = await request.json();
     
     // Validation des données

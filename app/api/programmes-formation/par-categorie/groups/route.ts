@@ -1,10 +1,18 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
+import { requireAuth, requireAuthWithRole } from '@/lib/api-auth';
 
 
 
 export async function GET() {
   try {
+    // Vérifier l'authentification
+    const authResult = await requireAuth();
+    if (!authResult.isAuthenticated) {
+      return authResult.error!;
+    }
+
+    
     console.log('Requête reçue sur /api/programmes-formation/par-categorie/groups');
 
     // Récupérer toutes les catégories avec leurs programmes actifs et visibles
