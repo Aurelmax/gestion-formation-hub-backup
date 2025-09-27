@@ -2,7 +2,7 @@
 
 import './globals.css';
 import { ReactNode } from 'react';
-import Providers from './components/providers/Providers';
+import Providers from './providers';
 
 type LayoutProps = {
   children: ReactNode;
