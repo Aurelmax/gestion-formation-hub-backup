@@ -1,51 +1,31 @@
-<<<<<<< HEAD
-"use client";
-=======
 import { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import CategoriesManager from '@/components/admin/CategoriesManager';
-import AdminNav from '@/components/admin/AdminNav';
->>>>>>> feature/clerk-only-final
 
-import { useAuth } from "@/app/components/providers/AuthProvider";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+export const metadata: Metadata = {
+  title: 'Administration - Catégories',
+  description: 'Gestion des catégories de formations',
+};
 
-<<<<<<< HEAD
-export default function AdminCategoriesPage() {
-  const { user } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!user || user.role !== "admin") {
-      router.push("/login"); // redirige si non connecté ou pas admin
-    }
-  }, [user, router]);
-
-  if (!user || user.role !== "admin") return <p>Redirection...</p>;
-
-=======
 export default async function AdminCategoriesPage() {
   const { userId } = await auth();
 
   // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
   if (!userId) {
-    redirect('/auth/sign-in?redirect_url=/admin/categories');
+    redirect('/auth?redirect_url=/admin/categories');
   }
 
->>>>>>> feature/clerk-only-final
   return (
-    <div>
-      <h1>Catégories Admin</h1>
-      <p>Bienvenue {user.email} !</p>
-      {/* Liste des catégories, boutons CRUD, etc. */}
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Gestion des Catégories</h1>
+        <p className="text-gray-600 mt-2">Gérez les catégories de formations disponibles</p>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-sm border p-6">
+        <p>Interface de gestion des catégories en cours de développement...</p>
+        {/* TODO: Intégrer CategoriesManager component */}
+      </div>
     </div>
   );
-<<<<<<< HEAD
 }
-
-
-=======
-}
->>>>>>> feature/clerk-only-final

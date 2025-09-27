@@ -19,10 +19,10 @@ const queryParamsSchema = z.object({
 // GET /api/programmes-formation/by-code/[code] - Récupérer un programme par son code
 export async function GET(
   request: NextRequest,
-  { params }: { params: { code: string } }
+  { params }: { params: Promise<{ code: string }> }
 ) {
   try {
-    const { code } = params;
+    const { code } = await params;
     const { searchParams } = new URL(request.url);
     
     // Validation du code

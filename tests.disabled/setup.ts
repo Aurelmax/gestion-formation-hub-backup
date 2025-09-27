@@ -59,7 +59,7 @@ export class TestDatabaseManager {
   static async seedTestData() {
     try {
       // Créer des données de test de base
-      const testCategory = await prisma.categoriesProgramme.upsert({
+      const testCategory = await prisma.categorieProgramme.upsert({
         where: { titre: 'Test Category' },
         update: {},
         create: {
@@ -72,11 +72,12 @@ export class TestDatabaseManager {
 
       // Programme de test
       await prisma.programmeFormation.upsert({
-        where: { code: 'TEST-PROG-001' },
+        where: { positionnementRequestId: 'test-request-001' },
         update: {},
         create: {
           code: 'TEST-PROG-001',
           type: 'catalogue',
+          positionnementRequestId: 'test-request-001',
           titre: 'Programme de Test',
           description: 'Programme de formation pour les tests',
           duree: '2 jours',

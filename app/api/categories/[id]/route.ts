@@ -15,11 +15,12 @@ const updateCategorieSchema = z.object({
 // GET /api/categories/[id] - Récupérer une catégorie par son ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const categorie = await prisma.categorieProgramme.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -51,15 +52,16 @@ export async function GET(
 // PATCH /api/categories/[id] - Mettre à jour une catégorie
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const data = await request.json();
     const validatedData = updateCategorieSchema.parse(data);
 
     // Vérifier si la catégorie existe
     const existing = await prisma.categorieProgramme.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existing) {
@@ -74,7 +76,7 @@ export async function PATCH(
       const codeExists = await prisma.categorieProgramme.findFirst({
         where: {
           code: validatedData.code,
-          id: { not: params.id }
+          id: { not: id }
         }
       });
 
@@ -87,7 +89,7 @@ export async function PATCH(
     }
 
     const updatedCategorie = await prisma.categorieProgramme.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...validatedData,
         updatedAt: new Date()
@@ -113,12 +115,13 @@ export async function PATCH(
 // DELETE /api/categories/[id] - Supprimer une catégorie
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Vérifier si la catégorie existe
     const categorie = await prisma.categorieProgramme.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -147,7 +150,7 @@ export async function DELETE(
     }
 
     await prisma.categorieProgramme.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return new Response(null, { status: 204 });

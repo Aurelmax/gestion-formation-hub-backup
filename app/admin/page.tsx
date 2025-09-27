@@ -1,59 +1,46 @@
-<<<<<<< HEAD
-"use client";
-=======
 import { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import AdminNav from '@/components/admin/AdminNav';
->>>>>>> feature/clerk-only-final
+import Link from 'next/link';
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+export const metadata: Metadata = {
+  title: 'Administration - Dashboard',
+  description: 'Interface d\'administration de GestionMax',
+};
 
-<<<<<<< HEAD
-export default function AdminPage() {
-  const { status } = useSession();
-  const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-
-  // Protection contre l'hydratation
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return; // Attendre que le composant soit monté côté client
-    
-    // Rediriger selon le statut d'authentification
-    if (status === "authenticated") {
-      router.push("/dashboard");
-    } else if (status === "unauthenticated") {
-      router.push("/admin/login");
-    }
-  }, [status, router, mounted]);
-
-  // Ne rien rendre côté serveur pour éviter les différences d'hydratation
-  if (!mounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Chargement...</div>
-      </div>
-    );
-=======
 export default async function AdminDashboardPage() {
   const { userId } = await auth();
 
   // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
   if (!userId) {
-    redirect('/auth/sign-in?redirect_url=/admin');
->>>>>>> feature/clerk-only-final
+    redirect('/auth?redirect_url=/admin');
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-lg">
-        {status === "loading" ? "Chargement..." : "Redirection..."}
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Administration</h1>
+        <p className="text-gray-600 mt-2">Interface de gestion de GestionMax</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Link
+          href="/admin/categories"
+          className="bg-white p-6 rounded-lg border shadow-sm hover:shadow-md transition-shadow"
+        >
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Catégories</h3>
+          <p className="text-gray-600">Gérer les catégories de formations</p>
+        </Link>
+
+        <div className="bg-gray-100 p-6 rounded-lg border">
+          <h3 className="text-xl font-semibold text-gray-500 mb-2">Formations</h3>
+          <p className="text-gray-500">À venir...</p>
+        </div>
+
+        <div className="bg-gray-100 p-6 rounded-lg border">
+          <h3 className="text-xl font-semibold text-gray-500 mb-2">Utilisateurs</h3>
+          <p className="text-gray-500">À venir...</p>
+        </div>
       </div>
     </div>
   );

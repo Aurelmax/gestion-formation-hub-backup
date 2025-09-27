@@ -47,10 +47,10 @@ const updateProgrammeSchema = z.object({
 // GET /api/programmes-formation/[id] - Récupérer un programme par son ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const programme = await prisma.programmeFormation.findUnique({
       where: { id },
@@ -95,10 +95,10 @@ export async function GET(
 // PUT /api/programmes-formation/[id] - Mettre à jour complètement un programme
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const data = await request.json();
     
     // Vérifier si le programme existe
@@ -168,10 +168,10 @@ export async function PUT(
 // PATCH /api/programmes-formation/[id] - Mettre à jour partiellement un programme
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const data = await request.json();
     
     // Vérifier si le programme existe
@@ -241,10 +241,10 @@ export async function PATCH(
 // DELETE /api/programmes-formation/[id] - Supprimer un programme
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Vérifier si le programme existe
     const existingProgramme = await prisma.programmeFormation.findUnique({
