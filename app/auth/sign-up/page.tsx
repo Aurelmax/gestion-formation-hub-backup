@@ -12,7 +12,8 @@ export default function SignUpPage() {
             Rejoignez GestionMax
           </p>
         </div>
-        <SignUp 
+        <SignUp
+          routing="hash"
           appearance={{
             elements: {
               formButtonPrimary: 'bg-blue-600 hover:bg-blue-700 text-sm normal-case',

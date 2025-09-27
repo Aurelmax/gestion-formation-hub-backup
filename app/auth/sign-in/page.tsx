@@ -12,7 +12,8 @@ export default function SignInPage() {
             Accédez à votre compte GestionMax
           </p>
         </div>
-        <SignIn 
+        <SignIn
+          routing="hash"
           appearance={{
             elements: {
               formButtonPrimary: 'bg-blue-600 hover:bg-blue-700 text-sm normal-case',
