@@ -1,6 +1,6 @@
 "use client";
 
-import { SessionProvider } from "next-auth/react";
+import { ClerkProvider } from '@clerk/nextjs';
 import { ReactNode } from "react";
 
 type ProvidersProps = {
@@ -9,8 +9,8 @@ type ProvidersProps = {
 
 export default function Providers({ children }: ProvidersProps) {
   return (
-    <SessionProvider>
+    <ClerkProvider>
       {children}
-    </SessionProvider>
+    </ClerkProvider>
   );
 }

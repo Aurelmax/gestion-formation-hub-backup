@@ -1,8 +1,7 @@
 import { Metadata } from 'next';
-import { getServerSession } from 'next-auth';
+import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import AdminNav from '@/components/admin/AdminNav';
-import { authOptions } from '@/lib/auth';
 
 export const metadata: Metadata = {
   title: 'Tableau de bord - Administration',
@@ -10,17 +9,12 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminDashboardPage() {
-  const session = await getServerSession(authOptions);
+  const { userId } = await auth();
 
   // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-  if (!session) {
-    redirect('/auth?callbackUrl=/admin');
+  if (!userId) {
+    redirect('/auth/sign-in?redirect_url=/admin');
   }
-
-  // Vérifier les permissions si nécessaire
-  // if (session.user.role !== 'admin') {
-  //   redirect('/unauthorized');
-  // }
 
   return (
     <div className="container mx-auto py-8">
