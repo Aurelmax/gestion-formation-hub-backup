@@ -1,9 +1,17 @@
+<<<<<<< HEAD
 "use client";
+=======
+import { Metadata } from 'next';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import AdminNav from '@/components/admin/AdminNav';
+>>>>>>> feature/clerk-only-final
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+<<<<<<< HEAD
 export default function AdminPage() {
   const { status } = useSession();
   const router = useRouter();
@@ -32,6 +40,14 @@ export default function AdminPage() {
         <div className="text-lg">Chargement...</div>
       </div>
     );
+=======
+export default async function AdminDashboardPage() {
+  const { userId } = await auth();
+
+  // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+  if (!userId) {
+    redirect('/auth/sign-in?redirect_url=/admin');
+>>>>>>> feature/clerk-only-final
   }
 
   return (

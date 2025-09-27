@@ -1,88 +1,78 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { UserButton } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/useAuth';
+import Link from 'next/link';
 
-const Navigation = () => {
-  const pathname = usePathname();
-  const { user, logout } = useAuth(); // ✅ hook maison
-  const isActive = (path: string) => pathname === path;
+export default function Navigation() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <div className="animate-pulse bg-gray-200 h-8 w-32 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
-    <nav className="flex items-center gap-4" aria-label="Menu principal">
-      <Link href="/catalogue">
-        <Button 
-          variant={isActive("/catalogue") || pathname === "/" ? "default" : "ghost"}
-          className="text-base font-medium"
-        >
-          Catalogue
-        </Button>
-      </Link>
-      <Link href="/blog">
-        <Button 
-          variant={isActive("/blog") ? "default" : "ghost"}
-          className="text-base"
-        >
-          Blog
-        </Button>
-      </Link>
-      <Link href="/a-propos">
-        <Button 
-          variant={isActive("/a-propos") ? "default" : "ghost"}
-          className="text-base"
-        >
-          À propos
-        </Button>
-      </Link>
-      <Link href="/contact">
-        <Button 
-          variant={isActive("/contact") ? "default" : "ghost"}
-          className="text-base"
-        >
-          Contact
-        </Button>
-      </Link>
+    <nav className="bg-white shadow-sm border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <Link href="/" className="text-xl font-bold text-gray-900">
+              GestionMax
+            </Link>
+          </div>
 
-      {user ? (
-        <>
-          <Link href="/apprenant/dashboard">
-            <Button 
-              variant={isActive("/apprenant/dashboard") ? "default" : "ghost"}
-              className="text-base bg-blue-100 hover:bg-blue-200 text-blue-800"
-            >
-              Espace Apprenant
-            </Button>
-          </Link>
-          <Link href="/admin">
-            <Button 
-              variant={isActive("/admin") ? "default" : "ghost"}
-              className="text-base bg-primary/10 hover:bg-primary/20"
-            >
-              Administration
-            </Button>
-          </Link>
-          <Button
-            variant="outline"
-            className="text-base"
-            onClick={logout} // ✅ bouton logout
-          >
-            Déconnexion
-          </Button>
-        </>
-      ) : (
-        <Link href="/login">
-          <Button 
-            variant="outline"
-            className="text-base"
-          >
-            Connexion
-          </Button>
-        </Link>
-      )}
+          <div className="flex items-center space-x-4">
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/admin"
+                  className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Admin
+                </Link>
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8"
+                    }
+                  }}
+                />
+              </>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Link
+                  href="/auth"
+                  className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Connexion
+                </Link>
+                <Link
+                  href="/auth/sign-up"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                >
+                  S'inscrire
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </nav>
   );
-};
-
-export default Navigation;
+}

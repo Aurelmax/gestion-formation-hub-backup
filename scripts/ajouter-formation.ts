@@ -44,7 +44,7 @@ async function main() {
       modalites: 'Présentiel ou distanciel',
       modalitesAcces: 'Accessible aux personnes en situation de handicap',
       modalitesTechniques: 'Ordinateur avec connexion internet',
-      modalitesReglement: 'Paiement à l\\'inscription',
+      modalitesReglement: 'Paiement à l\'inscription',
       formateur: 'Expert WordPress certifié',
       ressourcesDisposition: 'Support de cours, accès à un espace de formation en ligne',
       modalitesEvaluation: 'Exercices pratiques et projet final',
