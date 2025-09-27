@@ -1,62 +1,27 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { FileEdit, FilePlus, Eye, Trash2, Calendar, Download, CheckSquare } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { FilePlus } from 'lucide-react';
 import api from '@/services/api';
-import { ApiResponse } from '@/types';
-
-interface ProgrammePersonnalise {
-  id: string;
-  titre: string;
-  description: string;
-  modules: Module[];
-  rendezvousId: string;
-  beneficiaire: string;
-  dateCreation: string;
-  statut: string;
-  estValide: boolean;
-  documentUrl?: string;
-}
-
-interface Module {
-  id: string;
-  titre: string;
-  description: string;
-  duree: number;
-  objectifs: string[];
-  prerequis: string[];
-  contenu: string[];
-}
-
-interface ProgrammeDialogProps {
-  programme: ProgrammePersonnalise | null;
-  isOpen: boolean;
-  onClose: () => void;
-}
+import { ApiResponse, ProgrammePersonnalise } from './types';
+import { ProgrammeCard } from './ProgrammeCard';
 
 export default function ProgrammesPersonnalises() {
   const [programmes, setProgrammes] = useState<ProgrammePersonnalise[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('tous');
-  const [selectedProgramme, setSelectedProgramme] = useState<ProgrammePersonnalise | null>(null);
-  const [showProgrammeDetails, setShowProgrammeDetails] = useState(false);
   const { toast } = useToast();
 
   const fetchProgrammes = async (statut?: string) => {
     try {
       setLoading(true);
-      const endpoint = statut && statut !== 'tous' 
-        ? `/api/programmes-personnalises?statut=${statut}` 
+      const endpoint = statut && statut !== 'tous'
+        ? `/api/programmes-personnalises?statut=${statut}`
         : '/api/programmes-personnalises';
-      
+
       const response = await api.get<ApiResponse<ProgrammePersonnalise[]>>(endpoint);
-      
+
       if (Array.isArray(response.data)) {
         setProgrammes(response.data);
       } else if (response.data && typeof response.data === 'object') {
@@ -82,6 +47,7 @@ export default function ProgrammesPersonnalises() {
         id: '1',
         titre: 'Formation WordPress avancée - Jean Dupont',
         description: 'Programme personnalisé pour le positionnement du 15/08/2023',
+        type: 'sur-mesure',
         modules: [
           {
             id: 'm1',
@@ -112,6 +78,7 @@ export default function ProgrammesPersonnalises() {
         id: '2',
         titre: 'Formation SEO pour webmarketing - Marie Martin',
         description: 'Programme personnalisé suite au rendez-vous d\'évaluation',
+        type: 'sur-mesure',
         modules: [
           {
             id: 'm1',
@@ -131,7 +98,7 @@ export default function ProgrammesPersonnalises() {
         documentUrl: '/documents/programme-2.pdf'
       }
     ];
-    
+
     setProgrammes(demoData);
   };
 
@@ -143,11 +110,6 @@ export default function ProgrammesPersonnalises() {
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     fetchProgrammes(value === 'tous' ? undefined : value);
-  };
-
-  const handleViewProgramme = (programme: ProgrammePersonnalise) => {
-    setSelectedProgramme(programme);
-    setShowProgrammeDetails(true);
   };
 
   const handleValidateProgramme = async (programmeId: string) => {
@@ -211,115 +173,6 @@ export default function ProgrammesPersonnalises() {
     }
   };
 
-  const getStatusBadge = (statut: string) => {
-    switch (statut) {
-      case 'brouillon':
-        return <Badge variant="outline">Brouillon</Badge>;
-      case 'valide':
-        return <Badge variant="default" className="bg-green-500">Validé</Badge>;
-      case 'archive':
-        return <Badge variant="secondary">Archivé</Badge>;
-      default:
-        return <Badge variant="outline">{statut}</Badge>;
-    }
-  };
-
-  const ProgrammeDetailsDialog = ({ programme, isOpen, onClose }: ProgrammeDialogProps) => {
-    if (!programme) return null;
-
-    return (
-      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold">{programme.titre}</DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">
-                  Créé le {format(new Date(programme.dateCreation), 'dd MMMM yyyy à HH:mm', { locale: fr })}
-                </p>
-                <p className="text-sm">Bénéficiaire: <span className="font-medium">{programme.beneficiaire}</span></p>
-              </div>
-              <div>{getStatusBadge(programme.statut)}</div>
-            </div>
-
-            <div className="p-4 bg-muted/50 rounded-md">
-              <h3 className="font-medium mb-2">Description</h3>
-              <p>{programme.description}</p>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="font-medium">Modules ({programme.modules.length})</h3>
-              {programme.modules.map(module => (
-                <Card key={module.id}>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between">
-                      <CardTitle className="text-lg">{module.titre}</CardTitle>
-                      <Badge variant="outline">{module.duree}h</Badge>
-                    </div>
-                    <CardDescription>{module.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h4 className="text-sm font-medium mb-1">Objectifs</h4>
-                      <ul className="list-disc pl-5 text-sm space-y-1">
-                        {module.objectifs.map((obj, idx) => (
-                          <li key={idx}>{obj}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium mb-1">Prérequis</h4>
-                      <ul className="list-disc pl-5 text-sm space-y-1">
-                        {module.prerequis.map((pre, idx) => (
-                          <li key={idx}>{pre}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium mb-1">Contenu</h4>
-                      <ul className="list-disc pl-5 text-sm space-y-1">
-                        {module.contenu.map((cont, idx) => (
-                          <li key={idx}>{cont}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={onClose}>
-              Fermer
-            </Button>
-            {!programme.estValide && (
-              <Button onClick={() => handleValidateProgramme(programme.id)}>
-                <CheckSquare className="mr-2 h-4 w-4" />
-                Valider le programme
-              </Button>
-            )}
-            <Button onClick={() => handleGenerateDocument(programme.id)}>
-              <Download className="mr-2 h-4 w-4" />
-              Générer le document
-            </Button>
-            {programme.documentUrl && (
-              <Button onClick={() => window.open(programme.documentUrl, '_blank')}>
-                <Eye className="mr-2 h-4 w-4" />
-                Voir le document
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    );
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -350,75 +203,19 @@ export default function ProgrammesPersonnalises() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {programmes.map(programme => (
-                <Card key={programme.id}>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg">{programme.titre}</CardTitle>
-                      {getStatusBadge(programme.statut)}
-                    </div>
-                    <CardDescription>
-                      {format(new Date(programme.dateCreation), 'dd MMMM yyyy', { locale: fr })}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-2">
-                    <p className="mb-2 line-clamp-2">{programme.description}</p>
-                    <p className="text-sm mb-4">
-                      <span className="font-medium">Modules:</span> {programme.modules.length}
-                    </p>
-                    
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => handleViewProgramme(programme)}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        Détails
-                      </Button>
-                      
-                      {!programme.estValide && (
-                        <Button 
-                          size="sm" 
-                          onClick={() => handleValidateProgramme(programme.id)}
-                        >
-                          <CheckSquare className="h-4 w-4 mr-1" />
-                          Valider
-                        </Button>
-                      )}
-
-                      <Button 
-                        variant="secondary" 
-                        size="sm" 
-                        onClick={() => handleGenerateDocument(programme.id)}
-                      >
-                        <Download className="h-4 w-4 mr-1" />
-                        Document
-                      </Button>
-
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
-                        onClick={() => handleDeleteProgramme(programme.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <ProgrammeCard
+                  key={programme.id}
+                  programme={programme}
+                  variant="sur-mesure"
+                  onValidate={handleValidateProgramme}
+                  onGenerateDocument={handleGenerateDocument}
+                  onDelete={handleDeleteProgramme}
+                />
               ))}
             </div>
           )}
         </TabsContent>
       </Tabs>
-
-      <ProgrammeDetailsDialog 
-        programme={selectedProgramme}
-        isOpen={showProgrammeDetails}
-        onClose={() => {
-          setShowProgrammeDetails(false);
-          setSelectedProgramme(null);
-        }}
-      />
     </div>
   );
 }

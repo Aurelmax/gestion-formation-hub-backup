@@ -16,7 +16,7 @@ export async function GET() {
         }
       },
       orderBy: {
-        created_at: 'desc'
+        createdAt: 'desc'
       }
     });
 
