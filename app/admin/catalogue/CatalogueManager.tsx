@@ -99,7 +99,7 @@ export default function CatalogueManager() {
       const programmesData = await programmesResponse.json();
       const categoriesData = await categoriesResponse.json();
 
-      if (programmesData.success) {
+      if (programmesData.data) {
         const programmesFormatted = programmesData.data.map((prog: any) => ({
           id: prog.id,
           code: prog.code,

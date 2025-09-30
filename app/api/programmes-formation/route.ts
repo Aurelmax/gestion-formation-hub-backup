@@ -186,6 +186,7 @@ export async function GET(request: NextRequest) {
       type: true,
       version: true,
       estActif: true,
+      estVisible: true,  // Ajouté pour la gestion de visibilité
       dateCreation: true,  // Ajouté pour le tri
       categorie: {
         select: { id: true, titre: true }
