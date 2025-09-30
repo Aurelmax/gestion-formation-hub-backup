@@ -38,10 +38,10 @@ const menuItems = [
     title: 'Formations',
     icon: GraduationCap,
     children: [
-      { title: 'Catalogue', href: '/dashboard/formations/catalogue', icon: BookOpen },
+      { title: 'Programmes catalogue', href: '/admin/programmes', icon: BookOpen },
       { title: 'Programmes personnalisés', href: '/dashboard/formations/personnalises', icon: Target },
-      { title: 'Importer formations', href: '/dashboard/formations/import', icon: FileText },
-      { title: 'Catégories', href: '/dashboard/formations/categories', icon: ClipboardList },
+      { title: 'Catégories', href: '/admin/categories', icon: ClipboardList },
+      { title: 'Voir catalogue public', href: '/catalogue', icon: Eye, external: true },
     ]
   },
   {
@@ -56,7 +56,7 @@ const menuItems = [
   {
     title: 'Rendez-vous',
     icon: Calendar,
-    href: '/dashboard/rendezvous',
+    href: '/rendezvous-positionnement',
   },
   {
     title: 'Veille & Actualités',
@@ -76,9 +76,9 @@ const menuItems = [
     title: 'Administration',
     icon: Settings,
     children: [
-      { title: 'Organismes', href: '/dashboard/admin/organismes', icon: Building2 },
-      { title: 'Compétences', href: '/dashboard/admin/competences', icon: Target },
-      { title: 'Paramètres', href: '/dashboard/admin/settings', icon: Settings },
+      { title: 'Général', href: '/admin', icon: Settings },
+      { title: 'Catégories', href: '/admin/categories', icon: ClipboardList },
+      { title: 'Paramètres', href: '/admin', icon: Settings },
     ]
   },
   {
@@ -129,6 +129,8 @@ function SidebarItem({ item, isCollapsed }: SidebarItemProps) {
               <Link
                 key={child.href}
                 href={child.href}
+                target={child.external ? '_blank' : undefined}
+                rel={child.external ? 'noopener noreferrer' : undefined}
                 className={cn(
                   'flex items-center px-3 py-2 text-sm rounded-lg transition-colors',
                   'hover:bg-gray-100 dark:hover:bg-gray-800',
@@ -137,6 +139,7 @@ function SidebarItem({ item, isCollapsed }: SidebarItemProps) {
               >
                 <child.icon className="h-4 w-4 mr-3" />
                 <span>{child.title}</span>
+                {child.external && <span className="ml-1 text-xs">↗</span>}
               </Link>
             ))}
           </div>
