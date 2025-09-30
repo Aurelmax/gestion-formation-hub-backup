@@ -76,7 +76,6 @@ const menuItems = [
     icon: Settings,
     children: [
       { title: 'Général', href: '/admin', icon: Settings },
-      { title: 'Catégories', href: '/admin/categories', icon: ClipboardList },
       { title: 'Paramètres', href: '/admin', icon: Settings },
     ]
   },
