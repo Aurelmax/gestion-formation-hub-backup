@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // URL de base de l'API - utilisation de la variable d'environnement
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 // Configuration d'axios avec le token JWT s'il existe
 const api = axios.create({

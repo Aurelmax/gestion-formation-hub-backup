@@ -55,7 +55,7 @@ const menuItems = [
   {
     title: 'Rendez-vous',
     icon: Calendar,
-    href: '/rendezvous-positionnement',
+    href: '/admin/rendezvous',
   },
   {
     title: 'Veille & Actualités',

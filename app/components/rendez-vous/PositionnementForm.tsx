@@ -97,7 +97,7 @@ const PositionnementForm = ({ onSubmit, onCancel, formationTitre = "" }: Positio
     setIsSubmitting(true);
 
     try {
-      const response = await api.post('/api/rendezvous', {
+      const response = await api.post('/api/positionnement', {
         // Champs obligatoires pour la création d'un rendez-vous
         nom: formData.nomBeneficiaire,
         prenom: formData.prenomBeneficiaire,

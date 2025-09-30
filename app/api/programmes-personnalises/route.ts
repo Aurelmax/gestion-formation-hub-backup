@@ -6,13 +6,13 @@ const prisma = new PrismaClient();
 
 // Schéma de validation pour création de programme personnalisé
 const programmePersonnaliseSchema = z.object({
-  formationId: z.string().uuid('ID de formation invalide'),
+  formationId: z.string().uuid('ID de formation invalide').optional(),
   titre: z.string().min(1, 'Le titre est requis'),
   description: z.string().min(1, 'La description est requise'),
-  contenu: z.string().min(1, 'Le contenu est requis'),
-  duree: z.string().min(1, 'La durée est requise'),
-  objectifsSpecifiques: z.string().min(1, 'Les objectifs spécifiques sont requis'),
-  evaluationSur: z.string().min(1, 'L\'évaluation est requise'),
+  contenu: z.string().min(1, 'Le contenu est requis').optional(),
+  duree: z.string().min(1, 'La durée est requise').optional(),
+  objectifsSpecifiques: z.string().min(1, 'Les objectifs spécifiques sont requis').optional(),
+  evaluationSur: z.string().min(1, 'L\'évaluation est requise').optional(),
   positionnementRequestId: z.string().uuid('ID de demande de positionnement invalide').optional(),
   accessibiliteHandicap: z.string().optional(),
   cessationAnticipee: z.string().optional(),
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
             nomBeneficiaire: true,
             prenomBeneficiaire: true,
             formationSelectionnee: true,
-            dateCreation: true,
+            createdAt: true,
           }
         },
         rendezvous: {
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
       beneficiaire: prog.positionnementRequest
         ? `${prog.positionnementRequest.prenomBeneficiaire} ${prog.positionnementRequest.nomBeneficiaire}`
         : null,
-      rendezvousId: prog.positionnementRequest?.id || null,
+      rendezvousId: prog.positionnementRequestId || null,
       formationId: prog.formationId,
       formation: prog.formation,
       // Champs réglementaires
@@ -168,19 +168,21 @@ export async function POST(request: NextRequest) {
 
     const data = validation.data;
 
-    // Vérifier que la formation existe
-    const formation = await prisma.formation.findUnique({
-      where: { id: data.formationId }
-    });
+    // Vérifier que la formation existe si un formationId est fourni
+    if (data.formationId) {
+      const formation = await prisma.formation.findUnique({
+        where: { id: data.formationId }
+      });
 
-    if (!formation) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Formation non trouvée'
-        },
-        { status: 404 }
-      );
+      if (!formation) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Formation non trouvée'
+          },
+          { status: 404 }
+        );
+      }
     }
 
     // Vérifier que la demande de positionnement existe si fournie
@@ -203,13 +205,13 @@ export async function POST(request: NextRequest) {
     // Créer le programme personnalisé
     const nouveauProgramme = await prisma.programmePersonnalise.create({
       data: {
-        formationId: data.formationId,
+        formationId: data.formationId || null,
         titre: data.titre,
         description: data.description,
-        contenu: data.contenu,
-        duree: data.duree,
-        objectifsSpecifiques: data.objectifsSpecifiques,
-        evaluationSur: data.evaluationSur,
+        contenu: data.contenu || '',
+        duree: data.duree || '',
+        objectifsSpecifiques: data.objectifsSpecifiques || '',
+        evaluationSur: data.evaluationSur || '',
         positionnementRequestId: data.positionnementRequestId || null,
         accessibiliteHandicap: data.accessibiliteHandicap,
         cessationAnticipee: data.cessationAnticipee,

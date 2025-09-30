@@ -364,13 +364,13 @@ model DocumentFormation {
 
 model ProgrammePersonnalise {
   id                      String                 @id @default(uuid())
-  formationId             String                 @map("formation_id")
+  formationId             String?                @map("formation_id")
   titre                   String
   description             String
-  contenu                 String
-  duree                   String
-  objectifsSpecifiques    String                 @map("objectifs_specifiques")
-  evaluationSur           String                 @map("evaluation_sur")
+  contenu                 String?
+  duree                   String?
+  objectifsSpecifiques    String?                @map("objectifs_specifiques")
+  evaluationSur           String?                @map("evaluation_sur")
   createdAt               DateTime               @default(now()) @map("created_at")
   updatedAt               DateTime               @default(now()) @updatedAt @map("updated_at")
   accessibiliteHandicap   String?                @map("accessibilite_handicap")
@@ -392,7 +392,7 @@ model ProgrammePersonnalise {
   sanctionFormation       String?                @map("sanction_formation")
   tarif                   String?                @map("tarif")
   positionnementRequestId String?                @unique @map("positionnement_request_id")
-  formation               Formation              @relation(fields: [formationId], references: [id])
+  formation               Formation?             @relation(fields: [formationId], references: [id])
   positionnementRequest   PositionnementRequest? @relation(fields: [positionnementRequestId], references: [id])
   rendezvous              Rendezvous[]
 

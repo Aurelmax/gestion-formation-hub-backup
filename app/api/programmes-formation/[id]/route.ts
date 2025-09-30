@@ -149,15 +149,56 @@ export async function PUT(
       }
     }
 
+    // Préparation des données avec gestion des relations
+    const { programmeSourId, categorieId, beneficiaireId, formateurId, ...restData } = validation.data;
+
+    // Construction de l'objet de mise à jour avec relations
+    const updateData: Prisma.ProgrammeFormationUpdateInput = {
+      ...restData,
+      dateModification: new Date(),
+      ...(categorieId !== undefined && {
+        categorie: categorieId ? {
+          connect: { id: categorieId }
+        } : {
+          disconnect: true
+        }
+      }),
+      ...(programmeSourId !== undefined && {
+        programmeSource: programmeSourId ? {
+          connect: { id: programmeSourId }
+        } : {
+          disconnect: true
+        }
+      }),
+      ...(beneficiaireId !== undefined && {
+        beneficiaire: beneficiaireId ? {
+          connect: { id: beneficiaireId }
+        } : {
+          disconnect: true
+        }
+      }),
+      ...(formateurId !== undefined && {
+        formateur: formateurId ? {
+          connect: { id: formateurId }
+        } : {
+          disconnect: true
+        }
+      }),
+    };
+
     // Mise à jour du programme
     const updatedProgramme = await prisma.programmeFormation.update({
       where: { id },
-      data: {
-        ...validation.data,
-        dateModification: new Date(),
-      },
+      data: updateData,
       include: {
         categorie: true,
+        programmeSource: {
+          select: {
+            id: true,
+            code: true,
+            titre: true,
+          }
+        },
       },
     });
 
@@ -222,15 +263,56 @@ export async function PATCH(
       }
     }
 
+    // Préparation des données avec gestion des relations
+    const { programmeSourId, categorieId, beneficiaireId, formateurId, ...restData } = validation.data;
+
+    // Construction de l'objet de mise à jour avec relations
+    const updateData: Prisma.ProgrammeFormationUpdateInput = {
+      ...restData,
+      dateModification: new Date(),
+      ...(categorieId !== undefined && {
+        categorie: categorieId ? {
+          connect: { id: categorieId }
+        } : {
+          disconnect: true
+        }
+      }),
+      ...(programmeSourId !== undefined && {
+        programmeSource: programmeSourId ? {
+          connect: { id: programmeSourId }
+        } : {
+          disconnect: true
+        }
+      }),
+      ...(beneficiaireId !== undefined && {
+        beneficiaire: beneficiaireId ? {
+          connect: { id: beneficiaireId }
+        } : {
+          disconnect: true
+        }
+      }),
+      ...(formateurId !== undefined && {
+        formateur: formateurId ? {
+          connect: { id: formateurId }
+        } : {
+          disconnect: true
+        }
+      }),
+    };
+
     // Mise à jour partielle du programme
     const updatedProgramme = await prisma.programmeFormation.update({
       where: { id },
-      data: {
-        ...validation.data,
-        dateModification: new Date(),
-      },
+      data: updateData,
       include: {
         categorie: true,
+        programmeSource: {
+          select: {
+            id: true,
+            code: true,
+            titre: true,
+          }
+        },
       },
     });
 

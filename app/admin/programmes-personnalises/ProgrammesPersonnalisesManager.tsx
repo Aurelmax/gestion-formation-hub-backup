@@ -87,30 +87,54 @@ export default function ProgrammesPersonnalisesManager() {
     setShowEditModal(true);
   };
 
-  const handleSaveProgramme = async (id: string, data: any) => {
+  const handleSaveProgramme = async (id: string | null, data: any) => {
     try {
-      const response = await fetch(`/api/programmes-personnalises/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+      if (id) {
+        // Modification
+        const response = await fetch(`/api/programmes-personnalises/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
 
-      if (!response.ok) {
-        throw new Error('Erreur lors de la mise à jour');
+        if (!response.ok) {
+          throw new Error('Erreur lors de la mise à jour');
+        }
+
+        // Log de modification pour l'audit
+        const newLog = {
+          id: Date.now().toString(),
+          programmeId: id,
+          programmeTitre: data.titre || 'Programme modifié',
+          action: 'MODIFICATION' as any,
+          utilisateur: 'Administrateur',
+          dateModification: new Date().toISOString(),
+          ancienneValeur: true,
+          nouvelleValeur: true
+        };
+        setModificationLogs(prev => [newLog, ...prev]);
+
+        toast({
+          title: "Succès",
+          description: "Programme personnalisé modifié avec succès",
+        });
+      } else {
+        // Création
+        const response = await fetch('/api/programmes-personnalises', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur lors de la création');
+        }
+
+        toast({
+          title: "Succès",
+          description: "Programme personnalisé créé avec succès",
+        });
       }
-
-      // Log de modification pour l'audit
-      const newLog = {
-        id: Date.now().toString(),
-        programmeId: id,
-        programmeTitre: data.titre || 'Programme modifié',
-        action: 'MODIFICATION' as any,
-        utilisateur: 'Administrateur',
-        dateModification: new Date().toISOString(),
-        ancienneValeur: true,
-        nouvelleValeur: true
-      };
-      setModificationLogs(prev => [newLog, ...prev]);
 
       // Actualiser la liste
       await fetchProgrammesData();
@@ -118,12 +142,8 @@ export default function ProgrammesPersonnalisesManager() {
       setShowEditModal(false);
       setEditingProgramme(null);
 
-      toast({
-        title: "Succès",
-        description: "Programme personnalisé modifié avec succès",
-      });
     } catch (error) {
-      console.error('Erreur lors de la modification:', error);
+      console.error('Erreur lors de la sauvegarde:', error);
       throw error;
     }
   };
@@ -203,7 +223,6 @@ export default function ProgrammesPersonnalisesManager() {
       toast({
         title: "Erreur",
         description: "Impossible de charger les programmes personnalisés",
-        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -247,14 +266,18 @@ export default function ProgrammesPersonnalisesManager() {
       toast({
         title: "Erreur",
         description: "Erreur lors de la modification du statut",
-        variant: "destructive",
       });
     }
   };
 
   const handleGenerateDocument = async (programmeId: string, programmeTitre: string) => {
     try {
-      const response = await fetch(`/api/programmes-personnalises/${programmeId}/generer-document`, {
+      toast({
+        title: "Génération en cours",
+        description: "Génération du PDF en cours...",
+      });
+
+      const response = await fetch(`/api/programmes-personnalises/${programmeId}/generer-pdf`, {
         method: 'POST'
       });
 
@@ -272,16 +295,21 @@ export default function ProgrammesPersonnalisesManager() {
 
       toast({
         title: "Succès",
-        description: "Document généré et téléchargé avec succès",
+        description: "Document PDF généré et téléchargé avec succès",
       });
     } catch (error) {
       toast({
         title: "Erreur",
         description: "Erreur lors de la génération du document",
-        variant: "destructive",
       });
     }
   };
+
+  const handleCreateProgramme = () => {
+    setEditingProgramme(null);
+    setShowEditModal(true);
+  };
+
 
   const exportAuditLog = () => {
     const csvContent = [
@@ -374,7 +402,7 @@ export default function ProgrammesPersonnalisesManager() {
             Historique
           </Button>
           <Button
-            onClick={() => router.push('/admin/positionnement')}
+            onClick={handleCreateProgramme}
             className="flex items-center gap-2"
           >
             <Users className="h-4 w-4" />
@@ -512,7 +540,7 @@ export default function ProgrammesPersonnalisesManager() {
                   variant={VariantCard.SUR_MESURE}
                   showActions={true}
                   actions={{
-                    onView: () => router.push(`/admin/programmes/${programme.id}`),
+                    onView: () => router.push(`/admin/positionnement/${programme.rendezvousId}`),
                     onEdit: () => handleEditProgramme(programme),
                     onGenerateDocument: () => handleGenerateDocument(programme.id, programme.titre)
                   }}

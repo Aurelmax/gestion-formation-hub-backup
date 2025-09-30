@@ -77,7 +77,7 @@ const queryParamsSchema = z.object({
     z.number().int().min(1).max(100)
   ).default(20),
   includeInactive: z.string().transform(val => val === 'true').optional(),
-}) satisfies z.ZodType<QueryParams>;
+});
 
 /**
  * @swagger
@@ -195,7 +195,7 @@ export async function GET(request: NextRequest) {
 
     // Ajouter les champs optionnels si demandés
     if (Array.isArray(params.fields) && params.fields.includes('details')) {
-      select.contenuDetailleHtml = true;
+      select.contenuDetailleJours = true;
       select.objectifs = true;
       select.prerequis = true;
       select.modalites = true;
@@ -291,7 +291,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérifier si le code existe déjà
-    const existingProgramme = await prisma.programmeFormation.findUnique({
+    const existingProgramme = await prisma.programmeFormation.findFirst({
       where: { code: data.code },
     });
 
@@ -303,14 +303,47 @@ export async function POST(request: NextRequest) {
     }
 
     // Création du programme
+    const { categorieId, programmeSourId, ...programmeData } = validation.data;
+    
+    // Préparation des données conformes au type ProgrammeFormationCreateInput
+    // Tous les champs obligatoires sont validés par Zod
+    const createData = {
+      ...programmeData,
+      code: programmeData.code,
+      type: programmeData.type,
+      titre: programmeData.titre,
+      description: programmeData.description,
+      duree: programmeData.duree,
+      prix: programmeData.prix,
+      niveau: programmeData.niveau,
+      participants: programmeData.participants,
+      objectifs: programmeData.objectifs,
+      prerequis: programmeData.prerequis,
+      publicConcerne: programmeData.publicConcerne,
+      contenuDetailleJours: programmeData.contenuDetailleJours,
+      modalites: programmeData.modalites,
+      modalitesAcces: programmeData.modalitesAcces,
+      modalitesTechniques: programmeData.modalitesTechniques,
+      modalitesReglement: programmeData.modalitesReglement,
+      formateur: programmeData.formateur,
+      ressourcesDisposition: programmeData.ressourcesDisposition,
+      modalitesEvaluation: programmeData.modalitesEvaluation,
+      sanctionFormation: programmeData.sanctionFormation,
+      niveauCertification: programmeData.niveauCertification,
+      delaiAcceptation: programmeData.delaiAcceptation,
+      accessibiliteHandicap: programmeData.accessibiliteHandicap,
+      cessationAbandon: programmeData.cessationAbandon,
+      dateCreation: new Date(),
+      dateModification: new Date(),
+      categorie: categorieId ? { connect: { id: categorieId } } : undefined,
+      programmeSource: programmeSourId ? { connect: { id: programmeSourId } } : undefined,
+    } satisfies Prisma.ProgrammeFormationCreateInput;
+
     const programme = await prisma.programmeFormation.create({
-      data: {
-        ...validation.data,
-        dateCreation: new Date(),
-        dateModification: new Date(),
-      },
+      data: createData,
       include: {
         categorie: true,
+        ...(programmeSourId ? { programmeSour: true } : {}),
       },
     });
 

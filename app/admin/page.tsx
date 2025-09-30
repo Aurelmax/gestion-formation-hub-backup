@@ -25,25 +25,22 @@ export default async function AdminDashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Link
-          href="/admin/categories"
-          className="bg-white p-6 rounded-lg border shadow-sm hover:shadow-md transition-shadow"
-        >
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Catégories</h3>
-          <p className="text-gray-600">Gérer les catégories de formations</p>
-        </Link>
-
-        <div className="bg-gray-100 p-6 rounded-lg border">
-          <h3 className="text-xl font-semibold text-gray-500 mb-2">Formations</h3>
-          <p className="text-gray-500">À venir...</p>
-        </div>
-
-        <Link
           href="/admin/users"
           className="bg-white p-6 rounded-lg border shadow-sm hover:shadow-md transition-shadow"
         >
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Utilisateurs</h3>
           <p className="text-gray-600">Gérer les utilisateurs de la plateforme</p>
         </Link>
+
+        <div className="bg-gray-100 p-6 rounded-lg border">
+          <h3 className="text-xl font-semibold text-gray-500 mb-2">Paramètres système</h3>
+          <p className="text-gray-500">Configuration avancée (à venir)</p>
+        </div>
+
+        <div className="bg-gray-100 p-6 rounded-lg border">
+          <h3 className="text-xl font-semibold text-gray-500 mb-2">Sauvegardes</h3>
+          <p className="text-gray-500">Gestion des sauvegardes (à venir)</p>
+        </div>
       </div>
     </div>
   );
