@@ -1,105 +1,138 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { z } from 'zod';
 
-// Données de démonstration (en attendant l'intégration avec Prisma)
-const demoData = [
-  {
-    id: '1',
-    titre: 'Formation WordPress avancée - Jean Dupont',
-    description: 'Programme personnalisé pour le positionnement du 15/08/2023',
-    type: 'sur-mesure',
-    modules: [
-      {
-        id: 'm1',
-        titre: 'Introduction à WordPress',
-        description: 'Bases et fondamentaux',
-        duree: '3 heures',
-        ordre: 1,
-        objectifs: ['Comprendre l\'architecture', 'Installer WordPress'],
-        prerequis: ['Connaissances web basiques'],
-        contenu: ['Installation', 'Configuration initiale', 'Tableau de bord']
-      },
-      {
-        id: 'm2',
-        titre: 'Personnalisation avancée',
-        description: 'Thèmes et templates',
-        duree: '7 heures',
-        ordre: 2,
-        objectifs: ['Créer des thèmes personnalisés', 'Maîtriser les templates'],
-        prerequis: ['Bases HTML/CSS'],
-        contenu: ['Structure des thèmes', 'Hiérarchie des templates', 'Hooks et filtres']
-      }
-    ],
-    rendezvousId: '101',
-    beneficiaire: 'Jean Dupont',
-    dateCreation: '2023-08-16T10:30:00Z',
-    statut: 'brouillon',
-    estValide: false
-  },
-  {
-    id: '2',
-    titre: 'Formation SEO pour webmarketing - Marie Martin',
-    description: 'Programme personnalisé suite au rendez-vous d\'évaluation',
-    type: 'sur-mesure',
-    modules: [
-      {
-        id: 'm1',
-        titre: 'Fondamentaux du SEO',
-        description: 'Les bases du référencement',
-        duree: '4 heures',
-        ordre: 1,
-        objectifs: ['Comprendre les algorithmes', 'Optimiser le contenu'],
-        prerequis: ['Aucun'],
-        contenu: ['Fonctionnement des moteurs', 'Mots-clés', 'Structure de site']
-      }
-    ],
-    rendezvousId: '102',
-    beneficiaire: 'Marie Martin',
-    dateCreation: '2023-08-18T14:45:00Z',
-    statut: 'valide',
-    estValide: true,
-    documentUrl: '/documents/programme-2.pdf'
-  },
-  {
-    id: '3',
-    titre: 'Formation React avancée - Pierre Durand',
-    description: 'Programme personnalisé pour développeur senior',
-    type: 'sur-mesure',
-    modules: [
-      {
-        id: 'm1',
-        titre: 'React Hooks avancés',
-        description: 'Maîtrise des hooks personnalisés',
-        duree: '6 heures',
-        ordre: 1,
-        objectifs: ['Créer des hooks personnalisés', 'Optimiser les performances'],
-        prerequis: ['Bases React'],
-        contenu: ['useContext', 'useReducer', 'Custom hooks']
-      }
-    ],
-    rendezvousId: '103',
-    beneficiaire: 'Pierre Durand',
-    dateCreation: '2023-08-20T09:15:00Z',
-    statut: 'archive',
-    estValide: true,
-    documentUrl: '/documents/programme-3.pdf'
-  }
-];
+const prisma = new PrismaClient();
 
+// Schéma de validation pour création de programme personnalisé
+const programmePersonnaliseSchema = z.object({
+  formationId: z.string().uuid('ID de formation invalide'),
+  titre: z.string().min(1, 'Le titre est requis'),
+  description: z.string().min(1, 'La description est requise'),
+  contenu: z.string().min(1, 'Le contenu est requis'),
+  duree: z.string().min(1, 'La durée est requise'),
+  objectifsSpecifiques: z.string().min(1, 'Les objectifs spécifiques sont requis'),
+  evaluationSur: z.string().min(1, 'L\'évaluation est requise'),
+  positionnementRequestId: z.string().uuid('ID de demande de positionnement invalide').optional(),
+  accessibiliteHandicap: z.string().optional(),
+  cessationAnticipee: z.string().optional(),
+  delaiAcceptation: z.string().optional(),
+  delaiAcces: z.string().optional(),
+  formateur: z.string().optional(),
+  horaires: z.string().optional(),
+  modalitesAcces: z.string().optional(),
+  modalitesEvaluation: z.string().optional(),
+  modalitesReglement: z.string().optional(),
+  modalitesTechniques: z.string().optional(),
+  niveauCertification: z.string().optional(),
+  prerequis: z.string().optional(),
+  publicConcerne: z.string().optional(),
+  referentPedagogique: z.string().optional(),
+  referentQualite: z.string().optional(),
+  ressourcesDisposition: z.string().optional(),
+  sanctionFormation: z.string().optional(),
+  tarif: z.string().optional(),
+});
+
+// GET /api/programmes-personnalises - Récupérer tous les programmes personnalisés
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const statut = searchParams.get('statut');
+    const beneficiaire = searchParams.get('beneficiaire');
 
-    let filteredData = demoData;
-
-    // Filtrer par statut si spécifié
+    // Construction du filtre WHERE
+    const where: any = {};
     if (statut && statut !== 'tous') {
-      filteredData = demoData.filter(programme => programme.statut === statut);
+      // Mapper les statuts pour ProgrammePersonnalise
+      where.createdAt = { gte: new Date('1970-01-01') }; // Tous les programmes
     }
+    if (beneficiaire && beneficiaire !== 'all') {
+      where.positionnementRequest = {
+        nomBeneficiaire: {
+          contains: beneficiaire,
+          mode: 'insensitive'
+        }
+      };
+    }
+
+    const programmesPersonnalises = await prisma.programmePersonnalise.findMany({
+      where,
+      include: {
+        formation: {
+          select: {
+            id: true,
+            libelle: true,
+            code: true,
+          }
+        },
+        positionnementRequest: {
+          select: {
+            id: true,
+            nomBeneficiaire: true,
+            prenomBeneficiaire: true,
+            formationSelectionnee: true,
+            dateCreation: true,
+          }
+        },
+        rendezvous: {
+          select: {
+            id: true,
+            dateRdv: true,
+            status: true,
+          }
+        }
+      },
+      orderBy: [
+        { createdAt: 'desc' }
+      ]
+    });
+
+    // Formatter les données pour correspondre à l'interface attendue
+    const formattedData = programmesPersonnalises.map(prog => ({
+      id: prog.id,
+      titre: prog.titre,
+      description: prog.description,
+      type: 'sur-mesure',
+      dateCreation: prog.createdAt.toISOString(),
+      dateModification: prog.updatedAt.toISOString(),
+      contenu: prog.contenu,
+      duree: prog.duree,
+      objectifsSpecifiques: prog.objectifsSpecifiques,
+      evaluationSur: prog.evaluationSur,
+      statut: 'valide', // Sera déterminé par la logique métier
+      estValide: true,
+      beneficiaire: prog.positionnementRequest
+        ? `${prog.positionnementRequest.prenomBeneficiaire} ${prog.positionnementRequest.nomBeneficiaire}`
+        : null,
+      rendezvousId: prog.positionnementRequest?.id || null,
+      formationId: prog.formationId,
+      formation: prog.formation,
+      // Champs réglementaires
+      accessibiliteHandicap: prog.accessibiliteHandicap,
+      cessationAbandon: prog.cessationAnticipee,
+      delaiAcceptation: prog.delaiAcceptation,
+      delaiAcces: prog.delaiAcces,
+      formateur: prog.formateur,
+      horaires: prog.horaires,
+      modalitesAcces: prog.modalitesAcces,
+      modalitesEvaluation: prog.modalitesEvaluation,
+      modalitesReglement: prog.modalitesReglement,
+      modalitesTechniques: prog.modalitesTechniques,
+      niveauCertification: prog.niveauCertification,
+      prerequis: prog.prerequis,
+      publicConcerne: prog.publicConcerne,
+      referentPedagogique: prog.referentPedagogique,
+      referentQualite: prog.referentQualite,
+      ressourcesDisposition: prog.ressourcesDisposition,
+      sanctionFormation: prog.sanctionFormation,
+      prix: prog.tarif,
+    }));
 
     return NextResponse.json({
       success: true,
-      data: filteredData,
+      data: formattedData,
+      total: formattedData.length,
       message: 'Programmes personnalisés récupérés avec succès'
     });
 
@@ -108,41 +141,125 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: 'Erreur lors de la récupération des programmes personnalisés'
+        error: 'Erreur serveur lors de la récupération des programmes personnalisés'
       },
       { status: 500 }
     );
   }
 }
 
+// POST /api/programmes-personnalises - Créer un nouveau programme personnalisé
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Créer un nouveau programme avec un ID unique
-    const newProgramme = {
-      id: Date.now().toString(),
-      dateCreation: new Date().toISOString(),
-      statut: 'brouillon',
-      estValide: false,
-      ...body
-    };
+    // Validation des données
+    const validation = programmePersonnaliseSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Données invalides',
+          details: validation.error.format()
+        },
+        { status: 400 }
+      );
+    }
 
-    // En production, sauvegarder en base de données
-    console.log('Nouveau programme créé:', newProgramme);
+    const data = validation.data;
+
+    // Vérifier que la formation existe
+    const formation = await prisma.formation.findUnique({
+      where: { id: data.formationId }
+    });
+
+    if (!formation) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Formation non trouvée'
+        },
+        { status: 404 }
+      );
+    }
+
+    // Vérifier que la demande de positionnement existe si fournie
+    if (data.positionnementRequestId) {
+      const positionnementRequest = await prisma.positionnementRequest.findUnique({
+        where: { id: data.positionnementRequestId }
+      });
+
+      if (!positionnementRequest) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Demande de positionnement non trouvée'
+          },
+          { status: 404 }
+        );
+      }
+    }
+
+    // Créer le programme personnalisé
+    const nouveauProgramme = await prisma.programmePersonnalise.create({
+      data: {
+        formationId: data.formationId,
+        titre: data.titre,
+        description: data.description,
+        contenu: data.contenu,
+        duree: data.duree,
+        objectifsSpecifiques: data.objectifsSpecifiques,
+        evaluationSur: data.evaluationSur,
+        positionnementRequestId: data.positionnementRequestId || null,
+        accessibiliteHandicap: data.accessibiliteHandicap,
+        cessationAnticipee: data.cessationAnticipee,
+        delaiAcceptation: data.delaiAcceptation,
+        delaiAcces: data.delaiAcces,
+        formateur: data.formateur,
+        horaires: data.horaires,
+        modalitesAcces: data.modalitesAcces,
+        modalitesEvaluation: data.modalitesEvaluation,
+        modalitesReglement: data.modalitesReglement,
+        modalitesTechniques: data.modalitesTechniques,
+        niveauCertification: data.niveauCertification,
+        prerequis: data.prerequis,
+        publicConcerne: data.publicConcerne,
+        referentPedagogique: data.referentPedagogique,
+        referentQualite: data.referentQualite,
+        ressourcesDisposition: data.ressourcesDisposition,
+        sanctionFormation: data.sanctionFormation,
+        tarif: data.tarif,
+      },
+      include: {
+        formation: {
+          select: {
+            id: true,
+            libelle: true,
+            code: true,
+          }
+        },
+        positionnementRequest: {
+          select: {
+            id: true,
+            nomBeneficiaire: true,
+            prenomBeneficiaire: true,
+          }
+        }
+      }
+    });
 
     return NextResponse.json({
       success: true,
-      data: newProgramme,
+      data: nouveauProgramme,
       message: 'Programme personnalisé créé avec succès'
-    });
+    }, { status: 201 });
 
   } catch (error) {
     console.error('Erreur lors de la création du programme personnalisé:', error);
     return NextResponse.json(
       {
         success: false,
-        error: 'Erreur lors de la création du programme personnalisé'
+        error: 'Erreur serveur lors de la création du programme personnalisé'
       },
       { status: 500 }
     );

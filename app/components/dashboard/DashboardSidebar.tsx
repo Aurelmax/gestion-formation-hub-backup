@@ -41,7 +41,7 @@ const menuItems = [
     children: [
       { title: 'Gestion catalogue public', href: '/admin/catalogue', icon: Globe },
       { title: 'Programmes catalogue', href: '/admin/programmes', icon: BookOpen },
-      { title: 'Programmes personnalisés', href: '/dashboard/formations/personnalises', icon: Target },
+      { title: 'Programmes personnalisés', href: '/admin/programmes-personnalises', icon: Target },
       { title: 'Catégories', href: '/admin/categories', icon: ClipboardList },
       { title: 'Voir catalogue public', href: '/catalogue', icon: Eye, external: true },
     ]
