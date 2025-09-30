@@ -107,17 +107,20 @@ model Session {
 }
 
 model User {
-  id                    String        @id @default(cuid())
+  id                    String        @id @default(cuid()) // Keep existing ID system temporarily
+  clerkId               String?       @unique @map("clerk_id") // Optional for migration
   email                 String?       @unique
-  password              String?
-  nom                   String?
-  prenom                String?
+  firstName             String?       @map("first_name")
+  lastName              String?       @map("last_name")
+  name                  String?       // Nom complet calculé
   role                  String        @default("user")
+  isActive              Boolean       @default(true) @map("is_active")
+  lastLoginAt           DateTime?     @map("last_login_at")
   createdAt             DateTime      @default(now()) @map("created_at")
   updatedAt             DateTime      @default(now()) @updatedAt @map("updated_at")
   emailVerified         DateTime?     @map("email_verified")
+  emailVerifiedBoolean  Boolean       @default(false) @map("email_verified_boolean")
   image                 String?
-  name                  String?
   accounts              Account[]
   reclamationsAssignees Reclamation[] @relation("ReclamationsAssignees")
   sessions              Session[]
