@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   Home,
-  BookOpen,
   Users,
   Calendar,
   FileText,
@@ -19,7 +18,6 @@ import {
   Menu,
   X,
   ChevronDown,
-  Building2,
   Target,
   Eye,
   Globe
@@ -40,7 +38,6 @@ const menuItems = [
     icon: GraduationCap,
     children: [
       { title: 'Gestion catalogue public', href: '/admin/catalogue', icon: Globe },
-      { title: 'Programmes catalogue', href: '/admin/programmes', icon: BookOpen },
       { title: 'Programmes personnalisés', href: '/admin/programmes-personnalises', icon: Target },
       { title: 'Catégories', href: '/admin/categories', icon: ClipboardList },
       { title: 'Voir catalogue public', href: '/catalogue', icon: Eye, external: true },
