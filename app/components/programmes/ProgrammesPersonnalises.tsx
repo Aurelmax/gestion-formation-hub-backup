@@ -1,10 +1,12 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { FilePlus } from 'lucide-react';
 import api from '@/services/api';
-import { ApiResponse, ProgrammePersonnalise } from './types';
+import { ApiResponse, ProgrammePersonnalise, TypeProgramme, StatutProgramme, VariantCard } from './types';
 import { ProgrammeCard } from './ProgrammeCard';
 
 export default function ProgrammesPersonnalises() {
@@ -22,17 +24,20 @@ export default function ProgrammesPersonnalises() {
 
       const response = await api.get<ApiResponse<ProgrammePersonnalise[]>>(endpoint);
 
-      if (Array.isArray(response.data)) {
+      if (response.data && response.data.success && Array.isArray(response.data.data)) {
+        setProgrammes(response.data.data);
+      } else if (Array.isArray(response.data)) {
+        // Fallback pour compatibilité avec d'autres APIs
         setProgrammes(response.data);
-      } else if (response.data && typeof response.data === 'object') {
-        setProgrammes(response.data as unknown as ProgrammePersonnalise[]);
+      } else {
+        console.warn('Format de réponse inattendu:', response.data);
+        setProgrammes([]);
       }
     } catch (error) {
       console.error('Erreur lors du chargement des programmes:', error);
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les programmes personnalisés.',
-        variant: 'destructive',
       });
       // En mode démonstration, générer des données de test
       generateDemoData();
@@ -47,13 +52,14 @@ export default function ProgrammesPersonnalises() {
         id: '1',
         titre: 'Formation WordPress avancée - Jean Dupont',
         description: 'Programme personnalisé pour le positionnement du 15/08/2023',
-        type: 'sur-mesure',
+        type: TypeProgramme.SUR_MESURE,
         modules: [
           {
             id: 'm1',
             titre: 'Introduction à WordPress',
             description: 'Bases et fondamentaux',
-            duree: 3,
+            duree: '3 heures',
+            ordre: 1,
             objectifs: ['Comprendre l\'architecture', 'Installer WordPress'],
             prerequis: ['Connaissances web basiques'],
             contenu: ['Installation', 'Configuration initiale', 'Tableau de bord']
@@ -62,7 +68,8 @@ export default function ProgrammesPersonnalises() {
             id: 'm2',
             titre: 'Personnalisation avancée',
             description: 'Thèmes et templates',
-            duree: 7,
+            duree: '7 heures',
+            ordre: 2,
             objectifs: ['Créer des thèmes personnalisés', 'Maîtriser les templates'],
             prerequis: ['Bases HTML/CSS'],
             contenu: ['Structure des thèmes', 'Hiérarchie des templates', 'Hooks et filtres']
@@ -71,20 +78,21 @@ export default function ProgrammesPersonnalises() {
         rendezvousId: '101',
         beneficiaire: 'Jean Dupont',
         dateCreation: '2023-08-16T10:30:00Z',
-        statut: 'brouillon',
+        statut: StatutProgramme.BROUILLON,
         estValide: false
       },
       {
         id: '2',
         titre: 'Formation SEO pour webmarketing - Marie Martin',
         description: 'Programme personnalisé suite au rendez-vous d\'évaluation',
-        type: 'sur-mesure',
+        type: TypeProgramme.SUR_MESURE,
         modules: [
           {
             id: 'm1',
             titre: 'Fondamentaux du SEO',
             description: 'Les bases du référencement',
-            duree: 4,
+            duree: '4 heures',
+            ordre: 1,
             objectifs: ['Comprendre les algorithmes', 'Optimiser le contenu'],
             prerequis: ['Aucun'],
             contenu: ['Fonctionnement des moteurs', 'Mots-clés', 'Structure de site']
@@ -93,7 +101,7 @@ export default function ProgrammesPersonnalises() {
         rendezvousId: '102',
         beneficiaire: 'Marie Martin',
         dateCreation: '2023-08-18T14:45:00Z',
-        statut: 'valide',
+        statut: StatutProgramme.VALIDE,
         estValide: true,
         documentUrl: '/documents/programme-2.pdf'
       }
@@ -125,7 +133,6 @@ export default function ProgrammesPersonnalises() {
       toast({
         title: 'Erreur',
         description: 'Impossible de valider le programme.',
-        variant: 'destructive',
       });
     }
   };
@@ -147,14 +154,13 @@ export default function ProgrammesPersonnalises() {
       toast({
         title: 'Erreur',
         description: 'Impossible de supprimer le programme.',
-        variant: 'destructive',
       });
     }
   };
 
   const handleGenerateDocument = async (programmeId: string) => {
     try {
-      const response = await api.post<{url: string}>(`/api/programmes-personnalises/${programmeId}/generer-document`);
+      const response = await api.post<{ url: string }>(`/api/programmes-personnalises/${programmeId}/generer-document`);
       if (response.data && response.data.url) {
         window.open(response.data.url, '_blank');
         toast({
@@ -168,16 +174,27 @@ export default function ProgrammesPersonnalises() {
       toast({
         title: 'Erreur',
         description: 'Impossible de générer le document.',
-        variant: 'destructive',
       });
     }
+  };
+
+  const handleCreateProgramme = () => {
+    // Pour l'instant, on affiche un toast informatif
+    // En production, ceci devrait ouvrir un modal ou rediriger vers une page de création
+    toast({
+      title: 'Nouveau programme',
+      description: 'Fonctionnalité de création en cours de développement.',
+    });
+
+    // Optionnel: redirection vers une page de création
+    // window.location.href = '/dashboard/programmes/nouveau';
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold tracking-tight">Programmes personnalisés</h2>
-        <Button>
+        <Button onClick={() => handleCreateProgramme()}>
           <FilePlus className="mr-2 h-4 w-4" />
           Nouveau programme
         </Button>
@@ -196,7 +213,7 @@ export default function ProgrammesPersonnalises() {
             <div className="flex justify-center p-8">
               <p>Chargement des programmes...</p>
             </div>
-          ) : programmes.length === 0 ? (
+          ) : !Array.isArray(programmes) || programmes.length === 0 ? (
             <div className="text-center p-8">
               <p className="text-muted-foreground">Aucun programme trouvé.</p>
             </div>
@@ -206,10 +223,12 @@ export default function ProgrammesPersonnalises() {
                 <ProgrammeCard
                   key={programme.id}
                   programme={programme}
-                  variant="sur-mesure"
-                  onValidate={handleValidateProgramme}
-                  onGenerateDocument={handleGenerateDocument}
-                  onDelete={handleDeleteProgramme}
+                  variant={VariantCard.SUR_MESURE}
+                  actions={{
+                    onValidate: handleValidateProgramme,
+                    onGenerateDocument: handleGenerateDocument,
+                    onDelete: handleDeleteProgramme
+                  }}
                 />
               ))}
             </div>

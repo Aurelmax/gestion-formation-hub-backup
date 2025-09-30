@@ -34,10 +34,12 @@ import {
   XCircle,
   History,
   Download,
-  RefreshCw
+  RefreshCw,
+  Edit
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import ProgrammeCard from '@/components/programmes/ProgrammeCard';
+import ProgrammeEditModal from '@/components/programmes/ProgrammeEditModal';
 import { Programme, VariantCard } from '@/components/programmes/types';
 
 interface CatalogueStats {
@@ -79,6 +81,54 @@ export default function CatalogueManager() {
   const [categorieFilter, setCategorieFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showHistory, setShowHistory] = useState(false);
+  const [editingProgramme, setEditingProgramme] = useState<any>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  const handleEditProgramme = (programme: any) => {
+    setEditingProgramme(programme);
+    setShowEditModal(true);
+  };
+
+  const handleSaveProgramme = async (id: string, data: any) => {
+    try {
+      const response = await fetch(`/api/programmes-formation/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la mise à jour');
+      }
+
+      // Log de modification pour l'audit
+      const newLog = {
+        id: Date.now().toString(),
+        programmeId: id,
+        programmeTitre: data.titre || 'Programme modifié',
+        action: 'MODIFICATION' as any,
+        utilisateur: 'Administrateur',
+        dateModification: new Date().toISOString(),
+        ancienneValeur: true,
+        nouvelleValeur: true
+      };
+      setModificationLogs(prev => [newLog, ...prev]);
+
+      // Actualiser la liste
+      await fetchCatalogueData();
+
+      setShowEditModal(false);
+      setEditingProgramme(null);
+
+      toast({
+        title: "Succès",
+        description: "Programme modifié avec succès",
+      });
+    } catch (error) {
+      console.error('Erreur lors de la modification:', error);
+      throw error;
+    }
+  };
 
   const fetchCatalogueData = async () => {
     try {
@@ -568,6 +618,7 @@ export default function CatalogueManager() {
                   showActions={true}
                   actions={{
                     onView: () => router.push(`/admin/programmes/${programme.id}`),
+                    onEdit: () => handleEditProgramme(programme),
                     onSchedule: () => {
                       window.location.href = `/rendezvous-positionnement?programme=${programme.id}`;
                     }
@@ -577,6 +628,15 @@ export default function CatalogueManager() {
                 {/* Actions spécialisées pour le catalogue */}
                 <div className="mt-3 space-y-2">
                   <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditProgramme(programme)}
+                      className="flex items-center gap-1"
+                    >
+                      <Edit className="h-4 w-4" />
+                      Modifier
+                    </Button>
                     <Button
                       variant={programme.estVisible ? "destructive" : "default"}
                       size="sm"
@@ -621,6 +681,17 @@ export default function CatalogueManager() {
           </div>
         )}
       </div>
+
+      {/* Modal d'édition */}
+      <ProgrammeEditModal
+        programme={editingProgramme}
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingProgramme(null);
+        }}
+        onSave={handleSaveProgramme}
+      />
     </div>
   );
 }

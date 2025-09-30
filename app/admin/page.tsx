@@ -37,10 +37,13 @@ export default async function AdminDashboardPage() {
           <p className="text-gray-500">À venir...</p>
         </div>
 
-        <div className="bg-gray-100 p-6 rounded-lg border">
-          <h3 className="text-xl font-semibold text-gray-500 mb-2">Utilisateurs</h3>
-          <p className="text-gray-500">À venir...</p>
-        </div>
+        <Link
+          href="/admin/users"
+          className="bg-white p-6 rounded-lg border shadow-sm hover:shadow-md transition-shadow"
+        >
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Utilisateurs</h3>
+          <p className="text-gray-600">Gérer les utilisateurs de la plateforme</p>
+        </Link>
       </div>
     </div>
   );
